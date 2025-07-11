@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from "react"
 import { useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui"
 import { Program, AnchorProvider, utils, setProvider } from "@coral-xyz/anchor"
-import { PublicKey, Connection } from "@solana/web3.js"
+import { PublicKey } from "@solana/web3.js"
 import idl from "../idl/boxbox.json"
 import type { Boxbox } from "../types/boxbox"
 import BN from "bn.js"
@@ -27,7 +27,7 @@ import { totalLockedTokensAtom } from "../atoms/totalLocked"
 // }
 
 // const programID = new PublicKey("8pF5A2ocYykmv2MJhyRb4ZPG2d8CexsgvCECELgAetAh")
-const tokenMint = new PublicKey("H1TmoEgNoiFgUWh2BZpavyxzt7v3nrRDhbsGfWDKJdAk")
+const tokenMint = new PublicKey("A5D4sQ3gWgM7QHFRyo3ZavKa9jMjkfHSNR6rX5TNJB8y")
 const MAX_ACTIVE_VAULTS = 99
 const idl_object = JSON.parse(JSON.stringify(idl))
 let NUMBER_OF_TX: number
@@ -48,7 +48,7 @@ const formatNumber = (num: number): string => {
 
 const TransactionLink = ({ signature }: { signature: string }) => (
   <a
-    href={`https://solana.fm/tx/${signature}?cluster=devnet-alpha`}
+    href={`https://solana.fm/tx/${signature}?cluster=mainnet-alpha`}
     target="_blank"
     rel="noreferrer noopener"
     className="inline-flex items-center text-gray-50 transition-colors"
@@ -57,6 +57,8 @@ const TransactionLink = ({ signature }: { signature: string }) => (
     <ExternalLinkIcon className="ml-1 h-4 w-4" />
   </a>
 )
+
+const QUICKNODE_WS_URL = 'wss://palpable-divine-county.solana-mainnet.quiknode.pro/80f0d4257ab466c51fd0f1125be90a1ccb2584d9/';
 
 const BoxBoxInterface: React.FC = () => {
   const { connection } = useConnection()
@@ -152,7 +154,7 @@ const BoxBoxInterface: React.FC = () => {
   }
 
   const setupProgramSubscription = useCallback(async () => {
-    const ws = new WebSocket('wss://devnet.helius-rpc.com/?api-key=fb381146-ea31-4f74-8cb6-60ec5106e06c');
+    const ws = new WebSocket(QUICKNODE_WS_URL);
     let retryCount = 0;
     const MAX_RETRIES = 3;
     const RETRY_DELAY = 5000; // 5 seconds
@@ -178,14 +180,15 @@ const BoxBoxInterface: React.FC = () => {
 
     ws.onopen = () => {
         console.log('WebSocket Connected');
-        retryCount = 0; // Reset retry count on successful connection
+        retryCount = 0;
         sendSubscriptionRequest(ws);
         
+        // QuickNode doesn't require ping/pong, but we'll keep a longer interval just in case
         pingInterval = setInterval(() => {
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ jsonrpc: "2.0", method: "ping" }));
             }
-        }, 30000);
+        }, 45000);
 
         updateTotalLockedTokens();
     };
@@ -417,57 +420,56 @@ useEffect(() => {
     if (balance < 0.00016) return setMessageWithType("You need 0.00016 SOL to create a vault. If you've added the SOL, disconnect and reconnect your wallet to proceed.", "info")
 
     try {
-
         ;[membershipAccountPda] = await PublicKey.findProgramAddressSync(
           [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
           program.programId,
         )
-      setMembershipAccount(membershipAccountPda)
+        setMembershipAccount(membershipAccountPda)
 
+        escrowTokenAccountPda = await utils.token.associatedAddress({
+          mint: tokenMint,
+          owner: membershipAccountPda,
+        })
 
-      escrowTokenAccountPda = await utils.token.associatedAddress({
-        mint: tokenMint,
-        owner: membershipAccountPda,
-      })
+        const escrowAccountInfo = await connection.getAccountInfo(escrowTokenAccountPda)
+        
+        if (!escrowAccountInfo) {
+            const tx = await program.methods
+              .initializeEscrowAccount()
+              .accountsPartial({
+                owner: wallet.publicKey,
+                mint: tokenMint,
+                membershipAccount: membershipAccountPda,
+                tokenProgram: utils.token.TOKEN_PROGRAM_ID,
+              })
+              .transaction()
 
+            // Send and confirm the transaction
+            const signature = await sendTransaction(tx, connection)
+            
+            // Wait for confirmation
+            const confirmation = await connection.confirmTransaction(signature, 'confirmed')
+            
+            if (confirmation.value.err) {
+                throw new Error('Transaction failed to confirm')
+            }
 
-      const escrowAccountInfo = await connection.getAccountInfo(escrowTokenAccountPda)
-      // console.log('escrow 2: ', escrowTokenAccountPda);
-      if (!escrowAccountInfo) {
-        const tx = await program.methods
-          .initializeEscrowAccount()
-          .accountsPartial({
-            owner: wallet.publicKey,
-            mint: tokenMint,
-            membershipAccount: membershipAccountPda,
-            // escrowTokenAccount: escrowTokenAccountPda,
-            tokenProgram: utils.token.TOKEN_PROGRAM_ID,
-          })
-          .transaction()
-
-          
-        // if (!isEscrowInitialized && connection && wallet) {
-          tx.feePayer = wallet.publicKey;
-          tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-
-          const signedTx = await wallet.signTransaction(tx);
-          await connection.sendRawTransaction(signedTx.serialize());
-          // console.log("Transaction confirmed:", txId);
-        // }
-      }
-      else {
-        setEscrowAccount(escrowTokenAccountPda)
-        setIsEscrowInitialized(true)
-      }
+            setEscrowAccount(escrowTokenAccountPda)
+            setIsEscrowInitialized(true)
+            // setMessageWithType("Vault created successfully!", "success", signature)
+        } else {
+            setEscrowAccount(escrowTokenAccountPda)
+            setIsEscrowInitialized(true)
+        }
     } catch (error) {
-      if (error?.toString().includes("User rejected the request")) {
-        setMessageWithType(`You rejected the request to create your vault`, "error")
-      }
-      else if (!error?.toString().includes("failed to get info about account")) {
-        setMessageWithType(`Error creating vault: ${error}`, "error")
-      }
+        if (error?.toString().includes("User rejected the request")) {
+            setMessageWithType(`You rejected the request to create your vault`, "error")
+        } else if (error?.toString().includes("blockhash not found")) {
+            setMessageWithType(`Transaction expired. Please try again.`, "error")
+        } else if (!error?.toString().includes("failed to get info about account")) {
+            setMessageWithType(`Error creating vault: ${error}`, "error")
+        }
     }
-    
   }
 
   const updateAccountInfo = async () => {
