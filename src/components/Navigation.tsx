@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X } from "lucide-react"
+import { Menu, X, User } from "lucide-react"
+import { useWallet } from "@solana/wallet-adapter-react"
+import { Link } from "react-router-dom"
 
 interface NavigationProps {
   activeSection: string
@@ -11,6 +13,11 @@ interface NavigationProps {
 export default function Navigation({ activeSection }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { publicKey } = useWallet()
+  
+  // Debug logging
+  console.log('Navigation - Wallet connected:', !!publicKey)
+  console.log('Navigation - Public key:', publicKey?.toBase58())
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,6 +76,17 @@ export default function Navigation({ activeSection }: NavigationProps) {
                   )}
                 </button>
               ))}
+              
+              {/* Profile Link - Only show if wallet is connected */}
+              {publicKey && (
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-medium rounded-lg transition-colors"
+                >
+                  <User size={16} />
+                  Profile
+                </Link>
+              )}
             </nav>
 
             {/* Mobile Menu Button */}
@@ -104,6 +122,18 @@ export default function Navigation({ activeSection }: NavigationProps) {
                   {section.charAt(0).toUpperCase() + section.slice(1)}
                 </button>
               ))}
+              
+              {/* Profile Link - Only show if wallet is connected */}
+              {publicKey && (
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-yellow-500"
+                >
+                  <User size={20} />
+                  Profile
+                </Link>
+              )}
             </nav>
           </motion.div>
         )}

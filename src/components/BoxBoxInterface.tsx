@@ -27,7 +27,7 @@ import { totalLockedTokensAtom } from "../atoms/totalLocked"
 // }
 
 // const programID = new PublicKey("8pF5A2ocYykmv2MJhyRb4ZPG2d8CexsgvCECELgAetAh")
-const tokenMint = new PublicKey("A5D4sQ3gWgM7QHFRyo3ZavKa9jMjkfHSNR6rX5TNJB8y")
+const tokenMint = new PublicKey("H1TmoEgNoiFgUWh2BZpavyxzt7v3nrRDhbsGfWDKJdAk")
 const MAX_ACTIVE_VAULTS = 99
 const idl_object = JSON.parse(JSON.stringify(idl))
 let NUMBER_OF_TX: number
@@ -58,12 +58,16 @@ const TransactionLink = ({ signature }: { signature: string }) => (
   </a>
 )
 
-const QUICKNODE_WS_URL = 'wss://palpable-divine-county.solana-mainnet.quiknode.pro/80f0d4257ab466c51fd0f1125be90a1ccb2584d9/';
+const QUICKNODE_WS_URL = 'wss://api.devnet.solana.com';
 
 const BoxBoxInterface: React.FC = () => {
   const { connection } = useConnection()
   const wallet = useAnchorWallet()
   const { publicKey, sendTransaction } = useWallet()
+  
+  // Debug logging
+  console.log('BoxBoxInterface - Wallet connected:', !!publicKey)
+  console.log('BoxBoxInterface - Public key:', publicKey?.toBase58())
 
   const [membershipAccount, setMembershipAccount] = useState<PublicKey | null>(null)
   const [escrowAccount, setEscrowAccount] = useState<PublicKey | null>(null)

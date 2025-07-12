@@ -5,17 +5,11 @@ import Faqs from "./Faqs"
 import { Twitter, Send } from "lucide-react"
 import TwitterFeed from "./XFeed"
 import BoxBoxInterface from "./BoxBoxInterface"
-import { useMemo, useEffect, useState } from "react"
-import { ConnectionProvider, WalletProvider, useWallet } from "@solana/wallet-adapter-react"
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base"
-import { PhantomWalletAdapter, SolflareWalletAdapter, TorusWalletAdapter } from "@solana/wallet-adapter-wallets"
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui"
+import { useEffect, useState } from "react"
+import { useWallet } from "@solana/wallet-adapter-react"
 import Loader from "./Loader"
 
 import "@solana/wallet-adapter-react-ui/styles.css"
-
-import * as buffer from "buffer";
-window.Buffer = buffer.Buffer;
 
 // Moved outside the main component
 function WalletChangeListener() {
@@ -36,32 +30,15 @@ function WalletChangeListener() {
   return null
 }
 
-// Wallet context wrapper component
-function WalletContextWrapper({ children }: { children: React.ReactNode }) {
-  const network = WalletAdapterNetwork.Mainnet
-  const endpoint = useMemo(() => 
-    'https://palpable-divine-county.solana-mainnet.quiknode.pro/80f0d4257ab466c51fd0f1125be90a1ccb2584d9/', 
-    []
-  )
-  const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter({ network }), new TorusWalletAdapter()],
-    [network],
-  )
 
-  return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <WalletChangeListener />
-          {children}
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
-  )
-}
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
+  const { publicKey } = useWallet()
+  
+  // Debug logging
+  console.log('AppPage - Wallet connected:', !!publicKey)
+  console.log('AppPage - Public key:', publicKey?.toBase58())
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -80,8 +57,7 @@ export default function Home() {
   }
 
   return (
-    <WalletContextWrapper>
-      <div className="relative min-h-screen text-white font-sans overflow-hidden">
+    <div className="relative min-h-screen text-white font-sans overflow-hidden">
         {/* <BackgroundElements /> */}
 
         <main className="relative z-10">
@@ -164,7 +140,6 @@ export default function Home() {
           </div>
         </footer>
       </div>
-    </WalletContextWrapper>
-  )
+    )
 }
 
