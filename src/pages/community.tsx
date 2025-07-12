@@ -31,9 +31,12 @@ const Community: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-br from-black via-gray-900 to-black flex flex-col items-center py-12 px-4 sm:px-8 overflow-x-hidden">
+    <div className="relative min-h-screen w-full bg-gradient-to-br from-black via-gray-900 to-black flex flex-col items-center py-12 px-4 sm:px-8 overflow-x-hidden pt-28">
       <AnimatedBackground />
-      <h1 className="text-4xl font-bold text-yellow-400 mb-2 text-center drop-shadow-lg tracking-tight">F1Meme Community Members</h1>
+      <div className="flex items-center justify-between w-full mb-2">
+        <h1 className="text-4xl font-bold text-yellow-400 mb-2 text-center drop-shadow-lg tracking-tight">F1Meme Community Members</h1>
+        {/* Hamburger menu button here (mobile only) */}
+      </div>
       <h2 className="text-lg text-gray-300 mb-2 text-center font-medium max-w-2xl">Meet the legends of the F1Meme community.</h2>
       <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 rounded-full mb-10 opacity-70" />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 w-full max-w-7xl">
@@ -61,7 +64,7 @@ const Community: React.FC = () => {
               <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                 <div className="absolute -top-1/4 -left-1/4 w-2/3 h-2/3 bg-yellow-400/20 rounded-full blur-2xl animate-shine" />
               </div>
-              <div className="w-24 h-24 rounded-full border-4 border-yellow-400 shadow-lg overflow-hidden mb-4 flex items-center justify-center bg-gradient-to-br from-yellow-400 to-amber-500 group-hover:ring-4 group-hover:ring-yellow-400/40 transition-all">
+              <div className="w-32 h-32 sm:w-24 sm:h-24 rounded-full border-4 border-yellow-400 shadow-lg overflow-hidden mb-4 flex items-center justify-center bg-gradient-to-br from-yellow-400 to-amber-500 group-hover:ring-4 group-hover:ring-yellow-400/40 transition-all">
                 {member.profilePictureUrl ? (
                   <img src={member.profilePictureUrl} alt="Profile" className="w-full h-full object-cover" />
                 ) : (

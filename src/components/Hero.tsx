@@ -329,7 +329,7 @@ export default function Hero() {
         </div>
       </motion.div>
 
-      <div className="container mx-auto px-4 py-2 max-w-7xl mt-5">
+      <div className="container mx-auto px-4 py-2 max-w-7xl mt-14">
         {/* Hero Section */}
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-16 items-center mb-8 sm:mb-16 lg:mb-24">
           {/* Left Column */}
@@ -339,15 +339,15 @@ export default function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="space-y-8 sm:space-y-12 relative z-10"
           >
-            <div>
+            {/* <div>
               <h1 className="text-xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-none mb-4 sm:mb-6 bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent">
                 Latest Race Result
-              </h1>
+              </h1> */}
               {/* <div className="flex items-center gap-4">
                 <div className="h-1 w-24 bg-gradient-to-r from-yellow-500 to-yellow-300" />
                 <p className="text-xl font-light tracking-wider text-gray-300">{nextRace.circuit}</p>
               </div> */}
-            </div>
+            {/* </div> */}
 
             {/* Podium Results Card */}
             <DriversStandings />

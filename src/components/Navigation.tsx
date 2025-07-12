@@ -51,24 +51,26 @@ export default function Navigation({ activeSection }: NavigationProps) {
       >
         <div className="container mx-auto px-4 h-full">
           <div className="flex items-stretch justify-between h-full">
-            {/* Left: Back button only on /profile */}
-            {(location.pathname === "/profile" || location.pathname === "/community") && (
-              <button
-                onClick={() => navigate("/")}
-                className="flex items-center justify-center w-13 h-13 rounded-full hover:bg-yellow-500 hover:border-yellow-700 transition-all focus:outline-none focus:ring-2 focus:ring-yellow-600 self-end"
-                aria-label="Go back to home"
-              >
-                <svg width="88" height="88" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M18 6L10 14L18 22" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-            )}
+            {/* Left: Back button only on /profile or /community (desktop only) */}
+            <div className="hidden sm:flex items-center">
+              {(location.pathname === "/profile" || location.pathname === "/community") && (
+                <button
+                  onClick={() => navigate("/")}
+                  className="flex items-center justify-center w-13 h-13 rounded-full hover:bg-yellow-500 hover:border-yellow-700 transition-all focus:outline-none focus:ring-2 focus:ring-yellow-600 self-end"
+                  aria-label="Go back to home"
+                >
+                  <svg width="88" height="88" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L10 14L18 22" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              )}
+            </div>
 
             {/* Center: Logo or empty for now */}
             <div></div>
 
-            {/* Right: Profile and Community buttons always visible, side by side */}
-            <div className="flex flex-row items-end gap-3 h-full">
+            {/* Right: Profile and Community buttons always visible, side by side (desktop only) */}
+            <div className="hidden sm:flex flex-row items-end gap-3 h-full">
               <Link
                 to="/community"
                 className="mt-3 flex items-center justify-center w-11 h-11 rounded-full bg-white border-2 border-yellow-600 shadow-lg hover:bg-yellow-100 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
@@ -84,6 +86,17 @@ export default function Navigation({ activeSection }: NavigationProps) {
                 </Link>
               )}
             </div>
+
+            {/* Hamburger menu for mobile */}
+            <div className="flex sm:hidden items-center">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="flex items-center justify-center w-11 h-11 rounded-full bg-yellow-400 border-2 border-yellow-600 shadow-lg hover:bg-yellow-500 hover:border-yellow-700 transition-all focus:outline-none focus:ring-2 focus:ring-yellow-600 mt-12"
+                aria-label="Open menu"
+              >
+                {mobileMenuOpen ? <X className="h-6 w-6 text-yellow-900" /> : <Menu className="h-6 w-6 text-yellow-900" />}
+              </button>
+            </div>
           </div>
         </div>
       </motion.header>
@@ -96,18 +109,29 @@ export default function Navigation({ activeSection }: NavigationProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-black/95 pt-20"
+            className="fixed inset-0 z-40 bg-black/95 pt-24"
           >
             <nav className="container mx-auto px-4 py-8 flex flex-col gap-6">
-              
-              {/* Profile Link - Only show if wallet is connected */}
+              <Link
+                to="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-yellow-500"
+              >
+                Home
+              </Link>
+              <Link
+                to="/community"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-yellow-500"
+              >
+                Community
+              </Link>
               {publicKey && (
                 <Link
                   to="/profile"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-yellow-500"
                 >
-                  <User size={20} />
                   Profile
                 </Link>
               )}
