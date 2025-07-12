@@ -26,9 +26,9 @@ function WalletChangeListener() {
 }
 
 export default function WalletContextWrapper({ children }: { children: React.ReactNode }) {
-  const network = WalletAdapterNetwork.Devnet;
+  const network = WalletAdapterNetwork.Mainnet;
   const endpoint = useMemo(
-    () => 'https://api.devnet.solana.com',
+    () => 'https://late-dawn-firefly.solana-mainnet.quiknode.pro/b32292a16b41afcac0bf7022a5c34e4d57c7f58f/',
     []
   );
   const wallets = useMemo(

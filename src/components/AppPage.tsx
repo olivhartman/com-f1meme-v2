@@ -109,7 +109,6 @@ export default function Home() {
                 
                 <div className="flex gap-6 justify-center items-center w-full">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">🏎️</span>
                     <span className="font-bold text-yellow-500">BOXBOX</span>
                   </div>
                   

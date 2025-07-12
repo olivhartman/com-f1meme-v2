@@ -27,7 +27,7 @@ import { totalLockedTokensAtom } from "../atoms/totalLocked"
 // }
 
 // const programID = new PublicKey("8pF5A2ocYykmv2MJhyRb4ZPG2d8CexsgvCECELgAetAh")
-const tokenMint = new PublicKey("H1TmoEgNoiFgUWh2BZpavyxzt7v3nrRDhbsGfWDKJdAk")
+const tokenMint = new PublicKey("A5D4sQ3gWgM7QHFRyo3ZavKa9jMjkfHSNR6rX5TNJB8y")
 const MAX_ACTIVE_VAULTS = 99
 const idl_object = JSON.parse(JSON.stringify(idl))
 let NUMBER_OF_TX: number
@@ -58,7 +58,7 @@ const TransactionLink = ({ signature }: { signature: string }) => (
   </a>
 )
 
-const QUICKNODE_WS_URL = 'wss://api.devnet.solana.com';
+const QUICKNODE_WS_URL = 'wss://late-dawn-firefly.solana-mainnet.quiknode.pro/b32292a16b41afcac0bf7022a5c34e4d57c7f58f/';
 
 const BoxBoxInterface: React.FC = () => {
   const { connection } = useConnection()
@@ -85,24 +85,20 @@ const BoxBoxInterface: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const [unlockingLockId, setUnlockingLockId] = useState<number | null>(null);
-  const [isUnlockingDelayed, setIsUnlockingDelayed] = useState<boolean>(false);
   const [totalLockedTokens, setTotalLockedTokens] = useAtom(totalLockedTokensAtom);
 
   const handleUnlockTokens = async (lockIndex: number) => {
     try {
       setUnlockingLockId(lockIndex);
-      setIsUnlockingDelayed(true);
       
       await unlockTokens(lockIndex);
       
       setTimeout(() => {
-        setIsUnlockingDelayed(false);
         setUnlockingLockId(null);
       }, 3000);
       
     } catch (err) {
       console.error("Error unlocking tokens:", err);
-      setIsUnlockingDelayed(false);
       setUnlockingLockId(null);
     }
   };
@@ -242,32 +238,32 @@ const BoxBoxInterface: React.FC = () => {
         }
     };
 
-    ws.onerror = (error) => {
-        console.error('WebSocket Error:', error);
-        if (retryCount < MAX_RETRIES) {
-            retryCount++;
-            const delay = RETRY_DELAY * Math.pow(2, retryCount - 1);
-            setTimeout(() => {
-                if (ws.readyState === WebSocket.CLOSED) {
-                    setupProgramSubscription();
-                }
-            }, delay);
-        }
-    };
+    // ws.onerror = (error) => {
+    //     console.error('WebSocket Error:', error);
+    //     if (retryCount < MAX_RETRIES) {
+    //         retryCount++;
+    //         const delay = RETRY_DELAY * Math.pow(2, retryCount - 1);
+    //         setTimeout(() => {
+    //             if (ws.readyState === WebSocket.CLOSED) {
+    //                 setupProgramSubscription();
+    //             }
+    //         }, delay);
+    //     }
+    // };
 
-    ws.onclose = () => {
-        console.log('WebSocket Disconnected');
-        if (pingInterval) {
-            clearInterval(pingInterval);
-        }
-        if (retryCount < MAX_RETRIES) {
-            retryCount++;
-            const delay = RETRY_DELAY * Math.pow(2, retryCount - 1);
-            setTimeout(() => {
-                setupProgramSubscription();
-            }, delay);
-        }
-    };
+    // ws.onclose = () => {
+    //     console.log('WebSocket Disconnected');
+    //     if (pingInterval) {
+    //         clearInterval(pingInterval);
+    //     }
+    //     if (retryCount < MAX_RETRIES) {
+    //         retryCount++;
+    //         const delay = RETRY_DELAY * Math.pow(2, retryCount - 1);
+    //         setTimeout(() => {
+    //             setupProgramSubscription();
+    //         }, delay);
+    //     }
+    // };
 
     return () => {
         if (pingInterval) {
@@ -494,7 +490,7 @@ useEffect(() => {
         })),
       )
       setUserLevel(accountInfo.level) // Update user level
-    } catch (error) {
+    } catch {
       // setMessageWithType(`Error fetching account info: ${error}`, "error")
     }
   }
@@ -510,7 +506,7 @@ useEffect(() => {
       setTokenBalance(balance.value.uiAmount || 0)
       updateAccountInfo()
     }
-    catch (error) {
+    catch {
       // setMessageWithType("You don't have any BOXBOX tokens. Purchase some at boxbox.wtf", "info")
     }
   }

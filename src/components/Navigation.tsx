@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, User } from "lucide-react"
+import { Menu, X, User, Users, ArrowLeft, ChevronLeft } from "lucide-react"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 
 interface NavigationProps {
   activeSection: string
@@ -14,6 +14,8 @@ export default function Navigation({ activeSection }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { publicKey } = useWallet()
+  const navigate = useNavigate();
+  const location = useLocation();
   
   // Debug logging
   console.log('Navigation - Wallet connected:', !!publicKey)
@@ -45,57 +47,43 @@ export default function Navigation({ activeSection }: NavigationProps) {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? "bg-black/80 backdrop-blur-md shadow-md" : "bg-transparent"
-        }`}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-24"
       >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🏎️</span>
-              <span className="font-bold text-yellow-500 text-xl">BOXBOX</span>
-            </div>
+        <div className="container mx-auto px-4 h-full">
+          <div className="flex items-stretch justify-between h-full">
+            {/* Left: Back button only on /profile */}
+            {(location.pathname === "/profile" || location.pathname === "/community") && (
+              <button
+                onClick={() => navigate("/")}
+                className="flex items-center justify-center w-13 h-13 rounded-full hover:bg-yellow-500 hover:border-yellow-700 transition-all focus:outline-none focus:ring-2 focus:ring-yellow-600 self-end"
+                aria-label="Go back to home"
+              >
+                <svg width="88" height="88" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 6L10 14L18 22" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            )}
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-8">
-              {["hero", "tokenomics", "faqs"].map((section) => (
-                <button
-                  key={section}
-                  onClick={() => scrollToSection(section)}
-                  className={`relative px-2 py-1 text-sm font-medium transition-colors ${
-                    activeSection === section ? "text-yellow-500" : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  {section.charAt(0).toUpperCase() + section.slice(1)}
-                  {activeSection === section && (
-                    <motion.div
-                      layoutId="activeSection"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-500"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </button>
-              ))}
-              
-              {/* Profile Link - Only show if wallet is connected */}
+            {/* Center: Logo or empty for now */}
+            <div></div>
+
+            {/* Right: Profile and Community buttons always visible, side by side */}
+            <div className="flex flex-row items-end gap-3 h-full">
+              <Link
+                to="/community"
+                className="mt-3 flex items-center justify-center w-11 h-11 rounded-full bg-white border-2 border-yellow-600 shadow-lg hover:bg-yellow-100 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
+              >
+                <Users className="h-6 w-6 text-yellow-900" />
+              </Link>
               {publicKey && (
                 <Link
                   to="/profile"
-                  className="flex items-center gap-2 px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-medium rounded-lg transition-colors"
+                  className="mt-3 flex items-center justify-center w-11 h-11 rounded-full bg-yellow-400 border-2 border-yellow-600 shadow-lg hover:bg-yellow-500 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
                 >
-                  <User size={16} />
-                  Profile
+                  <User className="h-6 w-6 text-yellow-900" />
                 </Link>
               )}
-            </nav>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-gray-400 hover:text-white"
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            </div>
           </div>
         </div>
       </motion.header>
@@ -111,17 +99,6 @@ export default function Navigation({ activeSection }: NavigationProps) {
             className="fixed inset-0 z-40 bg-black/95 pt-20"
           >
             <nav className="container mx-auto px-4 py-8 flex flex-col gap-6">
-              {["hero", "tokenomics", "faqs"].map((section) => (
-                <button
-                  key={section}
-                  onClick={() => scrollToSection(section)}
-                  className={`text-xl font-medium py-4 border-b border-gray-800 ${
-                    activeSection === section ? "text-yellow-500" : "text-gray-400"
-                  }`}
-                >
-                  {section.charAt(0).toUpperCase() + section.slice(1)}
-                </button>
-              ))}
               
               {/* Profile Link - Only show if wallet is connected */}
               {publicKey && (

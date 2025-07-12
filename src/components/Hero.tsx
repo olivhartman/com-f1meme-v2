@@ -100,16 +100,16 @@ export default function Hero() {
     seconds: 0,
   })
   const [newsItems, setNewsItems] = useState<string[]>([
-    "Max Verstappen dominates in qualifying 🏎️",
-    "Ferrari showing strong pace in practice 🔥",
-    "Mercedes brings major upgrades to next race 🔧",
-    "Exciting battle for midfield positions 🏁",
+    "Yuki Tsunoda Racing in Red Bull in front Japanese Crowd 🏎️",
+    "Maclaren Big Lead in both Championship, is it a bad sign?🔥",
+    "Kimi winning his first Grand Prix soon 🔧",
+    "Over 220,000 attendance in Chinese Grand Prix 🏁",
   ])
   const [nextRace, setNextRace] = useState<NextRaceInfo>({
-    date: "2025-04-06",
-    time: "06:00:00",
-    raceName: "FORMULA 1 LENOVO JAPANESE GRAND PRIX 2025",
-    circuit: "FORMULA 1 LENOVO JAPANESE GRAND PRIX 2025",
+    date: "2025-05-02",
+    time: "04:00:00",
+    raceName: "FORMULA 1 CRYPTO.COM MIAMI GRAND PRIX 2025",
+    circuit: "Hard Rock Stadium",
   })
   const [player, setPlayer] = useState<any>(null)
   const [seasonInfo, setSeasonInfo] = useState<SeasonInfo>({
@@ -329,7 +329,7 @@ export default function Hero() {
         </div>
       </motion.div>
 
-      <div className="container mx-auto px-4 py-2 max-w-7xl">
+      <div className="container mx-auto px-4 py-2 max-w-7xl mt-5">
         {/* Hero Section */}
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-16 items-center mb-8 sm:mb-16 lg:mb-24">
           {/* Left Column */}
@@ -340,8 +340,8 @@ export default function Hero() {
             className="space-y-8 sm:space-y-12 relative z-10"
           >
             <div>
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white tracking-tight leading-none mb-4 sm:mb-6 bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent">
-                LATEST RACE
+              <h1 className="text-xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-none mb-4 sm:mb-6 bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent">
+                Latest Race Result
               </h1>
               {/* <div className="flex items-center gap-4">
                 <div className="h-1 w-24 bg-gradient-to-r from-yellow-500 to-yellow-300" />
@@ -364,7 +364,7 @@ export default function Hero() {
               <CardContent className="p-8">
                 <div className="flex flex-col h-full">
                   <div className="flex flex-col items-center gap-8 pt-14">
-                    <h2 className="text-4xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent tracking-tight">
+                    <h2 className="text-4xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent tracking-tight text-center w-full">
                       {nextRace.raceName}
                     </h2>
 

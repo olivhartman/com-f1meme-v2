@@ -7,6 +7,7 @@ import Navigation from './components/Navigation'
 import * as buffer from "buffer";
 window.Buffer = buffer.Buffer;
 import WalletContextWrapper from './components/WalletContextWrapper';
+import Community from './pages/community'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/community" element={<Community />} />
         </Routes>
       </Router>
     </WalletContextWrapper>

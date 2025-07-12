@@ -4,32 +4,66 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { User, Instagram, Music, Globe, Upload, Save, Camera, Sparkles } from "lucide-react"
+import { User, Instagram, Music, Globe, Upload, Save, Camera } from "lucide-react"
 import { airtableService, type ProfileData as AirtableProfileData } from "../api/airtable"
+import Loader from "./Loader";
 
 interface ProfileData {
-  name: string
-  instagramUrl: string
-  tiktokUrl: string
-  vkUrl: string
-  profilePicture: File | null
-  coverPicture: File | null
+  name: string;
+  email: string;
+  instagramUrl: string;
+  tiktokUrl: string;
+  vkUrl: string;
+  profilePicture: File | null;
+  coverPicture: File | null;
+  profilePictureUrl?: string;
+  coverPictureUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 const ProfilePage = () => {
   const { publicKey } = useWallet()
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
+    email: "",
     instagramUrl: "",
     tiktokUrl: "",
     vkUrl: "",
     profilePicture: null,
     coverPicture: null,
+    profilePictureUrl: "",
+    coverPictureUrl: "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState("")
   const profilePictureRef = useRef<HTMLInputElement>(null)
   const coverPictureRef = useRef<HTMLInputElement>(null)
+  const [showLoader, setShowLoader] = useState(true);
+  const [formErrors, setFormErrors] = useState<{
+    name?: string;
+    email?: string;
+    instagramUrl?: string;
+    tiktokUrl?: string;
+    vkUrl?: string;
+    profilePicture?: string;
+    coverPicture?: string;
+  }>({});
+
+  // Function to format date in the requested format
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      weekday: 'long',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    };
+    return date.toLocaleDateString('en-US', options);
+  };
 
   const handleInputChange = (field: keyof ProfileData, value: string) => {
     setProfileData((prev) => ({ ...prev, [field]: value }))
@@ -46,19 +80,35 @@ const ProfilePage = () => {
     }
   }
 
+  // Get preview URL for selected images
+  const getImagePreviewUrl = (file: File | null, existingUrl?: string): string => {
+    if (file) {
+      return URL.createObjectURL(file)
+    }
+    return existingUrl || ""
+  }
+
   useEffect(() => {
     const loadProfile = async () => {
       if (publicKey) {
         try {
+          // First, let's get the table structure to see all available fields
+          await airtableService.getTableFields();
+          
           const existingProfile = await airtableService.getProfile(publicKey.toBase58())
           if (existingProfile) {
             setProfileData({
               name: existingProfile.name,
+              email: existingProfile.email || "",
               instagramUrl: existingProfile.instagramUrl,
               tiktokUrl: existingProfile.tiktokUrl,
               vkUrl: existingProfile.vkUrl,
               profilePicture: null,
               coverPicture: null,
+              profilePictureUrl: existingProfile.profilePictureUrl,
+              coverPictureUrl: existingProfile.coverPictureUrl,
+              createdAt: existingProfile.createdAt || undefined,
+              updatedAt: existingProfile.updatedAt || undefined,
             })
           }
         } catch (error) {
@@ -69,14 +119,84 @@ const ProfilePage = () => {
     loadProfile()
   }, [publicKey])
 
+  // Cleanup object URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      // Cleanup any object URLs to prevent memory leaks
+      if (profileData.profilePicture) {
+        URL.revokeObjectURL(URL.createObjectURL(profileData.profilePicture))
+      }
+      if (profileData.coverPicture) {
+        URL.revokeObjectURL(URL.createObjectURL(profileData.coverPicture))
+      }
+    }
+  }, [profileData.profilePicture, profileData.coverPicture])
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowLoader(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  function validateField(field: keyof ProfileData, value: string | File | null): string | undefined {
+    if (field === "name") {
+      if (!value || typeof value !== "string" || value.trim().length < 2) return "Name is required (2+ chars).";
+      if (value.length > 32) return "Name must be at most 32 characters.";
+    }
+    if (field === "email") {
+      if (!value || typeof value !== "string") return "Email is required.";
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) return "Enter a valid email address.";
+    }
+    if (["instagramUrl", "tiktokUrl", "vkUrl"].includes(field)) {
+      if (value && typeof value === "string" && value.trim() !== "") {
+        try {
+          const url = new URL(value);
+          if (field === "instagramUrl" && !url.hostname.includes("instagram.com")) return "Must be an Instagram URL.";
+          if (field === "tiktokUrl" && !url.hostname.includes("tiktok.com")) return "Must be a TikTok URL.";
+          if (field === "vkUrl" && !url.hostname.includes("vk.com")) return "Must be a VK URL.";
+        } catch {
+          return "Enter a valid URL.";
+        }
+      }
+    }
+    if ((field === "profilePicture" || field === "coverPicture") && value) {
+      if (value instanceof File && !value.type.startsWith("image/")) return "File must be an image.";
+    }
+    return undefined;
+  }
+
+  function validateAll(): boolean {
+    const errors: typeof formErrors = {};
+    errors.name = validateField("name", profileData.name);
+    errors.email = validateField("email", profileData.email);
+    errors.instagramUrl = validateField("instagramUrl", profileData.instagramUrl);
+    errors.tiktokUrl = validateField("tiktokUrl", profileData.tiktokUrl);
+    errors.vkUrl = validateField("vkUrl", profileData.vkUrl);
+    errors.profilePicture = validateField("profilePicture", profileData.profilePicture);
+    errors.coverPicture = validateField("coverPicture", profileData.coverPicture);
+    setFormErrors(errors);
+    return Object.values(errors).every((e) => !e);
+  }
+
+  function handleBlur(field: keyof ProfileData) {
+    setFormErrors((prev) => ({ ...prev, [field]: validateField(field, profileData[field]) }));
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setMessage("")
+    const valid = validateAll();
+    if (!valid) {
+      setIsLoading(false);
+      setMessage("Please fill the required fields.");
+      return;
+    }
     try {
       if (!publicKey) throw new Error("Wallet not connected")
       const airtableData: AirtableProfileData = {
         name: profileData.name,
+        email: profileData.email,
         instagramUrl: profileData.instagramUrl,
         tiktokUrl: profileData.tiktokUrl,
         vkUrl: profileData.vkUrl,
@@ -94,80 +214,70 @@ const ProfilePage = () => {
     }
   }
 
-  const walletAddress = publicKey?.toBase58() || ""
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(""), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
-      {/* Subtle background patterns */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full opacity-30">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-72 h-72 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-2000"></div>
-          <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-br from-pink-100 to-rose-100 rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-4000"></div>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8">
+      {showLoader && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-xl">
+          <Loader />
         </div>
-
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=60 height=60 viewBox=0 0 60 60 xmlns=http://www.w3.org/2000/svg%3E%3Cg fill=none fillRule=evenodd%3E%3Cg fill=%23f1f5f9 fillOpacity=0.4%3E%3Ccircle cx=30 cy=30 r=1.5/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
-      </div>
-
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-8 pt-8 pb-6">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-500/25 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-              <Sparkles className="h-7 w-7 text-white relative z-10" />
-            </div>
-            <span className="text-3xl font-bold bg-gradient-to-r from-yellow-600 via-orange-600 to-yellow-700 bg-clip-text text-transparent">
-              BOXBOX
-            </span>
+      )}
+      {!showLoader && (
+        <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden mt-18">
+          {/* Cover Photo */}
+          <div className="relative w-full h-48 sm:h-64 bg-gray-200">
+            {profileData.coverPicture || profileData.coverPictureUrl ? (
+              <img
+                src={getImagePreviewUrl(profileData.coverPicture, profileData.coverPictureUrl)}
+                alt="Cover"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Camera className="h-14 w-14 text-gray-400 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
+            )}
+            <button
+              className="absolute bottom-4 right-4 bg-white/90 rounded-full p-2 shadow hover:bg-gray-100 transition"
+              onClick={() => coverPictureRef.current?.click()}
+              type="button"
+            >
+              <Upload className="h-5 w-5 text-gray-700" />
+            </button>
+            <input
+              ref={coverPictureRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, "coverPicture")}
+              className="hidden"
+            />
           </div>
-          <div className="h-8 w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
-          <h1 className="text-2xl font-bold text-gray-800">Profile Dashboard</h1>
-        </div>
 
-        <div className="bg-white/70 backdrop-blur-xl border border-white/60 shadow-lg shadow-gray-200/50 px-6 py-3 rounded-2xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-white/40 to-white/10"></div>
-          <span className="text-sm font-semibold text-gray-700 relative z-10">
-            {walletAddress.slice(0, 8)}...{walletAddress.slice(-6)}
-          </span>
-        </div>
-      </div>
-
-      <div className="relative z-10 flex flex-col lg:flex-row gap-8 px-8 pb-8">
-        {/* Left Sidebar */}
-        <div className="lg:w-1/3 space-y-8">
-          {/* Profile Card */}
-          <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-2xl shadow-gray-200/50 rounded-3xl p-8 relative overflow-hidden group hover:bg-white/70 hover:shadow-3xl hover:shadow-gray-300/30 transition-all duration-500">
-            {/* Glossy overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-white/20 to-transparent opacity-60"></div>
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/80 to-transparent"></div>
-            <div className="absolute top-0 left-0 h-full w-px bg-gradient-to-b from-transparent via-white/80 to-transparent"></div>
-
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="relative">
-                <div className="w-40 h-40 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden border-4 border-white/80 shadow-2xl shadow-gray-300/40 relative">
-                  {profileData.profilePicture ? (
-                    <img
-                      src={URL.createObjectURL(profileData.profilePicture) || "/placeholder.svg"}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Camera className="h-16 w-16 text-gray-400" />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent"></div>
-                  <div className="absolute inset-0 rounded-full shadow-inner shadow-gray-400/20"></div>
-                </div>
-
+          {/* Profile Header */}
+          <div className="relative flex flex-col sm:flex-row items-center sm:items-end gap-4 px-8 pt-0 pb-6 bg-white">
+            <div className="relative -mt-16 sm:-mt-20">
+              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden flex items-center justify-center">
+                {profileData.profilePicture || profileData.profilePictureUrl ? (
+                  <img
+                    src={getImagePreviewUrl(profileData.profilePicture, profileData.profilePictureUrl)}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Camera className="h-10 w-10 text-gray-400" />
+                )}
                 <button
+                  className="absolute bottom-2 right-2 bg-white rounded-full p-1 shadow hover:bg-gray-100 transition"
                   onClick={() => profilePictureRef.current?.click()}
-                  className="absolute -bottom-2 -right-2 bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 hover:from-yellow-500 hover:via-yellow-600 hover:to-orange-600 rounded-full p-3 shadow-2xl shadow-yellow-500/40 border-4 border-white/90 transition-all duration-300 hover:scale-110 relative overflow-hidden"
+                  type="button"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-full"></div>
-                  <Upload className="h-5 w-5 text-white relative z-10" />
+                  <Upload className="h-4 w-4 text-gray-700" />
                 </button>
-
                 <input
                   ref={profilePictureRef}
                   type="file"
@@ -176,202 +286,125 @@ const ProfilePage = () => {
                   className="hidden"
                 />
               </div>
-
-              <div className="mt-6 text-center">
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">{profileData.name || "Your Name"}</h2>
-                <p className="text-gray-600 text-base mb-4">F1 Community Member</p>
-                <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 rounded-full border border-purple-200/60 shadow-lg shadow-purple-200/30">
-                  <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mr-2 animate-pulse"></div>
-                  <span className="text-sm text-purple-700 font-semibold">Premium Member</span>
-                </div>
-              </div>
             </div>
-          </div>
-
-          {/* Cover Photo Card */}
-          <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-2xl shadow-gray-200/50 rounded-3xl p-8 relative overflow-hidden group hover:bg-white/70 hover:shadow-3xl hover:shadow-gray-300/30 transition-all duration-500">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-white/20 to-transparent opacity-60"></div>
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/80 to-transparent"></div>
-            <div className="absolute top-0 left-0 h-full w-px bg-gradient-to-b from-transparent via-white/80 to-transparent"></div>
-
-            <div className="relative z-10">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <div className="w-3 h-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full shadow-lg shadow-yellow-500/30"></div>
-                Cover Photo
-              </h3>
-
-              <div className="relative w-full h-40 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden border-2 border-white/60 shadow-inner shadow-gray-300/30 group/cover">
-                {profileData.coverPicture ? (
-                  <img
-                    src={URL.createObjectURL(profileData.coverPicture) || "/placeholder.svg"}
-                    alt="Cover"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Camera className="h-12 w-12 text-gray-400" />
-                )}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-white/10"></div>
-
-                <button
-                  onClick={() => coverPictureRef.current?.click()}
-                  className="absolute bottom-3 right-3 bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 hover:from-yellow-500 hover:via-yellow-600 hover:to-orange-600 rounded-full p-2.5 shadow-xl shadow-yellow-500/40 border-2 border-white/80 transition-all duration-300 hover:scale-110 opacity-90 group-hover/cover:opacity-100 relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-full"></div>
-                  <Upload className="h-4 w-4 text-white relative z-10" />
-                </button>
-
-                <input
-                  ref={coverPictureRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageUpload(e, "coverPicture")}
-                  className="hidden"
-                />
-              </div>
+            <div className="flex-1 flex flex-col items-center sm:items-start mt-2 sm:mt-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{profileData.name || "Your Name"}</h2>
+              {/* Optionally add stats here */}
+              {/* <div className="text-sm text-gray-500">193 followers · 21 following</div> */}
             </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 bg-white/60 backdrop-blur-2xl border border-white/80 shadow-2xl shadow-gray-200/50 rounded-3xl p-10 relative overflow-hidden">
-          {/* Glossy overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-white/20 to-transparent opacity-60"></div>
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/80 to-transparent"></div>
-          <div className="absolute top-0 left-0 h-full w-px bg-gradient-to-b from-transparent via-white/80 to-transparent"></div>
-
-          <div className="relative z-10">
-            <div className="mb-10">
-              <h2 className="text-3xl font-bold text-gray-800 mb-3 flex items-center gap-4">
-                <div className="w-1.5 h-8 bg-gradient-to-b from-yellow-500 via-orange-500 to-yellow-600 rounded-full shadow-lg shadow-yellow-500/30"></div>
-                Update Your Profile
-              </h2>
-              <p className="text-gray-600 text-lg">Customize your F1 community presence</p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Name Field */}
-              <div className="space-y-3">
-                <label className="block text-base font-semibold text-gray-700">Display Name</label>
-                <div className="relative group">
-                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-500 group-focus-within:text-yellow-600 transition-colors duration-300" />
-                  <input
-                    type="text"
-                    value={profileData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    className="w-full pl-14 pr-6 py-4 bg-white/50 backdrop-blur-xl border border-white/60 rounded-2xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 focus:bg-white/70 transition-all duration-300 text-lg shadow-inner shadow-gray-200/30"
-                    placeholder="Enter your display name"
-                  />
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                </div>
-              </div>
-
-              {/* Social Media Fields */}
-              <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-3">
-                  <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full shadow-lg shadow-purple-500/30"></div>
-                  Social Media Links
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-3">
-                    <label className="block text-sm font-semibold text-gray-700">Instagram</label>
-                    <div className="relative group">
-                      <Instagram className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-pink-600 transition-colors duration-300" />
-                      <input
-                        type="url"
-                        value={profileData.instagramUrl}
-                        onChange={(e) => handleInputChange("instagramUrl", e.target.value)}
-                        className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-xl border border-white/60 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 focus:bg-white/70 transition-all duration-300 shadow-inner shadow-gray-200/20"
-                        placeholder="Instagram URL"
-                      />
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-pink-100/20 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="block text-sm font-semibold text-gray-700">TikTok</label>
-                    <div className="relative group">
-                      <Music className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-red-600 transition-colors duration-300" />
-                      <input
-                        type="url"
-                        value={profileData.tiktokUrl}
-                        onChange={(e) => handleInputChange("tiktokUrl", e.target.value)}
-                        className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-xl border border-white/60 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 focus:bg-white/70 transition-all duration-300 shadow-inner shadow-gray-200/20"
-                        placeholder="TikTok URL"
-                      />
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-100/20 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="block text-sm font-semibold text-gray-700">VK</label>
-                    <div className="relative group">
-                      <Globe className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-blue-600 transition-colors duration-300" />
-                      <input
-                        type="url"
-                        value={profileData.vkUrl}
-                        onChange={(e) => handleInputChange("vkUrl", e.target.value)}
-                        className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-xl border border-white/60 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-white/70 transition-all duration-300 shadow-inner shadow-gray-200/20"
-                        placeholder="VK URL"
-                      />
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-100/20 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Message */}
-              {message && (
-                <div
-                  className={`p-5 rounded-2xl backdrop-blur-xl border shadow-lg relative overflow-hidden ${
-                    message.includes("successfully")
-                      ? "bg-green-100/60 border-green-200/60 text-green-800 shadow-green-200/30"
-                      : "bg-red-100/60 border-red-200/60 text-red-800 shadow-red-200/30"
-                  }`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/40 to-transparent"></div>
-                  <div className="flex items-center gap-3 relative z-10">
-                    <div
-                      className={`w-3 h-3 rounded-full shadow-lg ${
-                        message.includes("successfully")
-                          ? "bg-gradient-to-r from-green-500 to-emerald-500 shadow-green-500/30"
-                          : "bg-gradient-to-r from-red-500 to-rose-500 shadow-red-500/30"
-                      }`}
-                    ></div>
-                    <span className="font-semibold">{message}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Submit Button */}
+            <div className="w-full sm:w-auto flex justify-end mt-4 sm:mt-0">
               <button
                 type="submit"
+                form="profile-form"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 hover:from-yellow-500 hover:via-yellow-600 hover:to-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-5 px-8 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 text-lg shadow-2xl shadow-yellow-500/30 hover:shadow-yellow-500/40 hover:scale-[1.02] relative overflow-hidden group"
+                className="inline-flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-6 py-2 rounded-full shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent"></div>
-                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/80 to-transparent"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-
-                <div className="relative z-10 flex items-center space-x-3">
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
-                      <span>Saving Profile...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-6 w-6" />
-                      <span>Save Profile</span>
-                    </>
-                  )}
-                </div>
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-5 w-5" />
+                    <span>Save changes</span>
+                  </>
+                )}
               </button>
-            </form>
+            </div>
           </div>
+
+          {/* Form Section */}
+          <form id="profile-form" onSubmit={handleSubmit} className="px-8 pb-10 pt-2 bg-white">
+            {message && (
+              <div
+                className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 min-w-[260px] max-w-xs p-5 rounded-2xl border shadow-lg flex items-center gap-3 transition-transform duration-500 ease-out
+      ${message.includes('successfully')
+        ? 'bg-green-100 border-green-200 text-green-800 shadow-green-200/40'
+        : 'bg-red-100 border-red-200 text-red-800 shadow-red-200/40'}
+      animate-slide-in-tc`}
+    style={{animation: 'slide-in-tc 0.5s cubic-bezier(0.4,0,0.2,1)'}}
+  >
+    <div
+      className={`w-3 h-3 rounded-full shadow-lg flex-shrink-0
+        ${message.includes('successfully')
+          ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-green-400/30'
+          : 'bg-gradient-to-r from-red-400 to-pink-400 shadow-red-400/30'}`}
+    ></div>
+    <span className="font-semibold text-sm">{message}</span>
+  </div>
+)}
+            <h3 className="text-lg font-semibold text-gray-800 mb-6 mt-2">Personal details</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* Name Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
+                <input
+                  type="text"
+                  value={profileData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  onBlur={() => handleBlur("name")}
+                  className={`w-full px-4 py-3 border ${formErrors.name ? "border-red-500" : "border-gray-300"} rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 text-base bg-white`}
+                  placeholder="Enter your display name"
+                />
+                {formErrors.name && <div className="text-red-500 text-xs mt-1">{formErrors.name}</div>}
+              </div>
+              {/* Email Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={profileData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  onBlur={() => handleBlur("email")}
+                  className={`w-full px-4 py-3 border ${formErrors.email ? "border-red-500" : "border-gray-300"} rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 text-base bg-white`}
+                  placeholder="Enter your email address"
+                />
+                {formErrors.email && <div className="text-red-500 text-xs mt-1">{formErrors.email}</div>}
+              </div>
+              {/* Instagram Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
+                <input
+                  type="url"
+                  value={profileData.instagramUrl}
+                  onChange={(e) => handleInputChange("instagramUrl", e.target.value)}
+                  onBlur={() => handleBlur("instagramUrl")}
+                  className={`w-full px-4 py-3 border ${formErrors.instagramUrl ? "border-red-500" : "border-gray-300"} rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 text-base bg-white`}
+                  placeholder="https://instagram.com/username"
+                />
+                {formErrors.instagramUrl && <div className="text-red-500 text-xs mt-1">{formErrors.instagramUrl}</div>}
+              </div>
+              {/* TikTok Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">TikTok</label>
+                <input
+                  type="url"
+                  value={profileData.tiktokUrl}
+                  onChange={(e) => handleInputChange("tiktokUrl", e.target.value)}
+                  onBlur={() => handleBlur("tiktokUrl")}
+                  className={`w-full px-4 py-3 border ${formErrors.tiktokUrl ? "border-red-500" : "border-gray-300"} rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 text-base bg-white`}
+                  placeholder="https://tiktok.com/username"
+                />
+                {formErrors.tiktokUrl && <div className="text-red-500 text-xs mt-1">{formErrors.tiktokUrl}</div>}
+              </div>
+              {/* VK Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">VK</label>
+                <input
+                  type="url"
+                  value={profileData.vkUrl}
+                  onChange={(e) => handleInputChange("vkUrl", e.target.value)}
+                  onBlur={() => handleBlur("vkUrl")}
+                  className={`w-full px-4 py-3 border ${formErrors.vkUrl ? "border-red-500" : "border-gray-300"} rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 text-base bg-white`}
+                  placeholder="https://vk.com/username"
+                />
+                {formErrors.vkUrl && <div className="text-red-500 text-xs mt-1">{formErrors.vkUrl}</div>}
+              </div>
+            </div>
+          </form>
         </div>
-      </div>
+      )}
     </div>
   )
 }
