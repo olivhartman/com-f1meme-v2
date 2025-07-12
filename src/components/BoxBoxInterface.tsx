@@ -136,6 +136,10 @@ const BoxBoxInterface: React.FC = () => {
         type,
       },
     ])
+    // Automatically remove the message after 5 seconds
+    setTimeout(() => {
+      setMessages((prevMessages) => prevMessages.slice(1));
+    }, 5000);
   }
 
   const getProvider = () => {
