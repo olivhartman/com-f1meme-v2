@@ -14,7 +14,7 @@ function App() {
   return (
     <WalletContextWrapper>
       <Router>
-        <Navigation activeSection="hero" />
+        <Navigation />
         <Routes>
           <Route path="/" element={<AppPage />} />
           <Route

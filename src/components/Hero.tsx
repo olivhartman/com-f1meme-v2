@@ -8,17 +8,6 @@ import { Button } from "./ui/button"
 import DriversStandings from "./DriversStandings"
 // import Link from "next/link"
 
-interface Driver {
-  givenName: string
-  familyName: string
-  code: string
-}
-
-interface Constructor {
-  name: string
-  constructorId: string
-}
-
 interface NextRaceInfo {
   date: string
   time: string
