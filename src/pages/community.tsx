@@ -41,7 +41,7 @@ const SocialIcon = ({
   </Button>
 )
 
-const MemberCard = ({ member, index }: { member: ProfileData; index: number }) => (
+const MemberCard = ({ member }: { member: ProfileData }) => (
   <Card className="group relative bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-xl border border-yellow-400/20 hover:border-yellow-400/60 rounded-2xl overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-yellow-400/10">
     {/* Animated border gradient */}
     <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-400/20 to-yellow-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
@@ -217,7 +217,7 @@ const Community: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {members.map((member, index) => (
-                <MemberCard key={index} member={member} index={index} />
+                <MemberCard key={index} member={member} />
               ))}
             </div>
           )}

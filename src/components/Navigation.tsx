@@ -4,15 +4,13 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, User, Users, Calendar } from "lucide-react"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { Link, useNavigate, useLocation } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 interface NavigationProps {}
 
 export default function Navigation({}: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { publicKey } = useWallet()
-  const navigate = useNavigate();
-  const location = useLocation();
   
   // Debug logging
   console.log('Navigation - Wallet connected:', !!publicKey)
