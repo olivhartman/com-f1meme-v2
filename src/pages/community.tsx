@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { airtableService, type ProfileData } from "../api/airtable"
 import { Instagram, Music, Globe, Flag, Users, Sparkles, ExternalLink } from "lucide-react"
 import { Card, CardContent } from "../components/ui/card"
-import { Badge } from "../components/ui/badge"
+// import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
 
 const AnimatedBackground = () => (
@@ -53,13 +53,13 @@ const MemberCard = ({ member, index }: { member: ProfileData; index: number }) =
 
     <CardContent className="relative p-6 flex flex-col items-center text-center space-y-4">
       {/* Member badge */}
-      <div className="absolute top-4 right-4">
+      {/* <div className="absolute top-4 right-4">
         <Badge
           className="bg-yellow-400/20 text-yellow-400 border-yellow-400/40 text-xs font-semibold"
         >
           #{String(index + 1).padStart(3, "0")}
         </Badge>
-      </div>
+      </div> */}
 
       {/* Profile picture */}
       <div className="relative">
@@ -175,50 +175,22 @@ const Community: React.FC = () => {
       <AnimatedBackground />
 
       {/* Header Section */}
-      <div className="relative pt-32 pb-16 px-4 sm:px-8">
-        <div className="max-w-7xl mx-auto text-center space-y-6">
-          {/* Main title */}
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight">F1Meme Community</h1>
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-transparent"></div>
+        <div className="relative px-4 py-26 text-center flex flex-col items-center justify-center">
+          <div className="w-full max-w-3xl">
+            <div className="mb-4 mt-4">
+              <h1 className="text-4xl md:text-6xl font-black text-yellow-400 tracking-tight">F1Meme Community</h1>
             </div>
-
-            <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-              Meet the passionate F1 fans who make our community legendary. From meme creators to racing enthusiasts,
-              these are the people who fuel the excitement.
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+              Meet the passionate F1 fans who make our community legendary
             </p>
-          </div>
-
-          {/* Stats bar */}
-          <div className="flex items-center justify-center gap-8 pt-8">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-400">{loading ? "..." : members.length}</div>
-              <div className="text-sm text-slate-400">Members</div>
-            </div>
-            {/* <div className="w-px h-8 bg-slate-700" /> */}
-            {/* <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-400">∞</div>
-              <div className="text-sm text-slate-400">Memes</div>
-            </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-400">24/7</div>
-              <div className="text-sm text-slate-400">Racing</div>
-            </div> */}
-          </div>
-
-          {/* Decorative line */}
-          <div className="flex items-center justify-center pt-8">
-            <div className="w-24 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full" />
           </div>
         </div>
       </div>
 
       {/* Members Grid */}
-      <div className="px-4 sm:px-8 pb-16">
+      <div className="px-4 sm:px-8 pb-16 mt-10">
         <div className="max-w-7xl mx-auto">
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

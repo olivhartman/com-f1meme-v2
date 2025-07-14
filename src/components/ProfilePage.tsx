@@ -225,7 +225,7 @@ const ProfilePage = () => {
       )}
 
       {!showLoader && (
-        <div className="w-full max-w-5xl mx-auto mt-20">
+        <div className="w-full max-w-5xl mx-auto mt-26">
           {/* Main Profile Card */}
           <div className="bg-[#151e32] backdrop-blur-xl rounded-3xl shadow-2xl shadow-black/40 overflow-hidden border border-[#232c43]">
             {/* Cover Photo Section */}

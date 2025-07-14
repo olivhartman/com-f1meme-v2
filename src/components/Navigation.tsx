@@ -42,44 +42,41 @@ export default function Navigation({}: NavigationProps) {
         transition={{ duration: 0.5 }}
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-24"
       >
-        <div className="container mx-auto px-4 h-full">
-          <div className="flex items-stretch justify-between h-full">
-            {/* Left: Back button only on /profile or /community (desktop only) */}
-            <div className="hidden sm:flex items-center">
-              {(location.pathname === "/profile" || location.pathname === "/community") && (
-                <button
-                  onClick={() => navigate("/")}
-                  className="flex items-center justify-center w-13 h-13 rounded-full hover:bg-yellow-500 hover:border-yellow-700 transition-all focus:outline-none focus:ring-2 focus:ring-yellow-600 self-end"
-                  aria-label="Go back to home"
-                >
-                  <svg width="88" height="88" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18 6L10 14L18 22" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              )}
+        <div className="container mx-auto px-4 h-full mt-10">
+          <div className="flex items-center justify-between h-full">
+            {/* Left: Logo always visible */}
+            <div className="flex items-center h-16">
+              <Link to="/" className="flex items-center justify-center ml-3 sm:ml-0">
+                <div className="w-11 h-11 rounded-full overflow-hidden bg-white flex items-center justify-center">
+                  <img
+                    src="/assets/images/favicon.svg"
+                    alt="F1 Meme Logo"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </Link>
             </div>
 
-            {/* Center: Logo or empty for now */}
-            <div></div>
+            {/* Center: Remove empty div */}
 
             {/* Right: Profile and Community buttons always visible, side by side (desktop only) */}
-            <div className="hidden sm:flex flex-row items-end gap-3 h-full">
+            <div className="hidden sm:flex flex-row items-center gap-3 h-16">
               <Link
                 to="/community"
-                className="mt-3 flex items-center justify-center w-11 h-11 rounded-full bg-white border-2 border-yellow-600 shadow-lg hover:bg-yellow-100 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
+                className="flex items-center justify-center w-11 h-11 rounded-full bg-white border-2 border-yellow-600 shadow-lg hover:bg-yellow-100 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
               >
                 <Users className="h-6 w-6 text-yellow-900" />
               </Link>
               <Link
                 to="/schedule"
-                className="mt-3 flex items-center justify-center w-11 h-11 rounded-full bg-white border-2 border-yellow-600 shadow-lg hover:bg-yellow-100 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
+                className="flex items-center justify-center w-11 h-11 rounded-full bg-white border-2 border-yellow-600 shadow-lg hover:bg-yellow-100 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
               >
                 <Calendar className="h-6 w-6 text-yellow-900" />
               </Link>
               {publicKey && (
                 <Link
                   to="/profile"
-                  className="mt-3 flex items-center justify-center w-11 h-11 rounded-full bg-yellow-400 border-2 border-yellow-600 shadow-lg hover:bg-yellow-500 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
+                  className="flex items-center justify-center w-11 h-11 rounded-full bg-yellow-400 border-2 border-yellow-600 shadow-lg hover:bg-yellow-500 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
                 >
                   <User className="h-6 w-6 text-yellow-900" />
                 </Link>
@@ -87,10 +84,10 @@ export default function Navigation({}: NavigationProps) {
             </div>
 
             {/* Hamburger menu for mobile */}
-            <div className="flex sm:hidden items-center">
+            <div className="flex sm:hidden items-center h-16">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="flex items-center justify-center w-11 h-11 rounded-full bg-yellow-400 border-2 border-yellow-600 shadow-lg hover:bg-yellow-500 hover:border-yellow-700 transition-all focus:outline-none focus:ring-2 focus:ring-yellow-600 mt-12"
+                className="flex items-center justify-center w-11 h-11 rounded-full bg-yellow-400 border-2 border-yellow-600 shadow-lg hover:bg-yellow-500 hover:border-yellow-700 transition-all focus:outline-none focus:ring-2 focus:ring-yellow-600"
                 aria-label="Open menu"
               >
                 {mobileMenuOpen ? <X className="h-6 w-6 text-yellow-900" /> : <Menu className="h-6 w-6 text-yellow-900" />}

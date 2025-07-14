@@ -2,8 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Calendar, MapPin, Flag, Clock, Zap, Trophy, Timer, ArrowLeft } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { Calendar, MapPin, Flag, Clock, Zap, Trophy, Timer } from "lucide-react"
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 
@@ -112,7 +111,6 @@ function formatRaceDate(date: string, time: string) {
 export default function Schedule() {
   const [races, setRaces] = useState<Race[]>([])
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("https://api.jolpi.ca/ergast/f1/races/?offset=1137&limit=30")
@@ -174,30 +172,18 @@ export default function Schedule() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
-      {/* Back to Home Button */}
-      <div className="pt-8 pl-4">
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold shadow-lg border-2 border-yellow-600 transition-all focus:outline-none focus:ring-2 focus:ring-yellow-600"
-          aria-label="Go back to home"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Home</span>
-        </button>
-      </div>
       {/* Header */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-transparent"></div>
-        <div className="relative px-4 py-16 text-center">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg">
-              <Flag className="w-6 h-6 text-black" />
+        <div className="relative px-4 py-26 text-center flex flex-col items-center justify-center">
+          <div className="w-full max-w-3xl">
+            <div className="mb-4">
+              <h1 className="text-4xl md:text-6xl font-black text-yellow-400 tracking-tight">F1 Schedule</h1>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-yellow-400 tracking-tight">F1 Schedule</h1>
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+              Complete Formula 1 race weekend schedule with all sessions and timings
+            </p>
           </div>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-            Complete Formula 1 race weekend schedule with all sessions and timings
-          </p>
         </div>
       </div>
 
