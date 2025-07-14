@@ -124,12 +124,12 @@ const MemberCard = ({ member }: { member: ProfileData }) => (
       )}
 
       {/* Member stats or additional info could go here */}
-      <div className="w-full pt-2 border-t border-white/10">
+      {/* <div className="w-full pt-2 border-t border-white/10">
         <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
           <Flag className="w-3 h-3" />
           <span>F1 Meme Legend</span>
         </div>
-      </div>
+      </div> */}
     </CardContent>
   </Card>
 )
