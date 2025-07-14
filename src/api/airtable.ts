@@ -329,3 +329,39 @@ export const airtableService = {
     }
   }
 };
+
+// Generic function to save a record to any Airtable table
+async function saveRecordToAirtable(tableName: string, fields: Record<string, any>): Promise<void> {
+  if (!API_TOKEN) throw new Error('Airtable Personal Access Token is not configured');
+  if (!BASE_ID) throw new Error('Airtable Base ID is not configured');
+  const response = await fetch(`${AIRTABLE_API_URL}/${tableName}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${API_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ records: [{ fields }] }),
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Airtable save failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+}
+
+// Save F1 schedule entry to 'F1 Schedule' table
+export async function saveF1ScheduleEntry(entry: {
+  raceName: string;
+  date: string;
+  time: string;
+  circuit: string;
+}): Promise<void> {
+  // Map your entry fields to Airtable field names as needed
+  const fields = {
+    'Race Name': entry.raceName,
+    'Date': entry.date,
+    'Time': entry.time,
+    'Circuit': entry.circuit,
+    'Created At': new Date().toISOString(),
+  };
+  await saveRecordToAirtable('F1 Schedule', fields);
+}
