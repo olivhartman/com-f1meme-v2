@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { ChevronRight, Trophy, Clock } from "lucide-react"
+import { Clock } from "lucide-react"
 import { Card, CardContent } from "./ui/card"
 import { Button } from "./ui/button"
 import DriversStandings from "./DriversStandings"
@@ -50,49 +50,6 @@ interface CachedData {
 }
 
 export default function Hero() {
-  const [previousRace, setPreviousRace] = useState<RaceResults>({
-    raceName: "2024 Championship Standings",
-    Results: [
-      {
-        position: "1",
-        Driver: {
-          givenName: "Max",
-          familyName: "Verstappen",
-          code: "VER"
-        },
-        Constructor: {
-          name: "Red Bull Racing",
-          constructorId: "red_bull"
-        }
-      },
-      {
-        position: "2",
-        Driver: {
-          givenName: "Lando",
-          familyName: "Norris",
-          code: "NOR"
-        },
-        Constructor: {
-          name: "McLaren Mercedes",
-          constructorId: "mcLaren_mercedes"
-        }
-      },
-      {
-        position: "3",
-        Driver: {
-          givenName: "Charles",
-          familyName: "Leclerc",
-          code: "LEC"
-        },
-        Constructor: {
-          name: "Ferrari",
-          constructorId: "ferrari"
-        }
-      }
-    ]
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,

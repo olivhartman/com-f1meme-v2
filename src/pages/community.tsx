@@ -55,7 +55,6 @@ const MemberCard = ({ member, index }: { member: ProfileData; index: number }) =
       {/* Member badge */}
       <div className="absolute top-4 right-4">
         <Badge
-          variant="outline"
           className="bg-yellow-400/20 text-yellow-400 border-yellow-400/40 text-xs font-semibold"
         >
           #{String(index + 1).padStart(3, "0")}

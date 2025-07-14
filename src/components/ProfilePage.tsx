@@ -50,21 +50,6 @@ const ProfilePage = () => {
     coverPicture?: string
   }>({})
 
-  // Function to format date in the requested format
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString)
-    const options: Intl.DateTimeFormatOptions = {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      weekday: "long",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    }
-    return date.toLocaleDateString("en-US", options)
-  }
-
   const handleInputChange = (field: keyof ProfileData, value: string) => {
     setProfileData((prev) => ({ ...prev, [field]: value }))
   }

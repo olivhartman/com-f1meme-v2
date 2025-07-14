@@ -202,7 +202,7 @@ export default function Schedule() {
                   {/* Race Header */}
                   <div className="space-y-3">
                     <div className="flex items-start justify-between">
-                      <Badge variant="outline" className="bg-red-500/20 text-red-400 border-red-400/30 font-semibold">
+                      <Badge className="bg-red-500/20 text-red-400 border-red-400/30 font-semibold">
                         Round {race.round}
                       </Badge>
                       <div className="text-right text-xs text-slate-400">Season {race.season}</div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, User, Users, ArrowLeft, ChevronLeft, Calendar } from "lucide-react"
+import { Menu, X, User, Users, Calendar } from "lucide-react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 
@@ -11,7 +11,6 @@ interface NavigationProps {
 }
 
 export default function Navigation({ activeSection }: NavigationProps) {
-  const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { publicKey } = useWallet()
   const navigate = useNavigate();
@@ -23,23 +22,19 @@ export default function Navigation({ activeSection }: NavigationProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+      // setIsScrolled(window.scrollY > 50) // This line was removed as per the edit hint
     }
 
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const scrollToSection = (sectionId: string) => {
-    const section = document.getElementById(sectionId)
-    if (section) {
-      window.scrollTo({
-        top: section.offsetTop - 80,
-        behavior: "smooth",
-      })
-    }
-    setMobileMenuOpen(false)
-  }
+  // Remove unused imports
+  // import { ArrowLeft, ChevronLeft } from 'lucide-react';
+  // Remove unused variables
+  // const activeSection = ...;
+  // const isScrolled = ...;
+  // const scrollToSection = ...;
 
   return (
     <>
