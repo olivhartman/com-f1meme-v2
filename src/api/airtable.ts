@@ -378,6 +378,15 @@ export const airtableService = {
       }
 
       const record = data.records[0];
+      
+      // Handle membership level as string (since it's stored as Single Line Text)
+      let membershipLevel = 0;
+      if (record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL]) {
+        const levelStr = String(record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL]);
+        const levelNum = parseInt(levelStr, 10);
+        membershipLevel = isNaN(levelNum) ? 0 : levelNum;
+      }
+      
       return {
         name: record.fields[FIELD_NAMES.NAME] || '',
         email: record.fields[FIELD_NAMES.EMAIL] || '',
@@ -391,7 +400,7 @@ export const airtableService = {
         updatedAt: record.fields[FIELD_NAMES.UPDATED_AT] || undefined,
         profilePictureUrl: record.fields[FIELD_NAMES.PROFILE_PICTURE]?.[0]?.url || '',
         coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || '',
-        membershipLevel: typeof record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL] === 'number' ? record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL] : 0,
+        membershipLevel: membershipLevel,
       };
     } catch (error) {
       console.error('Error getting profile:', error);
@@ -413,17 +422,27 @@ export const airtableService = {
         throw new Error('Failed to fetch all profiles');
       }
       const data = await response.json();
-      return (data.records || []).map((record: any) => ({
-        name: record.fields[FIELD_NAMES.NAME] || '',
-        instagramUrl: record.fields[FIELD_NAMES.INSTAGRAM_URL] || '',
-        tiktokUrl: record.fields[FIELD_NAMES.TIKTOK_URL] || '',
-        vkUrl: record.fields[FIELD_NAMES.VK_URL] || '',
-        profilePictureUrl: record.fields[FIELD_NAMES.PROFILE_PICTURE]?.[0]?.url || '',
-        coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || '',
-        walletAddress: record.fields[FIELD_NAMES.WALLET_ADDRESS] || '',
-        membershipLevel: typeof record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL] === 'number' ? record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL] : 0,
-        // Do not include email
-      }));
+      return (data.records || []).map((record: any) => {
+        // Handle membership level as string (since it's stored as Single Line Text)
+        let membershipLevel = 0;
+        if (record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL]) {
+          const levelStr = String(record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL]);
+          const levelNum = parseInt(levelStr, 10);
+          membershipLevel = isNaN(levelNum) ? 0 : levelNum;
+        }
+        
+        return {
+          name: record.fields[FIELD_NAMES.NAME] || '',
+          instagramUrl: record.fields[FIELD_NAMES.INSTAGRAM_URL] || '',
+          tiktokUrl: record.fields[FIELD_NAMES.TIKTOK_URL] || '',
+          vkUrl: record.fields[FIELD_NAMES.VK_URL] || '',
+          profilePictureUrl: record.fields[FIELD_NAMES.PROFILE_PICTURE]?.[0]?.url || '',
+          coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || '',
+          walletAddress: record.fields[FIELD_NAMES.WALLET_ADDRESS] || '',
+          membershipLevel: membershipLevel,
+          // Do not include email
+        };
+      });
     } catch (error) {
       console.error('Error fetching all profiles:', error);
       return [];

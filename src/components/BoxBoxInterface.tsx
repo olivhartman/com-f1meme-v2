@@ -840,33 +840,40 @@ useEffect(() => {
     if (publicKey && typeof userLevel === 'number') {
       const syncLevel = async () => {
         try {
-          // Get existing profile data from Airtable
-          const existingProfile = await airtableService.getProfile(publicKey.toBase58())
+          // Add a small delay to ensure data is stable
+          await new Promise(resolve => setTimeout(resolve, 500))
           
-          // Only update if we have existing profile data to preserve
-          if (existingProfile) {
-            await airtableService.upsertProfile({ 
-              walletAddress: publicKey.toBase58(), 
-              membershipLevel: userLevel,
-              name: existingProfile.name || "",
-              email: existingProfile.email || "",
-              instagramUrl: existingProfile.instagramUrl || "",
-              tiktokUrl: existingProfile.tiktokUrl || "",
-              vkUrl: existingProfile.vkUrl || "",
-              profilePictureUrl: existingProfile.profilePictureUrl || "",
-              coverPictureUrl: existingProfile.coverPictureUrl || "",
-            })
-          } else {
-            // If no existing profile, just update the level without other fields
-            await airtableService.upsertProfile({ 
-              walletAddress: publicKey.toBase58(), 
-              membershipLevel: userLevel,
-              name: "",
-              email: "",
-              instagramUrl: "",
-              tiktokUrl: "",
-              vkUrl: "",
-            })
+          // Only sync if userLevel is greater than 0 or if we're sure it should be 0
+          if (userLevel > 0 || (userLevel === 0 && isMembershipInitialized)) {
+            // Get existing profile data from Airtable
+            const existingProfile = await airtableService.getProfile(publicKey.toBase58())
+            
+            // Only update if we have existing profile data to preserve
+            if (existingProfile) {
+              await airtableService.upsertProfile({ 
+                walletAddress: publicKey.toBase58(), 
+                membershipLevel: userLevel,
+                name: existingProfile.name || "",
+                email: existingProfile.email || "",
+                instagramUrl: existingProfile.instagramUrl || "",
+                tiktokUrl: existingProfile.tiktokUrl || "",
+                vkUrl: existingProfile.vkUrl || "",
+                profilePictureUrl: existingProfile.profilePictureUrl || "",
+                coverPictureUrl: existingProfile.coverPictureUrl || "",
+              })
+            } else {
+              // If no existing profile, just update the level without other fields
+              await airtableService.upsertProfile({ 
+                walletAddress: publicKey.toBase58(), 
+                membershipLevel: userLevel,
+                name: "",
+                email: "",
+                instagramUrl: "",
+                tiktokUrl: "",
+                vkUrl: "",
+              })
+            }
+            console.log('Membership level synced to Airtable:', userLevel)
           }
         } catch (err) {
           console.error('Failed to sync membership level to Airtable:', err)
@@ -875,7 +882,7 @@ useEffect(() => {
       
       syncLevel()
     }
-  }, [publicKey, userLevel])
+  }, [publicKey, userLevel, isMembershipInitialized])
 
   return (
     <div className="flex flex-col items-center justify-start text-white">

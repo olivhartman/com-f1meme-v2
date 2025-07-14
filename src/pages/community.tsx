@@ -53,13 +53,11 @@ const MemberCard = ({ member }: { member: ProfileData }) => (
 
     <CardContent className="relative p-6 flex flex-col items-center text-center space-y-4">
       {/* Member badge */}
-      {/* <div className="absolute top-4 right-4">
-        <Badge
-          className="bg-yellow-400/20 text-yellow-400 border-yellow-400/40 text-xs font-semibold"
-        >
-          #{String(index + 1).padStart(3, "0")}
-        </Badge>
-      </div> */}
+      <div className="absolute top-4 right-4">
+        <div className="bg-yellow-400/20 text-yellow-400 border border-yellow-400/40 text-xs font-semibold px-2 py-1 rounded-full">
+          Level {member.membershipLevel || 0}
+        </div>
+      </div>
 
       {/* Profile picture */}
       <div className="relative">

@@ -43,15 +43,55 @@ export default function Home() {
         const program = getProgram()
         if (!program) return
 
+        // Add a small delay to ensure blockchain data is loaded
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
         // Get user's membership account
         const [membershipAccountPda] = await PublicKey.findProgramAddress(
           [Buffer.from("membership_account"), publicKey.toBuffer()],
           program.programId,
         )
 
+        // Check if membership account exists first
+        const membershipAccountInfo = await connection.getAccountInfo(membershipAccountPda)
+        if (!membershipAccountInfo) {
+          console.log('Membership account does not exist, setting level to 0')
+          // Only set to 0 if account truly doesn't exist
+          try {
+            const existingProfile = await airtableService.getProfile(publicKey.toBase58())
+            await airtableService.upsertProfile({ 
+              walletAddress: publicKey.toBase58(), 
+              membershipLevel: 0,
+              name: existingProfile?.name || "",
+              email: existingProfile?.email || "",
+              instagramUrl: existingProfile?.instagramUrl || "",
+              tiktokUrl: existingProfile?.tiktokUrl || "",
+              vkUrl: existingProfile?.vkUrl || "",
+              profilePictureUrl: existingProfile?.profilePictureUrl || "",
+              coverPictureUrl: existingProfile?.coverPictureUrl || "",
+            })
+            console.info('Membership account not found, set level to 0 in Airtable')
+          } catch (profileError) {
+            console.error('Failed to get existing profile:', profileError)
+            // If we can't get the profile, just update the level without other fields
+            await airtableService.upsertProfile({ 
+              walletAddress: publicKey.toBase58(), 
+              membershipLevel: 0,
+              name: "",
+              email: "",
+              instagramUrl: "",
+              tiktokUrl: "",
+              vkUrl: "",
+            })
+          }
+          return
+        }
+
         // Fetch account info to get current level
         const accountInfo = await program.account.membershipAccount.fetch(membershipAccountPda)
         const currentLevel = accountInfo.level
+
+        console.log('Current blockchain level:', currentLevel)
 
         // Get existing profile data from Airtable
         const existingProfile = await airtableService.getProfile(publicKey.toBase58())
@@ -103,13 +143,18 @@ export default function Home() {
           }
         } else {
           console.error('Failed to sync membership level:', error)
-          // Optionally, you can still try to set to 0 as a fallback
+          // Don't set to 0 for other errors - just log them
         }
       }
     }
 
     if (publicKey) {
-      syncMembershipLevel()
+      // Add a delay to ensure wallet is fully connected
+      const timer = setTimeout(() => {
+        syncMembershipLevel()
+      }, 2000) // Wait 2 seconds for wallet to fully connect
+
+      return () => clearTimeout(timer)
     }
   }, [publicKey, connection])
 
