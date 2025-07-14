@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, User, Users, ArrowLeft, ChevronLeft } from "lucide-react"
+import { Menu, X, User, Users, ArrowLeft, ChevronLeft, Calendar } from "lucide-react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 
@@ -77,6 +77,12 @@ export default function Navigation({ activeSection }: NavigationProps) {
               >
                 <Users className="h-6 w-6 text-yellow-900" />
               </Link>
+              <Link
+                to="/schedule"
+                className="mt-3 flex items-center justify-center w-11 h-11 rounded-full bg-white border-2 border-yellow-600 shadow-lg hover:bg-yellow-100 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
+              >
+                <Calendar className="h-6 w-6 text-yellow-900" />
+              </Link>
               {publicKey && (
                 <Link
                   to="/profile"
@@ -125,6 +131,13 @@ export default function Navigation({ activeSection }: NavigationProps) {
                 className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-yellow-500"
               >
                 Community
+              </Link>
+              <Link
+                to="/schedule"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-yellow-500"
+              >
+                Schedule
               </Link>
               {publicKey && (
                 <Link
