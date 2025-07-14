@@ -838,16 +838,42 @@ useEffect(() => {
   // Sync membership level to Airtable when userLevel changes
   useEffect(() => {
     if (publicKey && typeof userLevel === 'number') {
-      airtableService.upsertProfile({ 
-        walletAddress: publicKey.toBase58(), 
-        membershipLevel: userLevel,
-        name: "", // Required but not used for level sync
-        email: "", // Required but not used for level sync
-        instagramUrl: "", // Required but not used for level sync
-        tiktokUrl: "", // Required but not used for level sync
-        vkUrl: "", // Required but not used for level sync
-      })
-        .catch((err) => console.error('Failed to sync membership level to Airtable:', err))
+      const syncLevel = async () => {
+        try {
+          // Get existing profile data from Airtable
+          const existingProfile = await airtableService.getProfile(publicKey.toBase58())
+          
+          // Only update if we have existing profile data to preserve
+          if (existingProfile) {
+            await airtableService.upsertProfile({ 
+              walletAddress: publicKey.toBase58(), 
+              membershipLevel: userLevel,
+              name: existingProfile.name || "",
+              email: existingProfile.email || "",
+              instagramUrl: existingProfile.instagramUrl || "",
+              tiktokUrl: existingProfile.tiktokUrl || "",
+              vkUrl: existingProfile.vkUrl || "",
+              profilePictureUrl: existingProfile.profilePictureUrl || "",
+              coverPictureUrl: existingProfile.coverPictureUrl || "",
+            })
+          } else {
+            // If no existing profile, just update the level without other fields
+            await airtableService.upsertProfile({ 
+              walletAddress: publicKey.toBase58(), 
+              membershipLevel: userLevel,
+              name: "",
+              email: "",
+              instagramUrl: "",
+              tiktokUrl: "",
+              vkUrl: "",
+            })
+          }
+        } catch (err) {
+          console.error('Failed to sync membership level to Airtable:', err)
+        }
+      }
+      
+      syncLevel()
     }
   }, [publicKey, userLevel])
 

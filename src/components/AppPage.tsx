@@ -53,15 +53,20 @@ export default function Home() {
         const accountInfo = await program.account.membershipAccount.fetch(membershipAccountPda)
         const currentLevel = accountInfo.level
 
-        // Update Airtable with current level (partial update)
+        // Get existing profile data from Airtable
+        const existingProfile = await airtableService.getProfile(publicKey.toBase58())
+        
+        // Update Airtable with current level and existing profile data
         await airtableService.upsertProfile({ 
           walletAddress: publicKey.toBase58(), 
           membershipLevel: currentLevel,
-          name: "", // Required but not used for level sync
-          email: "", // Required but not used for level sync
-          instagramUrl: "", // Required but not used for level sync
-          tiktokUrl: "", // Required but not used for level sync
-          vkUrl: "", // Required but not used for level sync
+          name: existingProfile?.name || "",
+          email: existingProfile?.email || "",
+          instagramUrl: existingProfile?.instagramUrl || "",
+          tiktokUrl: existingProfile?.tiktokUrl || "",
+          vkUrl: existingProfile?.vkUrl || "",
+          profilePictureUrl: existingProfile?.profilePictureUrl || "",
+          coverPictureUrl: existingProfile?.coverPictureUrl || "",
         })
         
         console.log('Membership level synced to Airtable:', currentLevel)
@@ -69,16 +74,33 @@ export default function Home() {
         const errorMsg = String(error)
         if (errorMsg.includes('Account does not exist') || errorMsg.includes('has no data')) {
           // Handle gracefully: set level to 0
-          await airtableService.upsertProfile({ 
-            walletAddress: publicKey.toBase58(), 
-            membershipLevel: 0,
-            name: "", // Required but not used for level sync
-            email: "", // Required but not used for level sync
-            instagramUrl: "", // Required but not used for level sync
-            tiktokUrl: "", // Required but not used for level sync
-            vkUrl: "", // Required but not used for level sync
-          })
-          console.info('Membership account not found, set level to 0 in Airtable')
+          try {
+            const existingProfile = await airtableService.getProfile(publicKey.toBase58())
+            await airtableService.upsertProfile({ 
+              walletAddress: publicKey.toBase58(), 
+              membershipLevel: 0,
+              name: existingProfile?.name || "",
+              email: existingProfile?.email || "",
+              instagramUrl: existingProfile?.instagramUrl || "",
+              tiktokUrl: existingProfile?.tiktokUrl || "",
+              vkUrl: existingProfile?.vkUrl || "",
+              profilePictureUrl: existingProfile?.profilePictureUrl || "",
+              coverPictureUrl: existingProfile?.coverPictureUrl || "",
+            })
+            console.info('Membership account not found, set level to 0 in Airtable')
+          } catch (profileError) {
+            console.error('Failed to get existing profile:', profileError)
+            // If we can't get the profile, just update the level without other fields
+            await airtableService.upsertProfile({ 
+              walletAddress: publicKey.toBase58(), 
+              membershipLevel: 0,
+              name: "",
+              email: "",
+              instagramUrl: "",
+              tiktokUrl: "",
+              vkUrl: "",
+            })
+          }
         } else {
           console.error('Failed to sync membership level:', error)
           // Optionally, you can still try to set to 0 as a fallback

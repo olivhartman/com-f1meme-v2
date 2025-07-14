@@ -121,9 +121,6 @@ export const airtableService = {
       
       // Prepare fields object - only include fields that exist in your table
       const fields: any = {
-        [FIELD_NAMES.NAME]: profileData.name,
-        [FIELD_NAMES.EMAIL]: profileData.email,
-        [FIELD_NAMES.INSTAGRAM_URL]: profileData.instagramUrl,
         [FIELD_NAMES.WALLET_ADDRESS]: profileData.walletAddress,
         [FIELD_NAMES.UPDATED_AT]: new Date().toLocaleDateString('en-US', {
           weekday: 'long',
@@ -140,6 +137,19 @@ export const airtableService = {
         }),
       };
 
+      // Only add fields that have actual values (not empty strings)
+      if (profileData.name && profileData.name.trim()) {
+        fields[FIELD_NAMES.NAME] = profileData.name;
+      }
+      
+      if (profileData.email && profileData.email.trim()) {
+        fields[FIELD_NAMES.EMAIL] = profileData.email;
+      }
+      
+      if (profileData.instagramUrl && profileData.instagramUrl.trim()) {
+        fields[FIELD_NAMES.INSTAGRAM_URL] = profileData.instagramUrl;
+      }
+
       // Handle membership level with validation
       if (typeof profileData.membershipLevel === 'number') {
         const levelValue = Math.max(0, Math.min(profileData.membershipLevel, 999)); // Ensure it's a valid positive number
@@ -154,12 +164,12 @@ export const airtableService = {
         console.log('No valid membership level provided, skipping field');
       }
 
-      // Only add TikTok and VK URLs if the fields exist in your table
-      if (profileData.tiktokUrl) {
+      // Only add TikTok and VK URLs if the fields exist in your table and have values
+      if (profileData.tiktokUrl && profileData.tiktokUrl.trim()) {
         fields[FIELD_NAMES.TIKTOK_URL] = profileData.tiktokUrl;
       }
       
-      if (profileData.vkUrl) {
+      if (profileData.vkUrl && profileData.vkUrl.trim()) {
         fields[FIELD_NAMES.VK_URL] = profileData.vkUrl;
       }
 
