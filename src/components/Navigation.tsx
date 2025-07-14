@@ -6,11 +6,9 @@ import { Menu, X, User, Users, Calendar } from "lucide-react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 
-interface NavigationProps {
-  activeSection: string
-}
+interface NavigationProps {}
 
-export default function Navigation({ activeSection }: NavigationProps) {
+export default function Navigation({}: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { publicKey } = useWallet()
   const navigate = useNavigate();

@@ -19,12 +19,6 @@ interface Constructor {
   constructorId: string
 }
 
-interface RaceResult {
-  position: string
-  Driver: Driver
-  Constructor: Constructor
-}
-
 interface NextRaceInfo {
   date: string
   time: string
@@ -51,13 +45,13 @@ export default function Hero() {
     minutes: 0,
     seconds: 0,
   })
-  const [newsItems, setNewsItems] = useState<string[]>([
+  const [newsItems] = useState<string[]>([
     "Yuki Tsunoda Racing in Red Bull in front Japanese Crowd 🏎️",
     "Maclaren Big Lead in both Championship, is it a bad sign?🔥",
     "Kimi winning his first Grand Prix soon 🔧",
     "Over 220,000 attendance in Chinese Grand Prix 🏁",
   ])
-  const [nextRace, setNextRace] = useState<NextRaceInfo>({
+  const [nextRace] = useState<NextRaceInfo>({
     date: "2025-05-02",
     time: "04:00:00",
     raceName: "FORMULA 1 CRYPTO.COM MIAMI GRAND PRIX 2025",

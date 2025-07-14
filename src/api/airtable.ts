@@ -245,15 +245,12 @@ export const airtableService = {
       console.error('Error upserting profile:', error);
       if (typeof error === 'object' && error !== null) {
         if ('message' in error) {
-          // @ts-expect-error: message might not exist
           console.error('Error details:', { message: error.message });
         }
         if ('statusCode' in error) {
-          // @ts-expect-error: statusCode might not exist
           console.error('Error statusCode:', error.statusCode);
         }
         if ('error' in error) {
-          // @ts-expect-error: error might not exist
           console.error('Error error:', error.error);
         }
       } else {
