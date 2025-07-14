@@ -243,11 +243,22 @@ export const airtableService = {
       }
     } catch (error) {
       console.error('Error upserting profile:', error);
-      console.error('Error details:', {
-        message: error.message,
-        statusCode: error.statusCode,
-        error: error.error
-      });
+      if (typeof error === 'object' && error !== null) {
+        if ('message' in error) {
+          // @ts-expect-error: message might not exist
+          console.error('Error details:', { message: error.message });
+        }
+        if ('statusCode' in error) {
+          // @ts-expect-error: statusCode might not exist
+          console.error('Error statusCode:', error.statusCode);
+        }
+        if ('error' in error) {
+          // @ts-expect-error: error might not exist
+          console.error('Error error:', error.error);
+        }
+      } else {
+        console.error('Error details:', String(error));
+      }
       throw error;
     }
   },
@@ -334,34 +345,4 @@ export const airtableService = {
 async function saveRecordToAirtable(tableName: string, fields: Record<string, any>): Promise<void> {
   if (!API_TOKEN) throw new Error('Airtable Personal Access Token is not configured');
   if (!BASE_ID) throw new Error('Airtable Base ID is not configured');
-  const response = await fetch(`${AIRTABLE_API_URL}/${tableName}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${API_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ records: [{ fields }] }),
-  });
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Airtable save failed: ${response.status} ${response.statusText} - ${errorText}`);
-  }
-}
-
-// Save F1 schedule entry to 'F1 Schedule' table
-export async function saveF1ScheduleEntry(entry: {
-  raceName: string;
-  date: string;
-  time: string;
-  circuit: string;
-}): Promise<void> {
-  // Map your entry fields to Airtable field names as needed
-  const fields = {
-    'Race Name': entry.raceName,
-    'Date': entry.date,
-    'Time': entry.time,
-    'Circuit': entry.circuit,
-    'Created At': new Date().toISOString(),
-  };
-  await saveRecordToAirtable('F1 Schedule', fields);
-}
+  const response = await fetch(`

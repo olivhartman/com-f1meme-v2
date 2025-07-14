@@ -11,26 +11,6 @@ import Loader from "./Loader"
 
 import "@solana/wallet-adapter-react-ui/styles.css"
 
-// Moved outside the main component
-function WalletChangeListener() {
-  const { publicKey } = useWallet()
-
-  useEffect(() => {
-    const currentWallet = publicKey?.toBase58()
-    const previousWallet = sessionStorage.getItem("previousWallet")
-
-    if (currentWallet && previousWallet && previousWallet !== currentWallet) {
-      sessionStorage.setItem("previousWallet", currentWallet)
-      window.location.href = window.location.href
-    } else if (currentWallet) {
-      sessionStorage.setItem("previousWallet", currentWallet)
-    }
-  }, [publicKey])
-
-  return null
-}
-
-
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)

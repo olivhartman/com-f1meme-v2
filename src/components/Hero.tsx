@@ -25,11 +25,6 @@ interface RaceResult {
   Constructor: Constructor
 }
 
-interface RaceResults {
-  raceName: string
-  Results: RaceResult[]
-}
-
 interface NextRaceInfo {
   date: string
   time: string
@@ -210,32 +205,6 @@ export default function Hero() {
       }
     }
   }, [])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-white text-xl">Loading Race Data.......</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md bg-black/40 border-red-500/20">
-          <CardContent className="flex flex-col items-center space-y-4 p-6">
-            <p className="text-red-500 text-xl">Error: {error}</p>
-            <Button onClick={() => window.location.reload()} variant="destructive">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen pt-16 sm:pt-24 text-white font-sans relative">

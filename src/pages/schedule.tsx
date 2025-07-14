@@ -117,7 +117,6 @@ export default function Schedule() {
       .then((res) => res.json())
       .then((data) => {
         const allRaces = data.MRData.RaceTable.Races;
-        const now = new Date();
         // Only keep races whose main event is in the future
         const upcomingRaces = allRaces.filter((race: Race) => {
           if (!race.date) return false;
@@ -193,7 +192,7 @@ export default function Schedule() {
       <div className="px-4 pb-16 mt-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {races.map((race, index) => (
+            {races.map((race) => (
               <Card
                 key={race.round}
                 className="group bg-gradient-to-br from-black/50 to-gray-900/50 border-yellow-400/50 backdrop-blur-sm hover:border-yellow-400 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10 hover:-translate-y-1"
