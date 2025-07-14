@@ -9,7 +9,7 @@ import { useEffect, useState } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { airtableService } from "../api/airtable"
 import { useConnection } from "@solana/wallet-adapter-react"
-import { Program, AnchorProvider, utils, setProvider } from "@coral-xyz/anchor"
+import { Program, AnchorProvider } from "@coral-xyz/anchor"
 import { PublicKey } from "@solana/web3.js"
 import idl from "../idl/boxbox.json"
 import type { Boxbox } from "../types/boxbox"
@@ -53,10 +53,15 @@ export default function Home() {
         const accountInfo = await program.account.membershipAccount.fetch(membershipAccountPda)
         const currentLevel = accountInfo.level
 
-        // Update Airtable with current level
+        // Update Airtable with current level (partial update)
         await airtableService.upsertProfile({ 
           walletAddress: publicKey.toBase58(), 
-          membershipLevel: currentLevel 
+          membershipLevel: currentLevel,
+          name: "", // Required but not used for level sync
+          email: "", // Required but not used for level sync
+          instagramUrl: "", // Required but not used for level sync
+          tiktokUrl: "", // Required but not used for level sync
+          vkUrl: "", // Required but not used for level sync
         })
         
         console.log('Membership level synced to Airtable:', currentLevel)
@@ -66,7 +71,12 @@ export default function Home() {
           // Handle gracefully: set level to 0
           await airtableService.upsertProfile({ 
             walletAddress: publicKey.toBase58(), 
-            membershipLevel: 0 
+            membershipLevel: 0,
+            name: "", // Required but not used for level sync
+            email: "", // Required but not used for level sync
+            instagramUrl: "", // Required but not used for level sync
+            tiktokUrl: "", // Required but not used for level sync
+            vkUrl: "", // Required but not used for level sync
           })
           console.info('Membership account not found, set level to 0 in Airtable')
         } else {

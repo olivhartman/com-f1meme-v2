@@ -838,7 +838,15 @@ useEffect(() => {
   // Sync membership level to Airtable when userLevel changes
   useEffect(() => {
     if (publicKey && typeof userLevel === 'number') {
-      airtableService.upsertProfile({ walletAddress: publicKey.toBase58(), membershipLevel: userLevel })
+      airtableService.upsertProfile({ 
+        walletAddress: publicKey.toBase58(), 
+        membershipLevel: userLevel,
+        name: "", // Required but not used for level sync
+        email: "", // Required but not used for level sync
+        instagramUrl: "", // Required but not used for level sync
+        tiktokUrl: "", // Required but not used for level sync
+        vkUrl: "", // Required but not used for level sync
+      })
         .catch((err) => console.error('Failed to sync membership level to Airtable:', err))
     }
   }, [publicKey, userLevel])
