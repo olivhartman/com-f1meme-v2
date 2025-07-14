@@ -20,6 +20,7 @@ interface ProfileData {
   coverPictureUrl?: string;
   createdAt?: string;
   updatedAt?: string;
+  membershipLevel?: number;
 }
 
 const ProfilePage = () => {
@@ -34,6 +35,7 @@ const ProfilePage = () => {
     coverPicture: null,
     profilePictureUrl: "",
     coverPictureUrl: "",
+    membershipLevel: 0,
   })
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState("")
@@ -92,6 +94,7 @@ const ProfilePage = () => {
               coverPictureUrl: existingProfile.coverPictureUrl,
               createdAt: existingProfile.createdAt || undefined,
               updatedAt: existingProfile.updatedAt || undefined,
+              membershipLevel: typeof existingProfile.membershipLevel === 'number' ? existingProfile.membershipLevel : 0,
             })
           }
         } catch (error) {
@@ -161,7 +164,10 @@ const ProfilePage = () => {
   }
 
   function handleBlur(field: keyof ProfileData) {
-    setFormErrors((prev) => ({ ...prev, [field]: validateField(field, profileData[field] ?? null) }))
+    // Only validate string or File fields, not number fields like membershipLevel
+    if (field !== 'membershipLevel') {
+      setFormErrors((prev) => ({ ...prev, [field]: validateField(field, profileData[field] ?? null) }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -186,6 +192,7 @@ const ProfilePage = () => {
         profilePicture: profileData.profilePicture || undefined,
         coverPicture: profileData.coverPicture || undefined,
         walletAddress: publicKey.toBase58(),
+        membershipLevel: typeof profileData.membershipLevel === 'number' ? profileData.membershipLevel : 0,
       }
       await airtableService.upsertProfile(airtableData)
       setMessage("Profile updated successfully!")

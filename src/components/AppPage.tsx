@@ -7,6 +7,12 @@ import TwitterFeed from "./XFeed"
 import BoxBoxInterface from "./BoxBoxInterface"
 import { useEffect, useState } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
+import { airtableService } from "../api/airtable"
+import { useConnection } from "@solana/wallet-adapter-react"
+import { Program, AnchorProvider, utils, setProvider } from "@coral-xyz/anchor"
+import { PublicKey } from "@solana/web3.js"
+import idl from "../idl/boxbox.json"
+import type { Boxbox } from "../types/boxbox"
 import Loader from "./Loader"
 
 import "@solana/wallet-adapter-react-ui/styles.css"
@@ -15,10 +21,65 @@ import "@solana/wallet-adapter-react-ui/styles.css"
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const { publicKey } = useWallet()
+  const { connection } = useConnection()
   
   // Debug logging
   console.log('AppPage - Wallet connected:', !!publicKey)
   console.log('AppPage - Public key:', publicKey?.toBase58())
+
+  // Get program instance
+  const getProgram = () => {
+    if (!publicKey) return null
+    const provider = new AnchorProvider(connection, { publicKey } as any, AnchorProvider.defaultOptions())
+    return new Program<Boxbox>(JSON.parse(JSON.stringify(idl)), provider)
+  }
+
+  // Sync membership level to Airtable when user visits homepage
+  useEffect(() => {
+    const syncMembershipLevel = async () => {
+      if (!publicKey) return
+      
+      try {
+        const program = getProgram()
+        if (!program) return
+
+        // Get user's membership account
+        const [membershipAccountPda] = await PublicKey.findProgramAddress(
+          [Buffer.from("membership_account"), publicKey.toBuffer()],
+          program.programId,
+        )
+
+        // Fetch account info to get current level
+        const accountInfo = await program.account.membershipAccount.fetch(membershipAccountPda)
+        const currentLevel = accountInfo.level
+
+        // Update Airtable with current level
+        await airtableService.upsertProfile({ 
+          walletAddress: publicKey.toBase58(), 
+          membershipLevel: currentLevel 
+        })
+        
+        console.log('Membership level synced to Airtable:', currentLevel)
+      } catch (error: any) {
+        const errorMsg = String(error)
+        if (errorMsg.includes('Account does not exist') || errorMsg.includes('has no data')) {
+          // Handle gracefully: set level to 0
+          await airtableService.upsertProfile({ 
+            walletAddress: publicKey.toBase58(), 
+            membershipLevel: 0 
+          })
+          console.info('Membership account not found, set level to 0 in Airtable')
+        } else {
+          console.error('Failed to sync membership level:', error)
+          // Optionally, you can still try to set to 0 as a fallback
+        }
+      }
+    }
+
+    if (publicKey) {
+      syncMembershipLevel()
+    }
+  }, [publicKey, connection])
 
   useEffect(() => {
     const timer = setTimeout(() => {

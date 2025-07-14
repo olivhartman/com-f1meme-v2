@@ -14,6 +14,7 @@ import BN from "bn.js"
 import { LockIcon, UnlockIcon, ExternalLinkIcon, XIcon } from "lucide-react"
 import { useAtom } from "jotai"
 import { totalLockedTokensAtom } from "../atoms/totalLocked"
+import { airtableService } from "../api/airtable"
 
 // interface MembershipAccount {
 //   owner: PublicKey
@@ -833,6 +834,14 @@ useEffect(() => {
         return () => clearInterval(pollInterval);
     }
   }, [wallet]);
+
+  // Sync membership level to Airtable when userLevel changes
+  useEffect(() => {
+    if (publicKey && typeof userLevel === 'number') {
+      airtableService.upsertProfile({ walletAddress: publicKey.toBase58(), membershipLevel: userLevel })
+        .catch((err) => console.error('Failed to sync membership level to Airtable:', err))
+    }
+  }, [publicKey, userLevel])
 
   return (
     <div className="flex flex-col items-center justify-start text-white">

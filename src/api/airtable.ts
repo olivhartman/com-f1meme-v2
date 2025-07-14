@@ -12,13 +12,14 @@ const FIELD_NAMES = {
   NAME: 'Name',
   EMAIL: 'Email',
   INSTAGRAM_URL: 'Instagram URL',
-  TIKTOK_URL: 'Tiktok URL', // Update this to match your actual field name
-  VK_URL: 'VK URL', // Update this to match your actual field name
+  TIKTOK_URL: 'Tiktok URL',
+  VK_URL: 'VK URL',
   WALLET_ADDRESS: 'Wallet Address',
   PROFILE_PICTURE: 'Profile Picture',
   COVER_PICTURE: 'Cover Picture',
   CREATED_AT: 'Created At',
-  UPDATED_AT: 'Updated At'
+  UPDATED_AT: 'Updated At',
+  MEMBERSHIP_LEVEL: 'Membership Level',
 };
 
 export interface ProfileData {
@@ -34,6 +35,7 @@ export interface ProfileData {
   coverPictureUrl?: string;
   createdAt?: string;
   updatedAt?: string;
+  membershipLevel?: number;
 }
 
 export const airtableService = {
@@ -65,12 +67,40 @@ export const airtableService = {
         console.log('Field values:', firstRecord.fields);
         console.log('Created At:', firstRecord.fields[FIELD_NAMES.CREATED_AT]);
         console.log('Updated At:', firstRecord.fields[FIELD_NAMES.UPDATED_AT]);
+        console.log('Membership Level field exists:', FIELD_NAMES.MEMBERSHIP_LEVEL in firstRecord.fields);
       } else {
         console.log('No records found in table');
       }
     } catch (error) {
       console.error('Error getting table fields:', error);
       throw error;
+    }
+  },
+
+  // Check if a specific field exists in the table
+  async checkFieldExists(fieldName: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${AIRTABLE_API_URL}/${TABLE_NAME}?maxRecords=1`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${API_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = await response.json();
+      if (data.records && data.records.length > 0) {
+        const firstRecord = data.records[0];
+        return fieldName in firstRecord.fields;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error checking field existence:', error);
+      return false;
     }
   },
 
@@ -107,8 +137,22 @@ export const airtableService = {
           hour: 'numeric',
           minute: '2-digit',
           hour12: true
-        })
+        }),
       };
+
+      // Handle membership level with validation
+      if (typeof profileData.membershipLevel === 'number') {
+        const levelValue = Math.max(0, Math.min(profileData.membershipLevel, 999)); // Ensure it's a valid positive number
+        console.log('Original membership level:', profileData.membershipLevel);
+        console.log('Validated membership level:', levelValue);
+        console.log('Type of levelValue:', typeof levelValue);
+        
+        // Convert to string since Airtable field is Single Line Text
+        fields[FIELD_NAMES.MEMBERSHIP_LEVEL] = String(levelValue);
+        console.log('Setting membership level to:', String(levelValue), 'Type:', typeof String(levelValue));
+      } else {
+        console.log('No valid membership level provided, skipping field');
+      }
 
       // Only add TikTok and VK URLs if the fields exist in your table
       if (profileData.tiktokUrl) {
@@ -236,6 +280,44 @@ export const airtableService = {
         if (!createResponse.ok) {
           const errorData = await createResponse.text();
           console.error('Create error response:', errorData);
+          
+          // Handle specific field validation errors
+          if (createResponse.status === 422) {
+            try {
+              const errorJson = JSON.parse(errorData);
+              if (errorJson.error?.type === 'INVALID_VALUE_FOR_COLUMN') {
+                console.error('Field validation error:', errorJson.error.message);
+                
+                // Try without the problematic field
+                delete fields[FIELD_NAMES.MEMBERSHIP_LEVEL];
+                console.log('Retrying without membership level field...');
+                
+                const retryResponse = await fetch(`${AIRTABLE_API_URL}/${TABLE_NAME}`, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${API_TOKEN}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    records: [{
+                      fields: fields
+                    }]
+                  })
+                });
+                
+                if (!retryResponse.ok) {
+                  const retryErrorData = await retryResponse.text();
+                  throw new Error(`Create failed (retry): ${retryResponse.status} ${retryResponse.statusText} - ${retryErrorData}`);
+                }
+                
+                console.log('Record created successfully (without membership level)');
+                return;
+              }
+            } catch (parseError) {
+              console.error('Failed to parse error response:', parseError);
+            }
+          }
+          
           throw new Error(`Create failed: ${createResponse.status} ${createResponse.statusText} - ${errorData}`);
         }
 
@@ -297,9 +379,9 @@ export const airtableService = {
         walletAddress: record.fields[FIELD_NAMES.WALLET_ADDRESS] || '',
         createdAt: record.fields[FIELD_NAMES.CREATED_AT] || undefined,
         updatedAt: record.fields[FIELD_NAMES.UPDATED_AT] || undefined,
-        // Add image URLs for preview
         profilePictureUrl: record.fields[FIELD_NAMES.PROFILE_PICTURE]?.[0]?.url || '',
-        coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || ''
+        coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || '',
+        membershipLevel: typeof record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL] === 'number' ? record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL] : 0,
       };
     } catch (error) {
       console.error('Error getting profile:', error);
@@ -329,6 +411,7 @@ export const airtableService = {
         profilePictureUrl: record.fields[FIELD_NAMES.PROFILE_PICTURE]?.[0]?.url || '',
         coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || '',
         walletAddress: record.fields[FIELD_NAMES.WALLET_ADDRESS] || '',
+        membershipLevel: typeof record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL] === 'number' ? record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL] : 0,
         // Do not include email
       }));
     } catch (error) {
