@@ -1,7 +1,7 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { airtableService, type ProfileData } from "../api/airtable"
-import { Instagram, Music, Globe, Flag, Users, Sparkles, ExternalLink } from "lucide-react"
+import { Instagram, Music, Globe, Flag, Users, Sparkles, ExternalLink, Copy } from "lucide-react"
 import { Card, CardContent } from "../components/ui/card"
 // import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
@@ -41,96 +41,128 @@ const SocialIcon = ({
   </Button>
 )
 
-const MemberCard = ({ member }: { member: ProfileData }) => (
-  <Card className="group relative bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-xl border border-yellow-400/20 hover:border-yellow-400/60 rounded-2xl overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-yellow-400/10">
-    {/* Animated border gradient */}
-    <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-400/20 to-yellow-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+const MemberCard = ({ member }: { member: ProfileData }) => {
+  const [copied, setCopied] = useState(false)
+  const handleCopy = () => {
+    if (member.walletAddress) {
+      navigator.clipboard.writeText(member.walletAddress)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1200)
+    }
+  }
+  return (
+    <Card className="group relative bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-xl border border-yellow-400/20 hover:border-yellow-400/60 rounded-2xl overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-yellow-400/10">
+      {/* Animated border gradient */}
+      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-400/20 to-yellow-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
 
-    {/* Shine effect */}
-    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-      <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-yellow-400/10 via-transparent to-transparent rotate-45 animate-shine" />
-    </div>
-
-    <CardContent className="relative p-6 flex flex-col items-center text-center space-y-4">
-      {/* Member badge */}
-      <div className="absolute top-4 right-4">
-        <div className="bg-yellow-400/20 text-yellow-400 border border-yellow-400/40 text-xs font-semibold px-2 py-1 rounded-full">
-          Level {member.membershipLevel || 0}
-        </div>
+      {/* Shine effect */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-yellow-400/10 via-transparent to-transparent rotate-45 animate-shine" />
       </div>
 
-      {/* Profile picture */}
-      <div className="relative">
-        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-red-500 p-1 group-hover:scale-105 transition-transform duration-300">
-          <div className="w-full h-full rounded-full overflow-hidden bg-slate-800 flex items-center justify-center">
-            {member.profilePictureUrl ? (
-              <img
-                src={member.profilePictureUrl || "/placeholder.svg"}
-                alt={`${member.name || "Member"} profile`}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-yellow-400/20 to-red-500/20">
-                <Users className="w-8 h-8 text-yellow-400" />
-              </div>
-            )}
+      <CardContent className="relative p-6 flex flex-col items-center text-center space-y-4">
+        {/* Member badge */}
+        <div className="absolute top-4 right-4">
+          <div className="bg-yellow-400/20 text-yellow-400 border border-yellow-400/40 text-xs font-semibold px-2 py-1 rounded-full">
+            Level {member.membershipLevel || 0}
           </div>
         </div>
 
-        {/* Online indicator */}
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-slate-800 flex items-center justify-center">
-          <Sparkles className="w-3 h-3 text-white" />
-        </div>
-      </div>
+        {/* Profile picture */}
+        <div className="relative">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-red-500 p-1 group-hover:scale-105 transition-transform duration-300">
+            <div className="w-full h-full rounded-full overflow-hidden bg-slate-800 flex items-center justify-center">
+              {member.profilePictureUrl ? (
+                <img
+                  src={member.profilePictureUrl || "/placeholder.svg"}
+                  alt={`${member.name || "Member"} profile`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-yellow-400/20 to-red-500/20">
+                  <Users className="w-8 h-8 text-yellow-400" />
+                </div>
+              )}
+            </div>
+          </div>
 
-      {/* Member name */}
-      <div className="space-y-1">
-        <h3 className="text-lg font-bold text-white group-hover:text-yellow-400 transition-colors duration-300">
-          {member.name || "F1 Enthusiast"}
-        </h3>
-        <p className="text-sm text-slate-400">Community Member</p>
-      </div>
-
-      {/* Social links */}
-      {(member.instagramUrl || member.tiktokUrl || member.vkUrl) && (
-        <div className="flex items-center gap-2 pt-2">
-          {member.instagramUrl && (
-            <SocialIcon
-              url={member.instagramUrl}
-              icon={<Instagram className="w-4 h-4" />}
-              hoverColor="hover:text-pink-400 hover:bg-pink-400/10"
-              platform="Instagram"
-            />
-          )}
-          {member.tiktokUrl && (
-            <SocialIcon
-              url={member.tiktokUrl}
-              icon={<Music className="w-4 h-4" />}
-              hoverColor="hover:text-white hover:bg-slate-700/50"
-              platform="TikTok"
-            />
-          )}
-          {member.vkUrl && (
-            <SocialIcon
-              url={member.vkUrl}
-              icon={<Globe className="w-4 h-4" />}
-              hoverColor="hover:text-blue-400 hover:bg-blue-400/10"
-              platform="VK"
-            />
-          )}
+          {/* Online indicator */}
+          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-slate-800 flex items-center justify-center">
+            <Sparkles className="w-3 h-3 text-white" />
+          </div>
         </div>
-      )}
 
-      {/* Member stats or additional info could go here */}
-      {/* <div className="w-full pt-2 border-t border-white/10">
-        <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
-          <Flag className="w-3 h-3" />
-          <span>F1 Meme Legend</span>
+        {/* Member name and wallet */}
+        <div className="space-y-1 w-full">
+          <h3 className="text-lg font-bold text-white group-hover:text-yellow-400 transition-colors duration-300">
+            {member.name || "F1 Enthusiast"}
+          </h3>
+          <div className="flex flex-col items-center gap-1 w-full mt-1">
+            <div className="flex items-center gap-2 justify-center w-full flex-wrap">
+              <span className="text-xs text-slate-400 font-mono break-all select-all max-w-full">
+                {member.walletAddress
+                  ? `${member.walletAddress.slice(0, 4)}...${member.walletAddress.slice(-4)}`
+                  : "No Wallet"}
+              </span>
+              {member.walletAddress && (
+                <button
+                  onClick={handleCopy}
+                  className="ml-1 p-1 rounded hover:bg-yellow-400/20 transition-colors focus:outline-none"
+                  title="Copy full address"
+                  type="button"
+                >
+                  <Copy className="w-4 h-4 text-yellow-400" />
+                </button>
+              )}
+              {copied && (
+                <span className="text-emerald-400 text-xs ml-2 animate-fade-in">Copied!</span>
+              )}
+            </div>
+          </div>
+          <p className="text-sm text-slate-400">Community Member</p>
         </div>
-      </div> */}
-    </CardContent>
-  </Card>
-)
+
+        {/* Social links */}
+        {(member.instagramUrl || member.tiktokUrl || member.vkUrl) && (
+          <div className="flex items-center gap-2 pt-2">
+            {member.instagramUrl && (
+              <SocialIcon
+                url={member.instagramUrl}
+                icon={<Instagram className="w-4 h-4" />}
+                hoverColor="hover:text-pink-400 hover:bg-pink-400/10"
+                platform="Instagram"
+              />
+            )}
+            {member.tiktokUrl && (
+              <SocialIcon
+                url={member.tiktokUrl}
+                icon={<Music className="w-4 h-4" />}
+                hoverColor="hover:text-white hover:bg-slate-700/50"
+                platform="TikTok"
+              />
+            )}
+            {member.vkUrl && (
+              <SocialIcon
+                url={member.vkUrl}
+                icon={<Globe className="w-4 h-4" />}
+                hoverColor="hover:text-blue-400 hover:bg-blue-400/10"
+                platform="VK"
+              />
+            )}
+          </div>
+        )}
+
+        {/* Member stats or additional info could go here */}
+        {/* <div className="w-full pt-2 border-t border-white/10">
+          <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
+            <Flag className="w-3 h-3" />
+            <span>F1 Meme Legend</span>
+          </div>
+        </div> */}
+      </CardContent>
+    </Card>
+  )
+}
 
 const LoadingCard = () => (
   <Card className="bg-slate-900/50 border-slate-700/50 rounded-2xl overflow-hidden">
