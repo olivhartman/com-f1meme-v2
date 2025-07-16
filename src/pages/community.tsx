@@ -107,7 +107,7 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
               {member.walletAddress && (
                 <button
                   onClick={handleCopy}
-                  className="ml-1 p-1 rounded hover:bg-yellow-400/20 transition-colors focus:outline-none"
+                  className="ml-1 p-1 rounded bg-transparent hover:bg-yellow-400/20 transition-colors focus:outline-none border-none shadow-none"
                   title="Copy full address"
                   type="button"
                 >
