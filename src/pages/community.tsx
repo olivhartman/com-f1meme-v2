@@ -183,6 +183,22 @@ const LoadingCard = () => (
 const Community: React.FC = () => {
   const [members, setMembers] = useState<ProfileData[]>([])
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(8)
+
+  // Responsive perPage
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth < 640) {
+        setPerPage(5)
+      } else {
+        setPerPage(8)
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -199,6 +215,18 @@ const Community: React.FC = () => {
 
     fetchMembers()
   }, [])
+
+  // Pagination logic
+  const totalPages = Math.ceil(members.length / perPage)
+  const pagedMembers = members.slice((page - 1) * perPage, page * perPage)
+
+  const handlePrev = () => setPage((p) => Math.max(1, p - 1))
+  const handleNext = () => setPage((p) => Math.min(totalPages, p + 1))
+
+  useEffect(() => {
+    // Reset to first page if perPage changes or members change
+    setPage(1)
+  }, [perPage, members.length])
 
   return (
     <div className="relative min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-x-hidden">
@@ -224,7 +252,7 @@ const Community: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: perPage }).map((_, i) => (
                 <LoadingCard key={i} />
               ))}
             </div>
@@ -245,11 +273,39 @@ const Community: React.FC = () => {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {members.map((member, index) => (
-                <MemberCard key={index} member={member} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {pagedMembers.map((member, index) => (
+                  <MemberCard key={index} member={member} />
+                ))}
+              </div>
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-4 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handlePrev}
+                    disabled={page === 1}
+                    className="px-3 py-1"
+                  >
+                    Prev
+                  </Button>
+                  <span className="text-slate-300 text-sm">
+                    Page {page} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleNext}
+                    disabled={page === totalPages}
+                    className="px-3 py-1"
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
