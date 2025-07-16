@@ -15,18 +15,6 @@ interface NextRaceInfo {
   circuit: string
 }
 
-interface SeasonInfo {
-  isActive: boolean
-  currentYear: number
-  nextSeasonStart?: string
-  lastRaceDate?: string
-}
-
-interface CachedData {
-  data: any;
-  timestamp: number;
-}
-
 export default function Hero() {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
