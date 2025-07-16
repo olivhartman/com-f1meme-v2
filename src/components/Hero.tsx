@@ -40,12 +40,7 @@ export default function Hero() {
     "Kimi winning his first Grand Prix soon 🔧",
     "Over 220,000 attendance in Chinese Grand Prix 🏁",
   ])
-  const [nextRace] = useState<NextRaceInfo>({
-    date: "2025-05-02",
-    time: "04:00:00",
-    raceName: "FORMULA 1 CRYPTO.COM MIAMI GRAND PRIX 2025",
-    circuit: "Hard Rock Stadium",
-  })
+  const [nextRace, setNextRace] = useState<NextRaceInfo | null>(null)
   const [player, setPlayer] = useState<any>(null)
   const [seasonInfo, setSeasonInfo] = useState<SeasonInfo>({
     isActive: false,
@@ -129,15 +124,54 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
+    // Fetch the next race from the F1 schedule API
+    async function fetchNextRace() {
+      try {
+        const API_URL = 'https://api.jolpi.ca/ergast/f1/races/';
+        const PAGE_LIMIT = 100; // Fetch a large enough page to get all future races
+        const now = new Date();
+        let offset = 0;
+        let found = false;
+        let closestRace = null;
+        let minDiff = Infinity;
+        while (!found) {
+          const url = `${API_URL}?offset=${offset}&limit=${PAGE_LIMIT}`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+          const data = await res.json();
+          const races = data.MRData.RaceTable.Races;
+          if (!races.length) break;
+          for (const race of races) {
+            const raceDateTime = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
+            const diff = raceDateTime.getTime() - now.getTime();
+            if (diff > 0 && diff < minDiff) {
+              minDiff = diff;
+              closestRace = race;
+            }
+          }
+          if (closestRace) break;
+          offset += PAGE_LIMIT;
+        }
+        if (closestRace) {
+          setNextRace({
+            date: closestRace.date,
+            time: closestRace.time || '00:00:00',
+            raceName: closestRace.raceName,
+            circuit: closestRace.Circuit.circuitName,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch next race:', err);
+      }
+    }
+    fetchNextRace();
+  }, []);
+
+  useEffect(() => {
     const calculateTimeLeft = () => {
-      const targetDate = seasonInfo.isActive 
-        ? new Date(`${nextRace.date}T${nextRace.time}`)
-        : seasonInfo.nextSeasonStart 
-          ? new Date(seasonInfo.nextSeasonStart)
-          : new Date(`${seasonInfo.currentYear + 1}-03-01T00:00:00Z`) // Fallback date
-
+      if (!nextRace) return;
+      const targetDate = new Date(`${nextRace.date}T${nextRace.time}`);
       const difference = targetDate.getTime() - new Date().getTime()
-
       if (difference > 0) {
         setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
@@ -147,11 +181,10 @@ export default function Hero() {
         })
       }
     }
-
     calculateTimeLeft()
     const timer = setInterval(calculateTimeLeft, 1000)
     return () => clearInterval(timer)
-  }, [nextRace, seasonInfo])
+  }, [nextRace])
 
   useEffect(() => {
     // Load the Vimeo Player API script
@@ -274,7 +307,7 @@ export default function Hero() {
                 <div className="flex flex-col h-full">
                   <div className="flex flex-col items-center gap-8 pt-14">
                     <h2 className="text-4xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent tracking-tight text-center w-full">
-                      {nextRace.raceName}
+                      {nextRace?.raceName}
                     </h2>
 
                     <Card className="bg-gradient-to-br from-black/80 to-gray-900/80 border-white/10 w-full hover:border-yellow-500/20 transition-all duration-300">
@@ -300,7 +333,7 @@ export default function Hero() {
                     <p className="text-base font-light tracking-wider text-gray-400 text-center">
                       Race Begins{" "}
                       <span className="text-yellow-500 font-medium block mt-1">
-                        {new Date(`${nextRace.date}T${nextRace.time}`).toLocaleString("en-US", {
+                        {nextRace ? new Date(`${nextRace.date}T${nextRace.time}`).toLocaleString("en-US", {
                           weekday: "long",
                           year: "numeric",
                           month: "long",
@@ -308,7 +341,7 @@ export default function Hero() {
                           hour: "2-digit",
                           minute: "2-digit",
                           timeZoneName: "short",
-                        })}
+                        }) : "Loading..."}
                       </span>
                     </p>
                   </div>
