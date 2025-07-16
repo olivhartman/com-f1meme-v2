@@ -1,7 +1,7 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { airtableService, type ProfileData } from "../api/airtable"
-import { Instagram, Music, Globe, Flag, Users, Sparkles, ExternalLink, Copy } from "lucide-react"
+import { Instagram, Music, Globe, Flag, Users, Sparkles, Copy } from "lucide-react"
 import { Card, CardContent } from "../components/ui/card"
 // import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
@@ -270,7 +270,6 @@ const Community: React.FC = () => {
               </div>
               <Button className="bg-gradient-to-r from-yellow-400 to-red-500 hover:from-yellow-500 hover:to-red-600 text-black font-semibold">
                 Join Community
-                <ExternalLink className="w-4 h-4 ml-2" />
               </Button>
             </div>
           ) : (
