@@ -217,8 +217,9 @@ const Community: React.FC = () => {
   }, [])
 
   // Pagination logic
-  const totalPages = Math.ceil(members.length / perPage)
-  const pagedMembers = members.slice((page - 1) * perPage, page * perPage)
+  const filteredMembers = members.filter(m => m.membershipLevel && m.membershipLevel >= 1 && m.membershipLevel <= 99)
+  const totalPages = Math.ceil(filteredMembers.length / perPage)
+  const pagedMembers = filteredMembers.slice((page - 1) * perPage, page * perPage)
 
   const handlePrev = () => setPage((p) => Math.max(1, p - 1))
   const handleNext = () => setPage((p) => Math.min(totalPages, p + 1))
@@ -256,15 +257,15 @@ const Community: React.FC = () => {
                 <LoadingCard key={i} />
               ))}
             </div>
-          ) : members.length === 0 ? (
+          ) : filteredMembers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 space-y-6">
               <div className="w-24 h-24 bg-gradient-to-br from-yellow-400/20 to-red-500/20 rounded-full flex items-center justify-center">
                 <Flag className="w-12 h-12 text-yellow-400 animate-bounce" />
               </div>
               <div className="text-center space-y-2">
-                <h3 className="text-2xl font-bold text-white">No Members Yet!</h3>
+                <h3 className="text-2xl font-bold text-white">No Members in Level 1-99!</h3>
                 <p className="text-slate-400 max-w-md">
-                  Be the first to join our amazing F1Meme community and start the legend.
+                  Be the first to join our F1Meme community and reach Level 1 or higher to appear here.
                 </p>
               </div>
               <Button className="bg-gradient-to-r from-yellow-400 to-red-500 hover:from-yellow-500 hover:to-red-600 text-black font-semibold">
