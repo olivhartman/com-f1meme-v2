@@ -238,7 +238,7 @@ export default function Hero() {
               <CardContent className="p-8">
                 <div className="flex flex-col h-full">
                   <div className="flex flex-col items-center gap-8 pt-14">
-                    <h2 className="text-4xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent tracking-tight text-center w-full">
+                    <h2 className="text-4xl uppercase font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent tracking-tight text-center w-full">
                       {nextRace?.raceName}
                     </h2>
 
