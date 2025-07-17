@@ -6,6 +6,9 @@ import { Clock } from "lucide-react"
 import { Card, CardContent } from "./ui/card"
 import { Button } from "./ui/button"
 import DriversStandings from "./DriversStandings"
+// IMPORTANT: Always type API data and function parameters. Enable 'noImplicitAny' in tsconfig.json for strict type safety.
+// If you add new API calls, define and use types for all data.
+// See: https://www.typescriptlang.org/tsconfig#noImplicitAny
 import type { Race } from "../pages/schedule";
 // import Link from "next/link"
 
@@ -70,9 +73,9 @@ export default function Hero() {
           const res = await fetch(url);
           if (!res.ok) throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
           const data = await res.json();
-          const races = data.MRData.RaceTable.Races;
+          const races: Race[] = data.MRData.RaceTable.Races as Race[];
           if (!races.length) break;
-          (races as Race[]).forEach((race: Race) => {
+          races.forEach((race: Race) => {
             const raceDateTime = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
             const diff = raceDateTime.getTime() - now.getTime();
             if (diff > 0 && diff < minDiff) {
