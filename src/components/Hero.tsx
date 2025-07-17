@@ -32,17 +32,39 @@ export default function Hero() {
   const [player, setPlayer] = useState<any>(null)
 
   useEffect(() => {
-    // Fetch the next race from the F1 schedule API
+    // Fetch the next race from the F1 schedule API, with local cache
+    const CACHE_KEY = 'next_f1_race';
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+    function getCachedRace() {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (!cached) return null;
+      try {
+        const { race, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          return race;
+        }
+      } catch {}
+      return null;
+    }
+
+    function setCachedRace(race) {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ race, timestamp: Date.now() }));
+    }
+
+    // Show cached race instantly if available
+    const cachedRace = getCachedRace();
+    if (cachedRace) setNextRace(cachedRace);
+
     async function fetchNextRace() {
       try {
         const API_URL = 'https://api.jolpi.ca/ergast/f1/races/';
-        const PAGE_LIMIT = 100; // Fetch a large enough page to get all future races
+        const PAGE_LIMIT = 100;
         const now = new Date();
         let offset = 0;
-        let found = false;
         let closestRace = null;
         let minDiff = Infinity;
-        while (!found) {
+        while (true) {
           const url = `${API_URL}?offset=${offset}&limit=${PAGE_LIMIT}`;
           const res = await fetch(url);
           if (!res.ok) throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
@@ -61,12 +83,14 @@ export default function Hero() {
           offset += PAGE_LIMIT;
         }
         if (closestRace) {
-          setNextRace({
+          const raceObj = {
             date: closestRace.date,
             time: closestRace.time || '00:00:00',
             raceName: closestRace.raceName,
             circuit: closestRace.Circuit.circuitName,
-          });
+          };
+          setNextRace(raceObj);
+          setCachedRace(raceObj);
         }
       } catch (err) {
         console.error('Failed to fetch next race:', err);
