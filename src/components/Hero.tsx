@@ -101,7 +101,7 @@ export default function Hero() {
           if (closestRace) break;
           offset += PAGE_LIMIT;
         }
-        if (closestRace) {
+        if (closestRace && isRace(closestRace)) {
           const raceObj: NextRaceInfo = {
             date: closestRace.date,
             time: closestRace.time || '00:00:00',
