@@ -19,6 +19,11 @@ interface NextRaceInfo {
   circuit: string
 }
 
+// Helper type guard to check if an object is a Race
+function isRace(obj: any): obj is Race {
+  return obj && typeof obj === 'object' && 'date' in obj && 'raceName' in obj && 'Circuit' in obj;
+}
+
 export default function Hero() {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -73,9 +78,10 @@ export default function Hero() {
           const res = await fetch(url);
           if (!res.ok) throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
           const data = await res.json();
-          const races: Race[] = data.MRData.RaceTable.Races as Race[];
-          if (!races.length) break;
-          (races as Race[]).forEach((race: Race) => {
+          const racesRaw = data.MRData.RaceTable.Races;
+          if (!Array.isArray(racesRaw) || !racesRaw.length) break;
+          const races: Race[] = racesRaw.filter(isRace);
+          races.forEach((race) => {
             const raceDateTime = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
             const diff = raceDateTime.getTime() - now.getTime();
             if (diff > 0 && diff < minDiff) {
