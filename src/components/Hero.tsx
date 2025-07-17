@@ -20,8 +20,14 @@ interface NextRaceInfo {
 }
 
 // Helper type guard to check if an object is a Race
-function isRace(obj: any): obj is Race {
-  return obj && typeof obj === 'object' && 'date' in obj && 'raceName' in obj && 'Circuit' in obj;
+function isRace(obj: unknown): obj is Race {
+  if (!obj || typeof obj !== 'object') return false;
+  const o = obj as Record<string, unknown>;
+  return (
+    typeof o.date === 'string' &&
+    typeof o.raceName === 'string' &&
+    typeof o.Circuit === 'object' && o.Circuit !== null
+  );
 }
 
 export default function Hero() {
@@ -38,26 +44,29 @@ export default function Hero() {
     "Over 220,000 attendance in Chinese Grand Prix 🏁",
   ])
   const [nextRace, setNextRace] = useState<NextRaceInfo | null>(null)
-  const [player, setPlayer] = useState<any>(null)
+  // Use Vimeo.Player | null if available, otherwise fallback to any
+  const [player, setPlayer] = useState<null | { destroy: () => void }>(null)
 
   useEffect(() => {
     // Fetch the next race from the F1 schedule API, with local cache
     const CACHE_KEY = 'next_f1_race';
     const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-    function getCachedRace() {
+    function getCachedRace(): NextRaceInfo | null {
       const cached = localStorage.getItem(CACHE_KEY);
       if (!cached) return null;
       try {
-        const { race, timestamp } = JSON.parse(cached);
+        const { race, timestamp } = JSON.parse(cached) as { race: NextRaceInfo, timestamp: number };
         if (Date.now() - timestamp < CACHE_DURATION) {
           return race;
         }
-      } catch {}
+      } catch (err) {
+        // Ignore JSON parse errors
+      }
       return null;
     }
 
-    function setCachedRace(race) {
+    function setCachedRace(race: NextRaceInfo) {
       localStorage.setItem(CACHE_KEY, JSON.stringify({ race, timestamp: Date.now() }));
     }
 
@@ -81,7 +90,7 @@ export default function Hero() {
           const racesRaw = data.MRData.RaceTable.Races;
           if (!Array.isArray(racesRaw) || !racesRaw.length) break;
           const races: Race[] = racesRaw.filter(isRace);
-          races.forEach((race) => {
+          races.forEach((race: Race) => {
             const raceDateTime = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
             const diff = raceDateTime.getTime() - now.getTime();
             if (diff > 0 && diff < minDiff) {
@@ -93,7 +102,7 @@ export default function Hero() {
           offset += PAGE_LIMIT;
         }
         if (closestRace) {
-          const raceObj = {
+          const raceObj: NextRaceInfo = {
             date: closestRace.date,
             time: closestRace.time || '00:00:00',
             raceName: closestRace.raceName,
@@ -137,6 +146,7 @@ export default function Hero() {
 
     // Initialize Vimeo player when script is loaded
     tag.onload = () => {
+      // @ts-ignore: Vimeo type may not be available
       const vimeoPlayer = new (window as any).Vimeo.Player('vimeo-player', {
         id: '45149087',
         background: true,
@@ -151,7 +161,7 @@ export default function Hero() {
 
       setPlayer(vimeoPlayer)
 
-      vimeoPlayer.on('error', function(error: any) {
+      vimeoPlayer.on('error', function(error: unknown) {
         console.error('Vimeo Player Error:', error)
       })
     }
