@@ -71,7 +71,7 @@ export default function Hero() {
           const data = await res.json();
           const races = data.MRData.RaceTable.Races;
           if (!races.length) break;
-          for (const race of races) {
+          for (const race of races as import("../pages/schedule").Race[]) {
             const raceDateTime = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
             const diff = raceDateTime.getTime() - now.getTime();
             if (diff > 0 && diff < minDiff) {
