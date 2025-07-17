@@ -101,12 +101,13 @@ export default function Hero() {
           if (closestRace) break;
           offset += PAGE_LIMIT;
         }
-        if (closestRace && isRace(closestRace)) {
+        if (closestRace !== null) {
+          const race = closestRace as Race;
           const raceObj: NextRaceInfo = {
-            date: closestRace.date,
-            time: closestRace.time || '00:00:00',
-            raceName: closestRace.raceName,
-            circuit: closestRace.Circuit.circuitName,
+            date: race.date,
+            time: race.time || '00:00:00',
+            raceName: race.raceName,
+            circuit: race.Circuit.circuitName,
           };
           setNextRace(raceObj);
           setCachedRace(raceObj);
