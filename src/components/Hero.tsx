@@ -66,7 +66,7 @@ export default function Hero() {
         const PAGE_LIMIT = 100;
         const now = new Date();
         let offset = 0;
-        let closestRace = null;
+        let closestRace: Race | null = null;
         let minDiff = Infinity;
         while (true) {
           const url = `${API_URL}?offset=${offset}&limit=${PAGE_LIMIT}`;
@@ -75,7 +75,7 @@ export default function Hero() {
           const data = await res.json();
           const races: Race[] = data.MRData.RaceTable.Races as Race[];
           if (!races.length) break;
-          races.forEach((race: Race) => {
+          (races as Race[]).forEach((race: Race) => {
             const raceDateTime = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
             const diff = raceDateTime.getTime() - now.getTime();
             if (diff > 0 && diff < minDiff) {
