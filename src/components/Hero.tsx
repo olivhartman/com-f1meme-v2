@@ -48,32 +48,25 @@ export default function Hero() {
   const [player, setPlayer] = useState<null | { destroy: () => void }>(null)
 
   useEffect(() => {
-    // Fetch the next race from the F1 schedule API, with local cache
     const CACHE_KEY = 'next_f1_race';
-    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
+    // Always show whatever is in localStorage immediately (even if stale)
     function getCachedRace(): NextRaceInfo | null {
       const cached = localStorage.getItem(CACHE_KEY);
       if (!cached) return null;
       try {
-        const { race, timestamp } = JSON.parse(cached) as { race: NextRaceInfo, timestamp: number };
-        if (Date.now() - timestamp < CACHE_DURATION) {
-          return race;
-        }
-      } catch (err) {
-        // Ignore JSON parse errors
+        const { race } = JSON.parse(cached) as { race: NextRaceInfo, timestamp: number };
+        return race;
+      } catch {
+        return null;
       }
-      return null;
     }
-
     function setCachedRace(race: NextRaceInfo) {
       localStorage.setItem(CACHE_KEY, JSON.stringify({ race, timestamp: Date.now() }));
     }
-
-    // Show cached race instantly if available
+    // Show cached race instantly
     const cachedRace = getCachedRace();
     if (cachedRace) setNextRace(cachedRace);
-
+    // Always update in the background
     async function fetchNextRace() {
       try {
         const API_URL = 'https://api.jolpi.ca/ergast/f1/races/';
