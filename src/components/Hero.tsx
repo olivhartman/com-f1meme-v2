@@ -6,6 +6,7 @@ import { Clock } from "lucide-react"
 import { Card, CardContent } from "./ui/card"
 import { Button } from "./ui/button"
 import DriversStandings from "./DriversStandings"
+import type { Race } from "../pages/schedule";
 // import Link from "next/link"
 
 interface NextRaceInfo {
@@ -71,7 +72,7 @@ export default function Hero() {
           const data = await res.json();
           const races = data.MRData.RaceTable.Races;
           if (!races.length) break;
-          for (const race of races as import("../pages/schedule").Race[]) {
+          for (const race of races as Race[]) {
             const raceDateTime = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
             const diff = raceDateTime.getTime() - now.getTime();
             if (diff > 0 && diff < minDiff) {

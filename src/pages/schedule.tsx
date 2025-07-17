@@ -11,7 +11,7 @@ type Session = {
   time: string
 }
 
-type Race = {
+export type Race = {
   season: string
   round: string
   raceName: string
