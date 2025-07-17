@@ -72,15 +72,14 @@ export default function Hero() {
           const data = await res.json();
           const races = data.MRData.RaceTable.Races;
           if (!races.length) break;
-          for (const race_ of races as Race[]) {
-            const race: Race = race_;
+          (races as Race[]).forEach((race: Race) => {
             const raceDateTime = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
             const diff = raceDateTime.getTime() - now.getTime();
             if (diff > 0 && diff < minDiff) {
               minDiff = diff;
               closestRace = race;
             }
-          }
+          });
           if (closestRace) break;
           offset += PAGE_LIMIT;
         }
