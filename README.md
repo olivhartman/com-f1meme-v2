@@ -80,6 +80,7 @@ yarn dev
 - `src/api/airtable.ts` — Airtable integration
 - `src/components/ProfilePage.tsx` — Profile management UI
 - `src/components/Hero.tsx` — Next race countdown and details
+- - `src/components/BoxBoxInterface.tsx` — BOXBOX Token Balance, Lock Token, Unlock Tokens, Tokens Lock History, Tokens Unlock History
 - `src/pages/schedule.tsx` — Full F1 schedule
 - `src/pages/community.tsx` — Community page
 
