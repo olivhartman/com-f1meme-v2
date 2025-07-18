@@ -12,7 +12,7 @@ import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react"
 import { Program, AnchorProvider, setProvider } from "@coral-xyz/anchor"
 import { PublicKey } from "@solana/web3.js"
 import idl from "../idl/boxbox.json"
-import type { Boxbox } from "../types/boxbox"
+import type { F1boxbox } from "../types/boxbox"
 import Loader from "./Loader"
 
 import "@solana/wallet-adapter-react-ui/styles.css"
@@ -45,7 +45,7 @@ export default function Home() {
   const getProgram = () => {
     if (!publicKey) return null
     const provider = getProvider()
-    return provider ? new Program<Boxbox>(idl_object, provider) : null
+    return provider ? new Program<F1boxbox>(idl_object, provider) : null
   }
 
   // Sync membership level to Airtable when user visits homepage

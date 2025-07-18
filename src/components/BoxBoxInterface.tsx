@@ -9,7 +9,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui"
 import { Program, AnchorProvider, utils, setProvider } from "@coral-xyz/anchor"
 import { PublicKey } from "@solana/web3.js"
 import idl from "../idl/boxbox.json"
-import type { Boxbox } from "../types/boxbox"
+import type { F1boxbox } from "../types/boxbox"
 import BN from "bn.js"
 import { LockIcon, UnlockIcon, ExternalLinkIcon, XIcon } from "lucide-react"
 import { useAtom } from "jotai"
@@ -159,7 +159,7 @@ const BoxBoxInterface: React.FC = () => {
 
   const getProgram = () => {
     const provider = getProvider()
-    return provider ? new Program<Boxbox>(idl_object, provider) : null
+    return provider ? new Program<F1boxbox>(idl_object, provider) : null
   }
 
   const setupProgramSubscription = useCallback(async () => {
@@ -305,10 +305,13 @@ useEffect(() => {
         if (program) {
             program.account.membershipAccount.all()
                 .then(accounts => {
-                    const total = accounts.reduce((sum, account) => {
+                    const total = accounts.reduce((sum: number, account: any) => {
                         const lockedAmount = account.account.locks
-                            .filter(lock => lock.isLocked)
-                            .reduce((lockSum, lock) => lockSum + lock.amount.toNumber(), 0);
+                            .filter((lock: any) => lock.isLocked)
+                            .reduce((lockSum: number, lock: any) => {
+                                console.log('Lock amount:', lock.amount.toNumber() / 1e6);
+                                return lockSum + lock.amount.toNumber();
+                            }, 0);
                         return sum + lockedAmount;
                     }, 0);
                     setTotalLockedTokens(total / 1e6);
@@ -490,7 +493,7 @@ useEffect(() => {
 
       const currentTime = new Date()
       setLocks(
-        accountInfo.locks.map((lock, index) => ({
+        accountInfo.locks.map((lock: any, index: number) => ({
           id: index,
           amount: lock.amount.toNumber() / 1e6,
           releaseDate: new Date(lock.releaseDate.toNumber() * 1000),
@@ -726,7 +729,7 @@ useEffect(() => {
     const interval = setInterval(() => {
       setLocks((prevLocks) => {
         const currentTime = new Date()
-        return prevLocks.map((lock) => ({
+        return prevLocks.map((lock: any) => ({
           ...lock,
           canUnlock: lock.isLocked && currentTime >= lock.releaseDate,
         }))
@@ -775,10 +778,10 @@ useEffect(() => {
             const accounts = await program.account.membershipAccount.all();
             console.log('Found accounts:', accounts.length);
             
-            const total = accounts.reduce((sum, account) => {
+            const total = accounts.reduce((sum: number, account: any) => {
                 const lockedAmount = account.account.locks
-                    .filter(lock => lock.isLocked)
-                    .reduce((lockSum, lock) => {
+                    .filter((lock: any) => lock.isLocked)
+                    .reduce((lockSum: number, lock: any) => {
                         console.log('Lock amount:', lock.amount.toNumber() / 1e6);
                         return lockSum + lock.amount.toNumber();
                     }, 0);
