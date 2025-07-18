@@ -66,9 +66,6 @@ const BoxBoxInterface: React.FC = () => {
   const wallet = useAnchorWallet()
   const { publicKey, sendTransaction } = useWallet()
   
-  // Debug logging
-  console.log('BoxBoxInterface - Wallet connected:', !!publicKey)
-  console.log('BoxBoxInterface - Public key:', publicKey?.toBase58())
 
   const [membershipAccount, setMembershipAccount] = useState<PublicKey | null>(null)
   const [escrowAccount, setEscrowAccount] = useState<PublicKey | null>(null)
@@ -146,12 +143,8 @@ const BoxBoxInterface: React.FC = () => {
   const getProvider = () => {
     if (!wallet) {
       // setMessageWithType("Wallet not connected.", "error")
-      console.log('[BoxBoxInterface] getProvider: wallet is null');
       return null
     }
-    console.log('[BoxBoxInterface] getProvider: wallet', wallet);
-    console.log('[BoxBoxInterface] getProvider: connection', connection);
-    console.log('[BoxBoxInterface] getProvider: options', AnchorProvider.defaultOptions());
     const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions())
     setProvider(provider)
     return provider
@@ -188,7 +181,6 @@ const BoxBoxInterface: React.FC = () => {
     let pingInterval: NodeJS.Timeout;
 
     ws.onopen = () => {
-        console.log('WebSocket Connected');
         retryCount = 0;
         sendSubscriptionRequest(ws);
         
@@ -238,7 +230,7 @@ const BoxBoxInterface: React.FC = () => {
 
             if (response.method === "programNotification" || 
                 (response.result && response.result.value)) {
-                console.log('Received update, refreshing totals');
+                // console.log('Received update, refreshing totals');
                 await updateTotalLockedTokens();
             }
         } catch (error) {
@@ -309,7 +301,7 @@ useEffect(() => {
                         const lockedAmount = account.account.locks
                             .filter((lock: any) => lock.isLocked)
                             .reduce((lockSum: number, lock: any) => {
-                                console.log('Lock amount:', lock.amount.toNumber() / 1e6);
+                                // console.log('Lock amount:', lock.amount.toNumber() / 1e6);
                                 return lockSum + lock.amount.toNumber();
                             }, 0);
                         return sum + lockedAmount;
@@ -774,28 +766,28 @@ useEffect(() => {
     const program = getProgram();
     if (program) {
         try {
-            console.log('Fetching all membership accounts...');
+            // console.log('Fetching all membership accounts...');
             const accounts = await program.account.membershipAccount.all();
-            console.log('Found accounts:', accounts.length);
+            // console.log('Found accounts:', accounts.length);
             
             const total = accounts.reduce((sum: number, account: any) => {
                 const lockedAmount = account.account.locks
                     .filter((lock: any) => lock.isLocked)
                     .reduce((lockSum: number, lock: any) => {
-                        console.log('Lock amount:', lock.amount.toNumber() / 1e6);
+                        // console.log('Lock amount:', lock.amount.toNumber() / 1e6);
                         return lockSum + lock.amount.toNumber();
                     }, 0);
                 return sum + lockedAmount;
             }, 0);
             
             const finalTotal = total / 1e6;
-            console.log('New total:', finalTotal);
+            // console.log('New total:', finalTotal);
             
             // Force a state update by creating a new number
             setTotalLockedTokens(prevTotal => {
-                console.log('Previous total:', prevTotal);
+                // console.log('Previous total:', prevTotal);
                 if (prevTotal !== finalTotal) {
-                    console.log('Updating total to:', finalTotal);
+                    // console.log('Updating total to:', finalTotal);
                     return finalTotal;
                 }
                 return prevTotal;
@@ -880,7 +872,7 @@ useEffect(() => {
                 vkUrl: "",
               })
             }
-            console.log('Membership level synced to Airtable:', userLevel)
+            // console.log('Membership level synced to Airtable:', userLevel)
           }
         } catch (err) {
           console.error('Failed to sync membership level to Airtable:', err)

@@ -27,9 +27,6 @@ export default function Home() {
   const wallet = useAnchorWallet()
   const { connection } = useConnection()
   
-  // Debug logging
-  console.log('AppPage - Wallet connected:', !!publicKey)
-  console.log('AppPage - Public key:', publicKey?.toBase58())
 
   const getProvider = () => {
     if (!wallet) {
@@ -69,7 +66,7 @@ export default function Home() {
         // Check if membership account exists first
         const membershipAccountInfo = await connection.getAccountInfo(membershipAccountPda)
         if (!membershipAccountInfo) {
-          console.log('Membership account does not exist, setting level to 0')
+          // console.log('Membership account does not exist, setting level to 0')
           // Only set to 0 if account truly doesn't exist
           try {
             const existingProfile = await airtableService.getProfile(publicKey.toBase58())
@@ -105,7 +102,7 @@ export default function Home() {
         const accountInfo = await program.account.membershipAccount.fetch(membershipAccountPda)
         const currentLevel = accountInfo.level
 
-        console.log('Current blockchain level:', currentLevel)
+        // console.log('Current blockchain level:', currentLevel)
 
         // Get existing profile data from Airtable
         const existingProfile = await airtableService.getProfile(publicKey.toBase58())
@@ -123,7 +120,7 @@ export default function Home() {
           coverPictureUrl: existingProfile?.coverPictureUrl || "",
         })
         
-        console.log('Membership level synced to Airtable:', currentLevel)
+        // console.log('Membership level synced to Airtable:', currentLevel)
       } catch (error: any) {
         const errorMsg = String(error)
         if (errorMsg.includes('Account does not exist') || errorMsg.includes('has no data')) {

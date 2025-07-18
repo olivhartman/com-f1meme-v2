@@ -145,7 +145,7 @@ export default function Hero() {
     tag.onload = () => {
       // @ts-ignore: Vimeo type may not be available
       const vimeoPlayer = new (window as any).Vimeo.Player('vimeo-player', {
-        id: '4514908aa7',
+        id: '45149087',
         background: true,
         autoplay: true,
         loop: true,
