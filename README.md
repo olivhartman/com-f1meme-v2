@@ -1,4 +1,4 @@
-# F1Meme Frontend
+# F1Meme
 
 A modern, F1-themed React/TypeScript web app featuring profile management, F1 schedule, community, and wallet integration.
 
