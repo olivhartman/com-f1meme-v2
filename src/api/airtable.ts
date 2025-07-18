@@ -459,9 +459,10 @@ async function saveRecordToAirtable(tableName: string, fields: Record<string, un
     : [fields];
   // Convert all field values to strings
   recordsArray.forEach(record => {
-    Object.keys(record.fields).forEach(key => {
-      if (typeof record.fields[key] !== 'string') {
-        record.fields[key] = record.fields[key]?.toString?.() ?? '';
+    const fields = record.fields as Record<string, unknown>;
+    Object.keys(fields).forEach(key => {
+      if (typeof fields[key] !== 'string') {
+        fields[key] = (fields[key] as any)?.toString?.() ?? '';
       }
     });
   });

@@ -265,8 +265,10 @@ export default function Hero() {
     // If race has finished and we haven't saved this race yet
     if (now > targetDate && lastSavedRace !== nextRace.raceName + nextRace.date) {
       async function saveWinner() {
+        if (!nextRace) return;
         try {
-          console.log('[Winner Save] Fetching session for race:', nextRace.raceName, nextRace.date);
+          // Only log if nextRace is not null
+          // console.log('[Winner Save] Fetching session for race:', nextRace.raceName, nextRace.date);
           // Fetch latest session for this race (by date and name)
           const sessionRes = await fetch('https://api.openf1.org/v1/sessions?meeting_key=latest');
           const sessionData = await sessionRes.json();
@@ -312,7 +314,7 @@ export default function Hero() {
           localStorage.setItem('lastSavedRace', nextRace.raceName + nextRace.date);
           setLastSavedRace(nextRace.raceName + nextRace.date);
         } catch (err) {
-          console.error('[Winner Save] Error saving winner:', err);
+          // console.error('[Winner Save] Error saving winner:', err);
         }
       }
       saveWinner();
