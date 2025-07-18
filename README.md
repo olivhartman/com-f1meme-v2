@@ -65,6 +65,17 @@ A modern, F1-themed React/TypeScript web app featuring profile management, F1 sc
 - Install dependencies with `npm install` or `yarn`.
 - Start the development server with `npm start` or `yarn dev`.
 
+## Environment Variables
+
+Create a `.env` file in your project root (or use Vercel's environment settings) with the following variables:
+
+- `VITE_AIRTABLE_PAT` — Your Airtable Personal Access Token (required for API access)
+- `VITE_AIRTABLE_BASE_ID` — Your Airtable Base ID (where your tables are stored)
+- `VITE_CLOUDINARY_CLOUD_NAME` — Your Cloudinary cloud name (for image uploads)
+- `VITE_CLOUDINARY_UPLOAD_PRESET` — Your Cloudinary unsigned upload preset (for image uploads)
+
+You may need additional variables for other services or features. See `.env.example` for a template.
+
 ## Running the Project
 ```bash
 npm install
