@@ -1,6 +1,6 @@
 // Paste your Airtable credentials here:
 const AIRTABLE_PAT = 'pat95AMuPcRFIx18w.d05e484612940e3d4296f4c13bb92d1e3d7d4c1dde24100fd20ba3933274e00c';
-const AIRTABLE_BASE_ID = 'appybIdNK7eRRXrw8';
+const AIRTABLE_BASE_ID = 'appYvwPNyWa7A1Aez';
 const AIRTABLE_TABLE_NAME = 'F1 Schedule';
 
 interface Session {

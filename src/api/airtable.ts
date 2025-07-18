@@ -450,17 +450,28 @@ export const airtableService = {
   }
 };
 
-// Generic function to save a record to any Airtable table
-async function saveRecordToAirtable(tableName: string, fields: Record<string, any>): Promise<void> {
+// Always send an array of records, and all fields as strings
+async function saveRecordToAirtable(tableName: string, fields: Record<string, unknown> | Record<string, unknown>[]): Promise<void> {
   if (!API_TOKEN) throw new Error('Airtable Personal Access Token is not configured');
   if (!BASE_ID) throw new Error('Airtable Base ID is not configured');
+  const recordsArray = Array.isArray(fields)
+    ? fields
+    : [fields];
+  // Convert all field values to strings
+  recordsArray.forEach(record => {
+    Object.keys(record.fields).forEach(key => {
+      if (typeof record.fields[key] !== 'string') {
+        record.fields[key] = record.fields[key]?.toString?.() ?? '';
+      }
+    });
+  });
   const response = await fetch(`${AIRTABLE_API_URL}/${tableName}`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${API_TOKEN}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ records: [{ fields }] }),
+    body: JSON.stringify({ records: recordsArray }),
   });
   if (!response.ok) {
     const errorText = await response.text();
@@ -484,4 +495,53 @@ export async function saveF1ScheduleEntry(entry: {
     'Created At': new Date().toISOString(),
   };
   await saveRecordToAirtable('F1 Schedule', fields);
+}
+
+// Save a race winner to the 'Winners' table
+export async function saveRaceWinner(entry: {
+  driverNumber: number;
+  fullName: string;
+  teamName?: string;
+  teamColor?: string;
+  raceName: string;
+  raceDate: string;
+}): Promise<void> {
+  const fields = {
+    'Driver Number': entry.driverNumber,
+    'Full Name': entry.fullName,
+    'Team Name': entry.teamName || '',
+    'Team Color': entry.teamColor || '',
+    'Race Name': entry.raceName,
+    'Race Date': entry.raceDate,
+    'Created At': new Date().toISOString(),
+  };
+  await saveRecordToAirtable('Winners', fields);
+}
+
+// Save top 3 race winners to the 'Winners' table
+export interface WinnerEntry {
+  position: number;
+  driverNumber: number;
+  fullName: string;
+  teamName?: string;
+  teamColor?: string;
+  raceName: string;
+  raceDate: string;
+}
+
+// All fields are sent as strings to match Airtable 'single line text' fields
+export async function saveRaceWinners(entries: WinnerEntry[]): Promise<void> {
+  const records = entries.map(entry => ({
+    fields: {
+      'Driver Number': entry.driverNumber.toString(),
+      'Position': entry.position.toString(),
+      'Full Name': entry.fullName || '',
+      'Team Name': entry.teamName || '',
+      'Team Color': entry.teamColor || '',
+      'Race Name': entry.raceName,
+      'Race Date': entry.raceDate,
+      'Created At': new Date().toISOString(),
+    }
+  }));
+  await saveRecordToAirtable('Winners', records);
 }
