@@ -74,7 +74,6 @@ Create a `.env` file in your project root (or use Vercel's environment settings)
 - `VITE_CLOUDINARY_CLOUD_NAME` — Your Cloudinary cloud name (for image uploads)
 - `VITE_CLOUDINARY_UPLOAD_PRESET` — Your Cloudinary unsigned upload preset (for image uploads)
 
-You may need additional variables for other services or features. See `.env.example` for a template.
 
 ## Running the Project
 ```bash
