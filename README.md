@@ -55,6 +55,11 @@ A modern, F1-themed React/TypeScript web app featuring profile management, F1 sc
 - The next race is determined by comparing race dates to the current time, and is cached in localStorage for 5 minutes to ensure instant display.
 - If cached data is available, it is shown immediately, and the app updates in the background with fresh data.
 
+## F1 Data APIs Used
+
+- **api.jolpi.ca**: This is a proxy for the Ergast F1 API, used to fetch the official F1 schedule and race data. The app uses this API to get all race dates, times, and details for the next race and the full schedule.
+- **api.openf1.org**: This API is used for additional F1 data and statistics. (Add more details here if you use it for specific features, e.g., live timing, telemetry, or results.)
+
 ## Setup & Environment
 - **Environment variables** are required for Airtable and Cloudinary API keys. See `.env.example` for details.
 - Install dependencies with `npm install` or `yarn`.
