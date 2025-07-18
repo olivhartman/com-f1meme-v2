@@ -8,30 +8,44 @@ import BoxBoxInterface from "./BoxBoxInterface"
 import { useEffect, useState } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { airtableService } from "../api/airtable"
-import { useConnection } from "@solana/wallet-adapter-react"
-import { Program, AnchorProvider } from "@coral-xyz/anchor"
+import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react"
+import { Program, AnchorProvider, setProvider } from "@coral-xyz/anchor"
 import { PublicKey } from "@solana/web3.js"
 import idl from "../idl/boxbox.json"
 import type { Boxbox } from "../types/boxbox"
 import Loader from "./Loader"
 
 import "@solana/wallet-adapter-react-ui/styles.css"
+import WalletContextWrapper from "./WalletContextWrapper";
 
 
+
+const idl_object = JSON.parse(JSON.stringify(idl))
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const { publicKey } = useWallet()
+  const wallet = useAnchorWallet()
   const { connection } = useConnection()
   
   // Debug logging
   console.log('AppPage - Wallet connected:', !!publicKey)
   console.log('AppPage - Public key:', publicKey?.toBase58())
 
+  const getProvider = () => {
+    if (!wallet) {
+      // setMessageWithType("Wallet not connected.", "error")
+      return null
+    }
+    const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions())
+    setProvider(provider)
+    return provider
+  }
+
   // Get program instance
   const getProgram = () => {
     if (!publicKey) return null
-    const provider = new AnchorProvider(connection, { publicKey } as any, AnchorProvider.defaultOptions())
-    return new Program<Boxbox>(JSON.parse(JSON.stringify(idl)), provider)
+    const provider = getProvider()
+    return provider ? new Program<Boxbox>(idl_object, provider) : null
   }
 
   // Sync membership level to Airtable when user visits homepage
@@ -175,6 +189,7 @@ export default function Home() {
   }
 
   return (
+    <WalletContextWrapper>
     <div className="relative min-h-screen text-white font-sans overflow-hidden">
         {/* <BackgroundElements /> */}
 
@@ -257,6 +272,7 @@ export default function Home() {
           </div>
         </footer>
       </div>
+      </WalletContextWrapper>
     )
 }
 

@@ -9,12 +9,11 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui"
 import { Program, AnchorProvider, utils, setProvider } from "@coral-xyz/anchor"
 import { PublicKey } from "@solana/web3.js"
 import idl from "../idl/boxbox.json"
-import type { Boxbox } from "../types/boxbox"
+import type { F1boxbox } from "../types/boxbox"
 import BN from "bn.js"
 import { LockIcon, UnlockIcon, ExternalLinkIcon, XIcon } from "lucide-react"
 import { useAtom } from "jotai"
 import { totalLockedTokensAtom } from "../atoms/totalLocked"
-import { airtableService } from "../api/airtable"
 
 // interface MembershipAccount {
 //   owner: PublicKey
@@ -65,10 +64,6 @@ const BoxBoxInterface: React.FC = () => {
   const { connection } = useConnection()
   const wallet = useAnchorWallet()
   const { publicKey, sendTransaction } = useWallet()
-  
-  // Debug logging
-  console.log('BoxBoxInterface - Wallet connected:', !!publicKey)
-  console.log('BoxBoxInterface - Public key:', publicKey?.toBase58())
 
   const [membershipAccount, setMembershipAccount] = useState<PublicKey | null>(null)
   const [escrowAccount, setEscrowAccount] = useState<PublicKey | null>(null)
@@ -86,20 +81,24 @@ const BoxBoxInterface: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const [unlockingLockId, setUnlockingLockId] = useState<number | null>(null);
+  const [isUnlockingDelayed, setIsUnlockingDelayed] = useState<boolean>(false);
   const [totalLockedTokens, setTotalLockedTokens] = useAtom(totalLockedTokensAtom);
 
   const handleUnlockTokens = async (lockIndex: number) => {
     try {
       setUnlockingLockId(lockIndex);
+      setIsUnlockingDelayed(true);
       
       await unlockTokens(lockIndex);
       
       setTimeout(() => {
+        setIsUnlockingDelayed(false);
         setUnlockingLockId(null);
       }, 3000);
       
     } catch (err) {
       console.error("Error unlocking tokens:", err);
+      setIsUnlockingDelayed(false);
       setUnlockingLockId(null);
     }
   };
@@ -137,21 +136,13 @@ const BoxBoxInterface: React.FC = () => {
         type,
       },
     ])
-    // Automatically remove the message after 5 seconds
-    setTimeout(() => {
-      setMessages((prevMessages) => prevMessages.slice(1));
-    }, 5000);
   }
 
   const getProvider = () => {
     if (!wallet) {
       // setMessageWithType("Wallet not connected.", "error")
-      console.log('[BoxBoxInterface] getProvider: wallet is null');
       return null
     }
-    console.log('[BoxBoxInterface] getProvider: wallet', wallet);
-    console.log('[BoxBoxInterface] getProvider: connection', connection);
-    console.log('[BoxBoxInterface] getProvider: options', AnchorProvider.defaultOptions());
     const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions())
     setProvider(provider)
     return provider
@@ -247,32 +238,32 @@ const BoxBoxInterface: React.FC = () => {
         }
     };
 
-    // ws.onerror = (error) => {
-    //     console.error('WebSocket Error:', error);
-    //     if (retryCount < MAX_RETRIES) {
-    //         retryCount++;
-    //         const delay = RETRY_DELAY * Math.pow(2, retryCount - 1);
-    //         setTimeout(() => {
-    //             if (ws.readyState === WebSocket.CLOSED) {
-    //                 setupProgramSubscription();
-    //             }
-    //         }, delay);
-    //     }
-    // };
+    ws.onerror = (error) => {
+        console.error('WebSocket Error:', error);
+        if (retryCount < MAX_RETRIES) {
+            retryCount++;
+            const delay = RETRY_DELAY * Math.pow(2, retryCount - 1);
+            setTimeout(() => {
+                if (ws.readyState === WebSocket.CLOSED) {
+                    setupProgramSubscription();
+                }
+            }, delay);
+        }
+    };
 
-    // ws.onclose = () => {
-    //     console.log('WebSocket Disconnected');
-    //     if (pingInterval) {
-    //         clearInterval(pingInterval);
-    //     }
-    //     if (retryCount < MAX_RETRIES) {
-    //         retryCount++;
-    //         const delay = RETRY_DELAY * Math.pow(2, retryCount - 1);
-    //         setTimeout(() => {
-    //             setupProgramSubscription();
-    //         }, delay);
-    //     }
-    // };
+    ws.onclose = () => {
+        console.log('WebSocket Disconnected');
+        if (pingInterval) {
+            clearInterval(pingInterval);
+        }
+        if (retryCount < MAX_RETRIES) {
+            retryCount++;
+            const delay = RETRY_DELAY * Math.pow(2, retryCount - 1);
+            setTimeout(() => {
+                setupProgramSubscription();
+            }, delay);
+        }
+    };
 
     return () => {
         if (pingInterval) {
@@ -499,7 +490,7 @@ useEffect(() => {
         })),
       )
       setUserLevel(accountInfo.level) // Update user level
-    } catch {
+    } catch (error) {
       // setMessageWithType(`Error fetching account info: ${error}`, "error")
     }
   }
@@ -515,7 +506,7 @@ useEffect(() => {
       setTokenBalance(balance.value.uiAmount || 0)
       updateAccountInfo()
     }
-    catch {
+    catch (error) {
       // setMessageWithType("You don't have any BOXBOX tokens. Purchase some at boxbox.wtf", "info")
     }
   }
@@ -838,55 +829,6 @@ useEffect(() => {
         return () => clearInterval(pollInterval);
     }
   }, [wallet]);
-
-  // Sync membership level to Airtable when userLevel changes
-  useEffect(() => {
-    if (publicKey && typeof userLevel === 'number') {
-      const syncLevel = async () => {
-        try {
-          // Add a small delay to ensure data is stable
-          await new Promise(resolve => setTimeout(resolve, 500))
-          
-          // Only sync if userLevel is greater than 0 or if we're sure it should be 0
-          if (userLevel > 0 || (userLevel === 0 && isMembershipInitialized)) {
-            // Get existing profile data from Airtable
-            const existingProfile = await airtableService.getProfile(publicKey.toBase58())
-            
-            // Only update if we have existing profile data to preserve
-            if (existingProfile) {
-              await airtableService.upsertProfile({ 
-                walletAddress: publicKey.toBase58(), 
-                membershipLevel: userLevel,
-                name: existingProfile.name || "",
-                email: existingProfile.email || "",
-                instagramUrl: existingProfile.instagramUrl || "",
-                tiktokUrl: existingProfile.tiktokUrl || "",
-                vkUrl: existingProfile.vkUrl || "",
-                profilePictureUrl: existingProfile.profilePictureUrl || "",
-                coverPictureUrl: existingProfile.coverPictureUrl || "",
-              })
-            } else {
-              // If no existing profile, just update the level without other fields
-              await airtableService.upsertProfile({ 
-                walletAddress: publicKey.toBase58(), 
-                membershipLevel: userLevel,
-                name: "",
-                email: "",
-                instagramUrl: "",
-                tiktokUrl: "",
-                vkUrl: "",
-              })
-            }
-            console.log('Membership level synced to Airtable:', userLevel)
-          }
-        } catch (err) {
-          console.error('Failed to sync membership level to Airtable:', err)
-        }
-      }
-      
-      syncLevel()
-    }
-  }, [publicKey, userLevel, isMembershipInitialized])
 
   return (
     <div className="flex flex-col items-center justify-start text-white">

@@ -530,19 +530,39 @@ export interface WinnerEntry {
   raceDate: string;
 }
 
+// Normalize race key for deduplication (race name + race date + driver name + position)
+export function normalizeRaceKey(raceName: string, raceDate: string, driverName: string, position: number): string {
+  return `${raceName.trim().toLowerCase()}|${new Date(raceDate).toISOString().slice(0, 10)}|${driverName.trim().toLowerCase()}|${position}`;
+}
+
 // All fields are sent as strings to match Airtable 'single line text' fields
 export async function saveRaceWinners(entries: WinnerEntry[]): Promise<void> {
   const records = entries.map(entry => ({
     fields: {
-      'Driver Number': entry.driverNumber.toString(),
       'Position': entry.position.toString(),
+      'Driver Number': entry.driverNumber.toString(),
       'Full Name': entry.fullName || '',
       'Team Name': entry.teamName || '',
       'Team Color': entry.teamColor || '',
       'Race Name': entry.raceName,
       'Race Date': entry.raceDate,
+      'Race Key': normalizeRaceKey(entry.raceName, entry.raceDate, entry.fullName || '', entry.position),
       'Created At': new Date().toISOString(),
     }
   }));
   await saveRecordToAirtable('Winners', records);
+}
+
+// Check if any winner for this race/driver/position exists
+export async function winnersExistForRace(raceName: string, raceDate: string, fullName: string, position: number): Promise<boolean> {
+  const raceKey = normalizeRaceKey(raceName, raceDate, fullName, position);
+  const filter = `{Race Key} = '${raceKey}'`;
+  const response = await fetch(`${AIRTABLE_API_URL}/Winners?filterByFormula=${encodeURIComponent(filter)}`, {
+    headers: {
+      'Authorization': `Bearer ${API_TOKEN}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  const data = await response.json();
+  return (data.records && data.records.length > 0);
 }

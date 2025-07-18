@@ -10,7 +10,7 @@ import DriversStandings from "./DriversStandings"
 // If you add new API calls, define and use types for all data.
 // See: https://www.typescriptlang.org/tsconfig#noImplicitAny
 import type { Race } from "../pages/schedule";
-import { saveRaceWinners, WinnerEntry } from '../api/airtable';
+import { saveRaceWinners, WinnerEntry, winnersExistForRace } from '../api/airtable';
 // import Link from "next/link"
 
 interface NextRaceInfo {
@@ -145,7 +145,7 @@ export default function Hero() {
     tag.onload = () => {
       // @ts-ignore: Vimeo type may not be available
       const vimeoPlayer = new (window as any).Vimeo.Player('vimeo-player', {
-        id: '45149087',
+        id: '4514908aa7',
         background: true,
         autoplay: true,
         loop: true,
@@ -170,92 +170,6 @@ export default function Hero() {
       }
     }
   }, [])
-
-  // On mount, check for the most recent past race and save its winner if not already saved
-  useEffect(() => {
-    async function saveLatestPastRaceWinner() {
-      try {
-        const API_URL = 'https://api.jolpi.ca/ergast/f1/races/';
-        const PAGE_LIMIT = 100;
-        const now = new Date();
-        let offset = 0;
-        let latestPastRace: Race | null = null;
-        let latestPastRaceTime = 0;
-        while (true) {
-          const url = `${API_URL}?offset=${offset}&limit=${PAGE_LIMIT}`;
-          const res = await fetch(url);
-          if (!res.ok) throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
-          const data = await res.json();
-          const racesRaw = data.MRData.RaceTable.Races;
-          if (!Array.isArray(racesRaw) || !racesRaw.length) break;
-          const races: Race[] = racesRaw.filter(isRace);
-          for (const race of races) {
-            const raceDateTime = new Date(`${race.date}T${race.time || '00:00:00Z'}`).getTime();
-            if (raceDateTime < now.getTime() && raceDateTime > latestPastRaceTime) {
-              latestPastRace = race;
-              latestPastRaceTime = raceDateTime;
-            }
-          }
-          offset += PAGE_LIMIT;
-        }
-        if (latestPastRace) {
-          const raceKey = latestPastRace.raceName + latestPastRace.date;
-          // Check if already saved (use localStorage as a simple cache)
-          if (localStorage.getItem('lastSavedRace') === raceKey) {
-            console.log('[Winner Save] Latest past race winner already saved:', raceKey);
-            return;
-          }
-          console.log('[Winner Save] Saving winner for latest past race:', latestPastRace.raceName, latestPastRace.date);
-          // Fetch latest session for this race (by date and name)
-          const sessionRes = await fetch('https://api.openf1.org/v1/sessions?meeting_key=latest');
-          const sessionData = await sessionRes.json();
-          console.log('[Winner Save] openf1 sessionData:', sessionData);
-          const session = sessionData[0];
-          if (!session) { console.log('[Winner Save] No session found'); return; }
-          // Fetch positions for this session
-          const posRes = await fetch(`https://api.openf1.org/v1/position?session_key=latest`);
-          const posData = await posRes.json();
-          console.log('[Winner Save] openf1 posData:', posData);
-          // Get latest position for each driver (reduce logic from DriversStandings)
-          const latestPositions = posData.reduce((acc: Record<number, any>, curr: any) => {
-            if (!acc[curr.driver_number] || new Date(curr.date) > new Date(acc[curr.driver_number].date)) {
-              acc[curr.driver_number] = curr;
-            }
-            return acc;
-          }, {});
-          // Convert to array and get top 3
-          const top3 = Object.values(latestPositions)
-            .sort((a: any, b: any) => a.position - b.position)
-            .slice(0, 3);
-          if (top3.length === 0) { console.log('[Winner Save] No top 3 finishers found'); return; }
-          // Fetch driver details for all top 3 (use session_key=latest)
-          const driversRes = await fetch(`https://api.openf1.org/v1/drivers?session_key=latest`);
-          const driversData = await driversRes.json();
-          console.log('[Winner Save] openf1 driversData:', driversData);
-          const winnerEntries: WinnerEntry[] = top3.map((pos: any) => {
-            const driverInfo = driversData.find((d: any) => d.driver_number === pos.driver_number);
-            console.log('[Winner Save] Matching driver:', pos.driver_number, driverInfo);
-            return {
-              position: pos.position,
-              driverNumber: pos.driver_number,
-              fullName: driverInfo?.full_name || '',
-              teamName: driverInfo?.team_name || '',
-              teamColor: driverInfo?.team_color || '',
-              raceName: latestPastRace.raceName,
-              raceDate: latestPastRace.date,
-            };
-          });
-          console.log('[Winner Save] Top 3 winner entries (latest past race):', winnerEntries);
-          await saveRaceWinners(winnerEntries);
-          localStorage.setItem('lastSavedRace', raceKey);
-          console.log('[Winner Save] Top 3 winners saved to Airtable for latest past race!');
-        }
-      } catch (err) {
-        console.error('[Winner Save] Error saving latest past race winner:', err);
-      }
-    }
-    saveLatestPastRaceWinner();
-  }, []);
 
   // Save winner to Airtable when race finishes
   useEffect(() => {
@@ -309,9 +223,15 @@ export default function Hero() {
             };
           });
           console.log('[Winner Save] Top 3 winner entries:', winnerEntries);
-          await saveRaceWinners(winnerEntries);
+          // Check Airtable for existing winners for this race/driver/position (global deduplication via Race Key)
+          const filteredWinnerEntries: WinnerEntry[] = [];
+          for (const entry of winnerEntries) {
+            const exists = await winnersExistForRace(entry.raceName, entry.raceDate, entry.fullName, entry.position);
+            if (!exists) filteredWinnerEntries.push(entry);
+          }
+          if (filteredWinnerEntries.length === 0) return;
+          await saveRaceWinners(filteredWinnerEntries);
           console.log('[Winner Save] Top 3 winners saved to Airtable!');
-          localStorage.setItem('lastSavedRace', nextRace.raceName + nextRace.date);
           setLastSavedRace(nextRace.raceName + nextRace.date);
         } catch (err) {
           // console.error('[Winner Save] Error saving winner:', err);
