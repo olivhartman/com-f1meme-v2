@@ -387,8 +387,8 @@ export default function Hero() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
                   </div>
                   
-                  <div className="relative space-y-2">
-                    <h3 className="text-3xl font-bold text-white">Get Started with Phantom</h3>
+                  <div className="relative space-y-2 flex flex-col justify-center items-center h-full">
+                    <h3 className="text-3xl font-bold text-white text-center">Get Started with Phantom</h3>
                   </div>
                   
                   <div className="relative flex gap-4">
