@@ -4,8 +4,8 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { User, Instagram, Music, Globe, Upload, Save, Camera, Check, AlertCircle, X } from "lucide-react"
-import { airtableService, type ProfileData as AirtableProfileData } from "../api/airtable"
+import { User, Instagram, Music, Globe, Upload, Save, Camera, Check, AlertCircle, X, Image, Plus } from "lucide-react"
+import { airtableService, type ProfileData as AirtableProfileData, type GalleryPhoto } from "../api/airtable"
 import Loader from "./Loader";
 
 interface ProfileData {
@@ -35,7 +35,7 @@ const ProfilePage = () => {
     coverPicture: null,
     profilePictureUrl: "",
     coverPictureUrl: "",
-    membershipLevel: 0,
+    membershipLevel: undefined,
   })
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState("")
@@ -51,6 +51,12 @@ const ProfilePage = () => {
     profilePicture?: string
     coverPicture?: string
   }>({})
+  
+  // Gallery state
+  const [galleryPhoto, setGalleryPhoto] = useState<File | null>(null)
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false)
+  const [galleryMessage, setGalleryMessage] = useState("")
+  const galleryPhotoRef = useRef<HTMLInputElement>(null)
 
   const handleInputChange = (field: keyof ProfileData, value: string) => {
     setProfileData((prev) => ({ ...prev, [field]: value }))
@@ -223,6 +229,53 @@ const ProfilePage = () => {
     }
   }
 
+  // Gallery handlers
+  const handleGalleryPhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null
+    if (file && file.type.startsWith("image/")) {
+      setGalleryPhoto(file)
+    }
+  }
+
+  const handleGalleryUpload = async () => {
+    if (!galleryPhoto || !publicKey) return
+    
+    setIsUploadingGallery(true)
+    setGalleryMessage("")
+    
+    try {
+      // Upload image to Cloudinary
+      const { cloudinaryService } = await import('../api/cloudinary')
+      const imageUrl = await cloudinaryService.uploadImage(galleryPhoto)
+      
+      // Get user profile for name
+      const userProfile = await airtableService.getProfile(publicKey.toBase58())
+      const uploadedBy = userProfile?.name || 'Anonymous'
+      
+      // Create gallery photo object
+      const galleryPhotoData: GalleryPhoto = {
+        url: imageUrl,
+        uploadedBy,
+        uploadedAt: new Date().toISOString(),
+        walletAddress: publicKey.toBase58(),
+      }
+      
+      // Save to Airtable
+      await airtableService.uploadGalleryPhoto(galleryPhotoData)
+      
+      setGalleryMessage("Photo uploaded successfully!")
+      setGalleryPhoto(null)
+      if (galleryPhotoRef.current) {
+        galleryPhotoRef.current.value = ""
+      }
+    } catch (error) {
+      console.error("Error uploading gallery photo:", error)
+      setGalleryMessage("Error uploading photo. Please try again.")
+    } finally {
+      setIsUploadingGallery(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#0F182C] flex flex-col items-center py-8 px-4">
       {showLoader && (
@@ -242,19 +295,19 @@ const ProfilePage = () => {
               onDrop={(e) => handleDrop(e, "coverPicture")}
               onClick={() => coverPictureRef.current?.click()}
             >
-              {profileData.coverPicture || profileData.coverPictureUrl ? (
-                <img
+            {profileData.coverPicture || profileData.coverPictureUrl ? (
+              <img
                   src={getImagePreviewUrl(profileData.coverPicture, profileData.coverPictureUrl) || "/placeholder.svg"}
-                  alt="Cover"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
+                alt="Cover"
+                className="w-full h-full object-cover"
+              />
+            ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400/80">
                   <Camera className="h-16 w-16 mb-3" />
                   <p className="text-lg font-medium">Add Cover Photo</p>
                   <p className="text-sm opacity-75">Click or drag to upload</p>
                 </div>
-              )}
+            )}
 
               <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <div className="bg-[#232c43]/80 backdrop-blur-sm rounded-full p-4">
@@ -262,16 +315,16 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <input
-                ref={coverPictureRef}
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleImageUpload(e, "coverPicture")}
-                className="hidden"
-              />
-            </div>
+            <input
+              ref={coverPictureRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, "coverPicture")}
+              className="hidden"
+            />
+          </div>
 
-            {/* Profile Header */}
+          {/* Profile Header */}
             <div className="relative px-8 pt-0 pb-8 bg-[#151e32]">
               <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6">
                 {/* Profile Picture */}
@@ -283,18 +336,18 @@ const ProfilePage = () => {
                     onClick={() => profilePictureRef.current?.click()}
                   >
                     <div className="w-full h-full rounded-full bg-[#232c43] overflow-hidden flex items-center justify-center">
-                      {profileData.profilePicture || profileData.profilePictureUrl ? (
-                        <img
+                {profileData.profilePicture || profileData.profilePictureUrl ? (
+                  <img
                           src={getImagePreviewUrl(profileData.profilePicture, profileData.profilePictureUrl) || "/placeholder.svg"}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
                         <div className="flex flex-col items-center text-slate-400">
                           <User className="h-12 w-12 mb-2" />
                           <span className="text-xs font-medium">Add Photo</span>
                         </div>
-                      )}
+                )}
                     </div>
 
                     <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full flex items-center justify-center">
@@ -304,14 +357,14 @@ const ProfilePage = () => {
                     </div>
                   </div>
 
-                  <input
-                    ref={profilePictureRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e, "profilePicture")}
-                    className="hidden"
-                  />
-                </div>
+                <input
+                  ref={profilePictureRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, "profilePicture")}
+                  className="hidden"
+                />
+              </div>
 
                 {/* Profile Info */}
                 <div className="flex-1 flex flex-col items-center sm:items-start mt-4 sm:mt-8">
@@ -337,29 +390,29 @@ const ProfilePage = () => {
                         <Globe className="h-5 w-5 text-white" />
                       </div>
                     )}
-                  </div>
-                </div>
+            </div>
+            </div>
 
                 {/* Save Button */}
                 <div className="w-full sm:w-auto mt-6 sm:mt-0">
-                  <button
-                    type="submit"
-                    form="profile-form"
-                    disabled={isLoading}
+              <button
+                type="submit"
+                form="profile-form"
+                disabled={isLoading}
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-yellow-500 to-yellow-700 hover:from-yellow-600 hover:to-yellow-800 text-white font-semibold px-8 py-3 rounded-2xl shadow-lg shadow-yellow-900/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                        <span>Saving...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Save className="h-5 w-5" />
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-5 w-5" />
                         <span>Save Changes</span>
-                      </>
-                    )}
-                  </button>
+                  </>
+                )}
+              </button>
                 </div>
               </div>
             </div>
@@ -373,129 +426,129 @@ const ProfilePage = () => {
                   <User className="h-5 w-5 text-white" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-100">Personal Details</h2>
-              </div>
+  </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Name Field */}
+              {/* Name Field */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200">
                     Display Name <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={profileData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    onBlur={() => handleBlur("name")}
+                <input
+                  type="text"
+                  value={profileData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  onBlur={() => handleBlur("name")}
                     className={`w-full px-4 py-4 border-2 ${
                       formErrors.name
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-yellow-500 focus:ring-yellow-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                    placeholder="Enter your display name"
-                  />
+                  placeholder="Enter your display name"
+                />
                   {formErrors.name && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
                       <AlertCircle className="h-4 w-4" />
                       {formErrors.name}
                     </div>
                   )}
-                </div>
+              </div>
 
-                {/* Email Field */}
+              {/* Email Field */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200">
                     Email Address <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="email"
-                    value={profileData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    onBlur={() => handleBlur("email")}
+                <input
+                  type="email"
+                  value={profileData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  onBlur={() => handleBlur("email")}
                     className={`w-full px-4 py-4 border-2 ${
                       formErrors.email
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-yellow-500 focus:ring-yellow-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                    placeholder="Enter your email address"
-                  />
+                  placeholder="Enter your email address"
+                />
                   {formErrors.email && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
                       <AlertCircle className="h-4 w-4" />
                       {formErrors.email}
                     </div>
                   )}
-                </div>
+              </div>
 
-                {/* Instagram Field */}
+              {/* Instagram Field */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200 flex items-center gap-2">
                     <Instagram className="h-4 w-4 text-pink-500" />
                     Instagram Profile
                   </label>
-                  <input
-                    type="url"
-                    value={profileData.instagramUrl}
-                    onChange={(e) => handleInputChange("instagramUrl", e.target.value)}
-                    onBlur={() => handleBlur("instagramUrl")}
+                <input
+                  type="url"
+                  value={profileData.instagramUrl}
+                  onChange={(e) => handleInputChange("instagramUrl", e.target.value)}
+                  onBlur={() => handleBlur("instagramUrl")}
                     className={`w-full px-4 py-4 border-2 ${
                       formErrors.instagramUrl
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-pink-500 focus:ring-pink-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                    placeholder="https://instagram.com/username"
-                  />
+                  placeholder="https://instagram.com/username"
+                />
                   {formErrors.instagramUrl && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
                       <AlertCircle className="h-4 w-4" />
                       {formErrors.instagramUrl}
                     </div>
                   )}
-                </div>
+              </div>
 
-                {/* TikTok Field */}
+              {/* TikTok Field */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200 flex items-center gap-2">
                     <Music className="h-4 w-4 text-slate-100" />
                     TikTok Profile
                   </label>
-                  <input
-                    type="url"
-                    value={profileData.tiktokUrl}
-                    onChange={(e) => handleInputChange("tiktokUrl", e.target.value)}
-                    onBlur={() => handleBlur("tiktokUrl")}
+                <input
+                  type="url"
+                  value={profileData.tiktokUrl}
+                  onChange={(e) => handleInputChange("tiktokUrl", e.target.value)}
+                  onBlur={() => handleBlur("tiktokUrl")}
                     className={`w-full px-4 py-4 border-2 ${
                       formErrors.tiktokUrl
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-yellow-500 focus:ring-yellow-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                    placeholder="https://tiktok.com/username"
-                  />
+                  placeholder="https://tiktok.com/username"
+                />
                   {formErrors.tiktokUrl && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
                       <AlertCircle className="h-4 w-4" />
                       {formErrors.tiktokUrl}
                     </div>
                   )}
-                </div>
+              </div>
 
-                {/* VK Field */}
+              {/* VK Field */}
                 <div className="space-y-2 lg:col-span-2">
                   <label className="block text-sm font-semibold text-slate-200 flex items-center gap-2">
                     <Globe className="h-4 w-4 text-blue-400" />
                     VK Profile
                   </label>
-                  <input
-                    type="url"
-                    value={profileData.vkUrl}
-                    onChange={(e) => handleInputChange("vkUrl", e.target.value)}
-                    onBlur={() => handleBlur("vkUrl")}
+                <input
+                  type="url"
+                  value={profileData.vkUrl}
+                  onChange={(e) => handleInputChange("vkUrl", e.target.value)}
+                  onBlur={() => handleBlur("vkUrl")}
                     className={`w-full px-4 py-4 border-2 ${
                       formErrors.vkUrl
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-blue-500 focus:ring-blue-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                    placeholder="https://vk.com/username"
-                  />
+                  placeholder="https://vk.com/username"
+                />
                   {formErrors.vkUrl && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
                       <AlertCircle className="h-4 w-4" />
@@ -506,8 +559,114 @@ const ProfilePage = () => {
               </div>
             </form>
           </div>
-        </div>
-      )}
+
+          {/* Gallery Section - Only for users with membership level 0+ */}
+          {(profileData.membershipLevel !== undefined && profileData.membershipLevel >= 55) && (
+          <div className="mt-8 bg-[#151e32] backdrop-blur-xl rounded-3xl shadow-xl shadow-black/30 border border-[#232c43] overflow-hidden">
+            <div className="p-8">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-xl flex items-center justify-center">
+                  <Image className="h-5 w-5 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-100">Gallery Upload</h2>
+                <div className="ml-auto">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                    Gallery Access
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Photo Upload */}
+                <div className="space-y-4">
+                  <label className="block text-sm font-semibold text-slate-200">
+                    Gallery Photo <span className="text-red-500">*</span>
+                  </label>
+                  
+                  <div
+                    className="relative w-full h-48 bg-[#1a2336] rounded-xl border-2 border-dashed border-[#232c43] group cursor-pointer hover:border-yellow-500/50 transition-all duration-300"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault()
+                      const file = e.dataTransfer.files[0]
+                      if (file && file.type.startsWith("image/")) {
+                        setGalleryPhoto(file)
+                      }
+                    }}
+                    onClick={() => galleryPhotoRef.current?.click()}
+                  >
+                    {galleryPhoto ? (
+                      <img
+                        src={URL.createObjectURL(galleryPhoto)}
+                        alt="Gallery preview"
+                        className="w-full h-full object-cover rounded-xl"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400/80">
+                        <Plus className="h-12 w-12 mb-3" />
+                        <p className="text-lg font-medium">Add Gallery Photo</p>
+                        <p className="text-sm opacity-75">Click or drag to upload</p>
+                      </div>
+                    )}
+
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex items-center justify-center">
+                      <div className="bg-[#232c43]/80 backdrop-blur-sm rounded-full p-3">
+                        <Upload className="h-6 w-6 text-slate-200" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <input
+                    ref={galleryPhotoRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleGalleryPhotoChange}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* Upload Button */}
+                <div className="space-y-4">
+                  <button
+                    onClick={handleGalleryUpload}
+                    disabled={!galleryPhoto || isUploadingGallery}
+                    className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-yellow-500 to-yellow-700 hover:from-yellow-600 hover:to-yellow-800 text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-yellow-900/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+                  >
+                    {isUploadingGallery ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-5 w-5" />
+                        <span>Upload to Gallery</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Gallery Message */}
+              {galleryMessage && (
+                <div className={`mt-4 p-4 rounded-xl ${
+                  galleryMessage.includes("successfully")
+                    ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                    : "bg-red-500/10 border border-red-500/30 text-red-400"
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {galleryMessage.includes("successfully") ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4" />
+                    )}
+                    <span className="font-medium">{galleryMessage}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
       {/* Toast Notification */}
       {message && (
@@ -530,6 +689,8 @@ const ProfilePage = () => {
             )}
             <span className="font-semibold">{message}</span>
           </div>
+        </div>
+      )}
         </div>
       )}
     </div>

@@ -9,6 +9,7 @@ window.Buffer = buffer.Buffer;
 import WalletContextWrapper from './components/WalletContextWrapper';
 import Community from './pages/community'
 import SchedulePage from './pages/schedule'
+import Gallery from './pages/gallery'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           />
           <Route path="/community" element={<Community />} />
           <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/gallery" element={<Gallery />} />
         </Routes>
       </Router>
     </WalletContextWrapper>

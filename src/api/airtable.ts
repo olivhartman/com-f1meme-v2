@@ -8,6 +8,7 @@ const AIRTABLE_API_URL = `https://api.airtable.com/v0/${BASE_ID}`;
 
 // Table and field names - update these to match your Airtable structure
 const TABLE_NAME = 'Profile';
+const GALLERY_TABLE_NAME = 'GalleryPhoto';
 const FIELD_NAMES = {
   NAME: 'Name',
   EMAIL: 'Email',
@@ -20,6 +21,14 @@ const FIELD_NAMES = {
   CREATED_AT: 'Created At',
   UPDATED_AT: 'Updated At',
   MEMBERSHIP_LEVEL: 'Membership Level',
+};
+
+const GALLERY_FIELD_NAMES = {
+  ID: 'id',
+  URL: 'url',
+  UPLOADED_BY: 'uploadedBy',
+  UPLOADED_AT: 'uploadedAt',
+  WALLET_ADDRESS: 'walletAddress',
 };
 
 export interface ProfileData {
@@ -36,6 +45,14 @@ export interface ProfileData {
   createdAt?: string;
   updatedAt?: string;
   membershipLevel?: number;
+}
+
+export interface GalleryPhoto {
+  id?: string;
+  url: string;
+  uploadedBy: string;
+  uploadedAt: string;
+  walletAddress: string;
 }
 
 export const airtableService = {
@@ -432,20 +449,92 @@ export const airtableService = {
         }
         
         return {
-          name: record.fields[FIELD_NAMES.NAME] || '',
-          instagramUrl: record.fields[FIELD_NAMES.INSTAGRAM_URL] || '',
-          tiktokUrl: record.fields[FIELD_NAMES.TIKTOK_URL] || '',
-          vkUrl: record.fields[FIELD_NAMES.VK_URL] || '',
-          profilePictureUrl: record.fields[FIELD_NAMES.PROFILE_PICTURE]?.[0]?.url || '',
-          coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || '',
-          walletAddress: record.fields[FIELD_NAMES.WALLET_ADDRESS] || '',
+        name: record.fields[FIELD_NAMES.NAME] || '',
+        instagramUrl: record.fields[FIELD_NAMES.INSTAGRAM_URL] || '',
+        tiktokUrl: record.fields[FIELD_NAMES.TIKTOK_URL] || '',
+        vkUrl: record.fields[FIELD_NAMES.VK_URL] || '',
+        profilePictureUrl: record.fields[FIELD_NAMES.PROFILE_PICTURE]?.[0]?.url || '',
+        coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || '',
+        walletAddress: record.fields[FIELD_NAMES.WALLET_ADDRESS] || '',
           membershipLevel: membershipLevel,
-          // Do not include email
+        // Do not include email
         };
       });
     } catch (error) {
       console.error('Error fetching all profiles:', error);
       return [];
+    }
+  },
+
+  // Gallery methods
+  async uploadGalleryPhoto(photo: GalleryPhoto): Promise<void> {
+    try {
+      console.log('Uploading gallery photo:', photo);
+      
+      const fields = {
+        [GALLERY_FIELD_NAMES.URL]: photo.url,
+        [GALLERY_FIELD_NAMES.UPLOADED_BY]: photo.uploadedBy,
+        [GALLERY_FIELD_NAMES.UPLOADED_AT]: photo.uploadedAt,
+        [GALLERY_FIELD_NAMES.WALLET_ADDRESS]: photo.walletAddress,
+      };
+
+      const response = await fetch(`${AIRTABLE_API_URL}/${GALLERY_TABLE_NAME}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${API_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          records: [{
+            fields
+          }]
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Upload gallery photo error response:', errorText);
+        throw new Error(`Upload gallery photo failed: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Gallery photo uploaded successfully:', data);
+    } catch (error) {
+      console.error('Error uploading gallery photo:', error);
+      throw error;
+    }
+  },
+
+  async getAllGalleryPhotos(): Promise<GalleryPhoto[]> {
+    try {
+      console.log('Getting all gallery photos...');
+      const response = await fetch(`${AIRTABLE_API_URL}/${GALLERY_TABLE_NAME}?view=Grid%20view&sort[0][field]=${GALLERY_FIELD_NAMES.UPLOADED_AT}&sort[0][direction]=desc`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${API_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Get all gallery photos error response:', errorText);
+        throw new Error(`Get all gallery photos failed: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('All gallery photos data:', data);
+
+      return data.records.map((record: any) => ({
+        id: record.id,
+        url: record.fields[GALLERY_FIELD_NAMES.URL] || '',
+        uploadedBy: record.fields[GALLERY_FIELD_NAMES.UPLOADED_BY] || '',
+        uploadedAt: record.fields[GALLERY_FIELD_NAMES.UPLOADED_AT] || '',
+        walletAddress: record.fields[GALLERY_FIELD_NAMES.WALLET_ADDRESS] || '',
+      }));
+    } catch (error) {
+      console.error('Error getting all gallery photos:', error);
+      throw error;
     }
   }
 };
