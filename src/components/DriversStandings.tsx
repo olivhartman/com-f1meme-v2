@@ -88,7 +88,6 @@ export default function DriversStandings() {
     <div className="space-y-4">
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold">{sessionInfo.meeting_name}</h2>
-        <p className="text-sm text-gray-400">{sessionInfo.session_name}</p>
       </div>
       <div className="grid gap-4">
         {drivers.map((driver) => (

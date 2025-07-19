@@ -20,6 +20,11 @@ interface NextRaceInfo {
   circuit: string
 }
 
+interface LatestRaceInfo {
+  meeting_name?: string
+  session_name?: string
+}
+
 // Helper type guard to check if an object is a Race
 function isRace(obj: unknown): obj is Race {
   if (!obj || typeof obj !== 'object') return false;
@@ -45,6 +50,7 @@ export default function Hero() {
     "Over 220,000 attendance in Chinese Grand Prix 🏁",
   ])
   const [nextRace, setNextRace] = useState<NextRaceInfo | null>(null)
+  const [latestRace, setLatestRace] = useState<LatestRaceInfo>({})
   // Use Vimeo.Player | null if available, otherwise fallback to any
   const [player, setPlayer] = useState<null | { destroy: () => void }>(null)
   // Track last saved race to avoid duplicate saves
@@ -113,6 +119,58 @@ export default function Hero() {
       }
     }
     fetchNextRace();
+    
+    // Fetch latest race info for the standings display
+    async function fetchLatestRace() {
+      try {
+        // Get the most recent completed race from Ergast API
+        const currentYear = new Date().getFullYear()
+        const racesRes = await fetch(`https://api.jolpi.ca/ergast/f1/${currentYear}.json`)
+        const racesData = await racesRes.json()
+        console.log('[Hero] Current season races:', racesData)
+        
+        if (racesData.MRData?.RaceTable?.Races?.length > 0) {
+          const races = racesData.MRData.RaceTable.Races
+          const now = new Date()
+          
+          // Find the most recent completed race
+          let latestCompletedRace = null
+          for (let i = races.length - 1; i >= 0; i--) {
+            const raceDate = new Date(races[i].date)
+            if (raceDate < now) {
+              latestCompletedRace = races[i]
+              break
+            }
+          }
+          
+          if (latestCompletedRace) {
+            console.log('[Hero] Latest completed race:', latestCompletedRace)
+            setLatestRace({
+              meeting_name: latestCompletedRace.raceName,
+              session_name: 'Race'
+            })
+          } else {
+            // Fallback to openf1 API
+            const sessionRes = await fetch("https://api.openf1.org/v1/sessions?session_key=latest")
+            const sessionData = await sessionRes.json()
+            const latestSession = sessionData[0] || {}
+            console.log('[Hero] Latest session:', latestSession)
+            
+            setLatestRace({
+              meeting_name: latestSession.meeting_name,
+              session_name: latestSession.session_name
+            })
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch latest race:', err)
+      }
+    }
+    fetchLatestRace();
+    
+    // Refresh latest race info every 30 seconds (same as DriversStandings)
+    const latestRaceInterval = setInterval(fetchLatestRace, 30000)
+    return () => clearInterval(latestRaceInterval)
   }, []);
 
   useEffect(() => {
@@ -292,23 +350,23 @@ export default function Hero() {
 
       <div className="container mx-auto px-4 py-2 max-w-7xl mt-14">
         {/* Hero Section */}
-        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-16 items-center mb-8 sm:mb-16 lg:mb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-16 items-start lg:items-center mb-8 sm:mb-16 lg:mb-24">
           {/* Left Column */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="space-y-8 sm:space-y-12 relative z-10"
+            className="space-y-6 sm:space-y-8 lg:space-y-12 relative z-10 order-1 lg:order-1"
           >
-            {/* <div>
-              <h1 className="text-xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-none mb-4 sm:mb-6 bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent">
+            <div className="text-center lg:text-left">
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white tracking-tight leading-none mb-3 sm:mb-4 lg:mb-6 bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent">
                 Latest Race Result
-              </h1> */}
-              {/* <div className="flex items-center gap-4">
-                <div className="h-1 w-24 bg-gradient-to-r from-yellow-500 to-yellow-300" />
-                <p className="text-xl font-light tracking-wider text-gray-300">{nextRace.circuit}</p>
-              </div> */}
-            {/* </div> */}
+              </h1>
+              <div className="flex items-center justify-center lg:justify-start gap-3 sm:gap-4">
+                <div className="h-1 w-16 sm:w-20 lg:w-24 bg-gradient-to-r from-yellow-500 to-yellow-300" />
+                <p className="text-sm sm:text-lg lg:text-xl font-light tracking-wider text-gray-300">{latestRace.meeting_name || nextRace?.raceName || "Loading..."}</p>
+              </div>
+            </div>
 
             {/* Podium Results Card */}
             <DriversStandings />
@@ -319,24 +377,24 @@ export default function Hero() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-col gap-8"
+            className="flex flex-col gap-6 sm:gap-8 order-2 lg:order-2"
           >
             <Card className="bg-gradient-to-br from-black/60 to-gray-900/60 backdrop-blur-lg border-white/10 hover:border-yellow-500/30 transition-all duration-500 shadow-2xl shadow-black/20">
-              <CardContent className="p-8">
+              <CardContent className="p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col h-full">
-                  <div className="flex flex-col items-center gap-8 pt-14">
-                    <h2 className="text-4xl uppercase font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent tracking-tight text-center w-full">
+                  <div className="flex flex-col items-center gap-4 sm:gap-6 lg:gap-8 pt-8 sm:pt-10 lg:pt-14">
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl uppercase font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent tracking-tight text-center w-full">
                       {nextRace?.raceName}
                     </h2>
 
                     <Card className="bg-gradient-to-br from-black/80 to-gray-900/80 border-white/10 w-full hover:border-yellow-500/20 transition-all duration-300">
-                      <CardContent className="p-8">
+                      <CardContent className="p-4 sm:p-6 lg:p-8">
                         <div className="flex items-center justify-center">
-                          <Clock className="text-yellow-500 mr-6 h-6 w-6" />
-                          <div className="grid grid-cols-4 gap-6">
+                          <Clock className="text-yellow-500 mr-3 sm:mr-4 lg:mr-6 h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
+                          <div className="grid grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
                             {Object.entries(timeLeft).map(([unit, value]) => (
                               <div key={unit} className="text-center">
-                                <span className="text-4xl font-bold text-white tabular-nums block mb-2">
+                                <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tabular-nums block mb-1 sm:mb-2">
                                   {value.toString().padStart(2, "0")}
                                 </span>
                                 <span className="text-xs font-medium uppercase tracking-widest text-yellow-500">
@@ -349,7 +407,7 @@ export default function Hero() {
                       </CardContent>
                     </Card>
 
-                    <p className="text-base font-light tracking-wider text-gray-400 text-center">
+                    <p className="text-sm sm:text-base font-light tracking-wider text-gray-400 text-center">
                       Race Begins{" "}
                       <span className="text-yellow-500 font-medium block mt-1">
                         {nextRace ? new Date(`${nextRace.date}T${nextRace.time}`).toLocaleString("en-US", {
@@ -373,10 +431,10 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="mt-8"
+              className="mt-6 sm:mt-8"
             >
-              <Card className="bg-black/40 backdrop-blur-sm border-white/10 overflow-hidden group hover:border-yellow-500/50 transition-all duration-300 h-[400px]">
-                <CardContent className="p-8 flex flex-col justify-between h-full relative">
+              <Card className="bg-black/40 backdrop-blur-sm border-white/10 overflow-hidden group hover:border-yellow-500/50 transition-all duration-300 h-[300px] sm:h-[350px] lg:h-[400px]">
+                <CardContent className="p-4 sm:p-6 lg:p-8 flex flex-col justify-between h-full relative">
                   <div className="absolute inset-0">
                     <img 
                       src="/assets/images/banner2.jpg" 
@@ -388,15 +446,15 @@ export default function Hero() {
                   </div>
                   
                   <div className="relative space-y-2 flex flex-col justify-center items-center h-full">
-                    <h3 className="text-3xl font-bold text-white text-center">Get Started with Phantom</h3>
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white text-center">Get Started with Phantom</h3>
                   </div>
                   
-                  <div className="relative flex gap-4">
+                  <div className="relative flex flex-col sm:flex-row gap-3 sm:gap-4">
                     <a href="https://apps.apple.com/app/phantom-solana-wallet/id1598432977" 
                        target="_blank" 
                        rel="noopener noreferrer"
                        className="flex-1">
-                      <Button className="w-full bg-yellow-500 text-black hover:bg-yellow-400 font-bold text-lg py-6">
+                      <Button className="w-full bg-yellow-500 text-black hover:bg-yellow-400 font-bold text-sm sm:text-base lg:text-lg py-4 sm:py-5 lg:py-6">
                         App Store
                       </Button>
                     </a>
@@ -404,7 +462,7 @@ export default function Hero() {
                        target="_blank" 
                        rel="noopener noreferrer"
                        className="flex-1">
-                      <Button className="w-full bg-yellow-500 text-black hover:bg-yellow-400 font-bold text-lg py-6">
+                      <Button className="w-full bg-yellow-500 text-black hover:bg-yellow-400 font-bold text-sm sm:text-base lg:text-lg py-4 sm:py-5 lg:py-6">
                         Play Store
                       </Button>
                     </a>
