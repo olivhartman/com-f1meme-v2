@@ -1,4 +1,4 @@
-// Cloudinary configuration and upload service
+// Cloudinary configurations and upload service
 function getEnv(key: string): string | undefined {
   if (typeof process !== 'undefined' && process.env && process.env[key]) {
     return process.env[key];
