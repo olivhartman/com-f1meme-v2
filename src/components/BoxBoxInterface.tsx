@@ -755,7 +755,7 @@ useEffect(() => {
 
   //Dummy LevelDisplay Component
   const LevelDisplay = ({ level }: { level: number }) => (
-    <div className="flex justify-between items-center mb-4">
+    <div className="flex justify-center items-center mb-4 gap-4">
       <span className="text-gray-400">Membership Level</span>
       <span className="text-xl font-semibold">{level}</span>
     </div>
@@ -912,7 +912,7 @@ useEffect(() => {
         </div>
 
         <div className="rounded-t-xl p-3 sm:p-4 mb-4 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-          <h3 className="text-xl sm:text-2xl font-bold text-yellow-500">BoxBox Premium</h3>
+          <h3 className="text-xl sm:text-2xl font-bold text-yellow-500 text-center sm:text-left">BoxBox Premium</h3>
           <div className="flex items-center w-full sm:w-auto justify-center sm:justify-end">
             <WalletMultiButton className="w-full sm:w-auto" />
           </div>
@@ -979,7 +979,7 @@ useEffect(() => {
                 {/* Lock Tokens Section */}
                 <div className="space-y-4 bg-[#1a1b23] p-4 sm:p-6 rounded-lg mt-6">
                   <div>
-                    <label htmlFor="amountToLock" className="block text-sm font-medium text-gray-400 mb-3">
+                    <label htmlFor="amountToLock" className="block text-sm font-medium text-gray-400 mb-3 text-center">
                       Amount to Lock (BOXBOX)
                     </label>
                     <div className="relative flex items-center">
@@ -1039,21 +1039,21 @@ useEffect(() => {
 
                 {/* Active Locks Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg sm:text-xl font-semibold">Active Locks</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-center">Active Locks</h3>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {locks.filter((lock) => lock.isLocked).length === 0 ? (
-                      <p className="text-gray-400 col-span-full">There are no active locks.</p>
+                      <p className="text-gray-400 col-span-full text-center">There are no active locks.</p>
                     ) : (
                       locks
                         .filter((lock) => lock.isLocked)
                         .map((lock) => (
                           <div key={lock.id} className="bg-[#1a1b23] p-4 rounded-lg">
                             <div className="space-y-3">
-                              <div>
+                              <div className="text-center">
                                 <span className="text-gray-400 text-sm">Locked Amount</span>
                                 <span className="text-lg sm:text-xl font-semibold block mt-1">{formatNumber(lock.amount)} BOXBOX</span>
                               </div>
-                              <div>
+                              <div className="text-center">
                                 <span className="text-gray-400 text-sm">Release Date</span>
                                 <span className="text-base block mt-1">{lock.releaseDate.toLocaleString()}</span>
                               </div>
@@ -1095,20 +1095,20 @@ useEffect(() => {
 
                 {/* Unlocked Tokens Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg sm:text-xl font-semibold">Unlocked Tokens</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-center">Unlocked Tokens</h3>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {locks.filter((lock) => !lock.isLocked).length === 0 ? (
-                      <p className="text-gray-400 col-span-full">There are no unlocked tokens.</p>
+                      <p className="text-gray-400 col-span-full text-center">There are no unlocked tokens.</p>
                     ) : (
                       locks
                         .filter((lock) => !lock.isLocked)
                         .map((lock) => (
                           <div key={lock.id} className="bg-[#1a1b23] p-4 rounded-lg">
-                            <div>
+                            <div className="text-center">
                               <span className="text-gray-400 text-sm">Unlocked Amount</span>
                               <span className="text-lg sm:text-xl font-semibold block mt-1">{formatNumber(lock.amount)} BOXBOX</span>
                             </div>
-                            <div className="mt-3">
+                            <div className="mt-3 text-center">
                               <span className="text-gray-400 text-sm">Unlocked Date</span>
                               <span className="text-base block mt-1">{lock.releaseDate.toLocaleString()}</span>
                             </div>
@@ -1125,10 +1125,10 @@ useEffect(() => {
         {/* Not Connected State */}
         {!wallet && (
           <div className="backdrop-blur-sm bg-black/20 rounded-b-xl shadow-lg w-full overflow-hidden p-6 text-center">
-            <p className="text-lg sm:text-xl font-medium text-gray-300 mb-3">
+            <p className="text-lg sm:text-xl font-medium text-gray-300 mb-3 text-center">
               Connect your wallet to lock your BOXBOX tokens.
             </p>
-            <small className="text-sm text-gray-400 max-w-lg mx-auto block">
+            <small className="text-sm text-gray-400 max-w-lg mx-auto block text-center">
               On your first wallet connection, your membership account and vault are automatically created. This requires approval for two transactions to cover the costs, so keep at least 0.001 SOL in your wallet.
             </small>
           </div>
