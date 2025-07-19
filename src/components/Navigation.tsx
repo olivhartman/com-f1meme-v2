@@ -45,7 +45,7 @@ export default function Navigation({}: NavigationProps) {
             {/* Left: Logo always visible */}
             <div className="flex items-center h-16">
               <Link to="/" className="flex items-center justify-center ml-3 sm:ml-0">
-                <div className="w-11 h-11 rounded-full overflow-hidden bg-white flex items-center justify-center">
+                <div className="w-11 h-11 rounded-lg overflow-hidden bg-white flex items-center justify-center">
                   <img
                     src="/assets/images/favicon.svg"
                     alt="F1 Meme Logo"
@@ -61,22 +61,22 @@ export default function Navigation({}: NavigationProps) {
             <div className="hidden sm:flex flex-row items-center gap-3 h-16">
               <Link
                 to="/community"
-                className="flex items-center justify-center w-11 h-11 rounded-full bg-white border-2 border-yellow-600 shadow-lg hover:bg-yellow-100 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
+                className="flex items-center justify-center w-11 h-11 rounded-lg bg-white border-2 border-[#FBEB04] shadow-lg hover:bg-[#FBEB04]/10 hover:border-[#FBEB04] transition-all font-bold text-[#272AE9] text-base focus:outline-none focus:ring-2 focus:ring-[#FBEB04]"
               >
-                <Users className="h-6 w-6 text-yellow-900" />
+                <Users className="h-6 w-6 text-[#272AE9]" strokeWidth={2} />
               </Link>
               <Link
                 to="/schedule"
-                className="flex items-center justify-center w-11 h-11 rounded-full bg-white border-2 border-yellow-600 shadow-lg hover:bg-yellow-100 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
+                className="flex items-center justify-center w-11 h-11 rounded-lg bg-white border-2 border-[#FBEB04] shadow-lg hover:bg-[#FBEB04]/10 hover:border-[#FBEB04] transition-all font-bold text-[#272AE9] text-base focus:outline-none focus:ring-2 focus:ring-[#FBEB04]"
               >
-                <Calendar className="h-6 w-6 text-yellow-900" />
+                <Calendar className="h-6 w-6 text-[#272AE9]" strokeWidth={2} />
               </Link>
               {publicKey && (
                 <Link
                   to="/profile"
-                  className="flex items-center justify-center w-11 h-11 rounded-full bg-yellow-400 border-2 border-yellow-600 shadow-lg hover:bg-yellow-500 hover:border-yellow-700 transition-all font-bold text-yellow-900 text-base focus:outline-none focus:ring-2 focus:ring-yellow-600"
+                  className="flex items-center justify-center w-11 h-11 rounded-lg bg-[#FBEB04] border-2 border-[#FBEB04] shadow-lg hover:bg-[#FBEB04]/80 hover:border-[#FBEB04] transition-all font-bold text-[#272AE9] text-base focus:outline-none focus:ring-2 focus:ring-[#FBEB04]"
                 >
-                  <User className="h-6 w-6 text-yellow-900" />
+                  <User className="h-6 w-6 text-[#272AE9]" strokeWidth={2} />
                 </Link>
               )}
             </div>
@@ -85,10 +85,10 @@ export default function Navigation({}: NavigationProps) {
             <div className="flex sm:hidden items-center h-16">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="flex items-center justify-center w-11 h-11 rounded-full bg-yellow-400 border-2 border-yellow-600 shadow-lg hover:bg-yellow-500 hover:border-yellow-700 transition-all focus:outline-none focus:ring-2 focus:ring-yellow-600"
+                className="flex items-center justify-center w-11 h-11 rounded-lg bg-[#FBEB04] border-2 border-[#FBEB04] shadow-lg hover:bg-[#FBEB04]/80 hover:border-[#FBEB04] transition-all focus:outline-none focus:ring-2 focus:ring-[#FBEB04]"
                 aria-label="Open menu"
               >
-                {mobileMenuOpen ? <X className="h-6 w-6 text-yellow-900" /> : <Menu className="h-6 w-6 text-yellow-900" />}
+                {mobileMenuOpen ? <X className="h-6 w-6 text-[#272AE9]" strokeWidth={2} /> : <Menu className="h-6 w-6 text-[#272AE9]" strokeWidth={2} />}
               </button>
             </div>
           </div>
@@ -109,21 +109,21 @@ export default function Navigation({}: NavigationProps) {
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-yellow-500"
+                className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
                 Home
               </Link>
               <Link
                 to="/community"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-yellow-500"
+                className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
                 Community
               </Link>
               <Link
                 to="/schedule"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-yellow-500"
+                className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
                 Schedule
               </Link>
@@ -131,7 +131,7 @@ export default function Navigation({}: NavigationProps) {
                 <Link
                   to="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-yellow-500"
+                  className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
                 >
                   Profile
                 </Link>

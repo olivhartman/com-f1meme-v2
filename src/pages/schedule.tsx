@@ -48,38 +48,38 @@ const sessionConfig: {
   FirstPractice: {
     label: "FP1",
     icon: <Timer className="w-3 h-3" />,
-    color: "text-yellow-400",
-    bgColor: "bg-yellow-400/10 border-yellow-400/30",
+    color: "text-[#FBEB04]",
+    bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
   SecondPractice: {
     label: "FP2",
     icon: <Timer className="w-3 h-3" />,
-    color: "text-yellow-400",
-    bgColor: "bg-yellow-400/10 border-yellow-400/30",
+    color: "text-[#FBEB04]",
+    bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
   ThirdPractice: {
     label: "FP3",
     icon: <Timer className="w-3 h-3" />,
-    color: "text-yellow-400",
-    bgColor: "bg-yellow-400/10 border-yellow-400/30",
+    color: "text-[#FBEB04]",
+    bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
   Qualifying: {
     label: "Qualifying",
     icon: <Zap className="w-3 h-3" />,
-    color: "text-yellow-400",
-    bgColor: "bg-yellow-400/10 border-yellow-400/30",
+    color: "text-[#FBEB04]",
+    bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
   Sprint: {
     label: "Sprint",
     icon: <Trophy className="w-3 h-3" />,
-    color: "text-yellow-400",
-    bgColor: "bg-yellow-400/10 border-yellow-400/30",
+    color: "text-[#FBEB04]",
+    bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
   SprintQualifying: {
     label: "Sprint Qualifying",
     icon: <Flag className="w-3 h-3" />,
-    color: "text-yellow-400",
-    bgColor: "bg-yellow-400/10 border-yellow-400/30",
+    color: "text-[#FBEB04]",
+    bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
 }
 
@@ -178,7 +178,7 @@ export default function Schedule() {
         <div className="relative px-4 py-26 text-center flex flex-col items-center justify-center">
           <div className="w-full max-w-3xl">
             <div className="mb-4">
-              <h1 className="text-4xl md:text-6xl font-black text-yellow-400 tracking-tight">F1 Schedule</h1>
+              <h1 className="text-4xl md:text-6xl font-black text-[#FBEB04] tracking-tight">F1 Schedule</h1>
             </div>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto">
               Complete Formula 1 race weekend schedule with all sessions and timings
@@ -194,19 +194,19 @@ export default function Schedule() {
             {races.map((race) => (
               <Card
                 key={race.round}
-                className="group bg-gradient-to-br from-black/50 to-gray-900/50 border-yellow-400/50 backdrop-blur-sm hover:border-yellow-400 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10 hover:-translate-y-1"
+                className="group bg-gradient-to-br from-black/50 to-gray-900/50 border-[#FBEB04]/50 backdrop-blur-sm hover:border-[#FBEB04] transition-all duration-300 hover:shadow-2xl hover:shadow-[#FBEB04]/10 hover:-translate-y-1"
               >
                 <CardContent className="p-6 space-y-6">
                   {/* Race Header */}
                   <div className="space-y-3">
                     <div className="flex items-start justify-between">
-                      <Badge className="bg-red-500/20 text-red-400 border-red-400/30 font-semibold">
+                      <Badge className="bg-[#FBEB04]/20 text-[#FBEB04] border-[#FBEB04]/40 font-semibold">
                         Round {race.round}
                       </Badge>
                       <div className="text-right text-xs text-slate-400">Season {race.season}</div>
                     </div>
 
-                    <h2 className="text-xl font-bold text-white group-hover:text-red-400 transition-colors line-clamp-2">
+                    <h2 className="text-xl font-bold text-white group-hover:text-[#FBEB04] transition-colors line-clamp-2">
                       <a href={race.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
                         {race.raceName}
                       </a>
@@ -222,7 +222,7 @@ export default function Schedule() {
                           href={race.Circuit.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm font-medium text-white hover:text-red-400 transition-colors hover:underline"
+                          className="text-sm font-medium text-white hover:text-[#FBEB04] transition-colors hover:underline"
                         >
                           {race.Circuit.circuitName}
                         </a>

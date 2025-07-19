@@ -239,7 +239,7 @@ const Community: React.FC = () => {
         <div className="relative px-4 py-26 text-center flex flex-col items-center justify-center">
           <div className="w-full max-w-3xl">
             <div className="mb-4 mt-4">
-              <h1 className="text-4xl md:text-6xl font-black text-yellow-400 tracking-tight">F1Meme Community</h1>
+              <h1 className="text-4xl md:text-6xl font-black text-[#FBEB04] tracking-tight">F1Meme Community</h1>
             </div>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto">
               Meet the passionate F1 fans who make our community legendary
@@ -268,9 +268,9 @@ const Community: React.FC = () => {
                   Be the first to join our F1Meme community and reach Level 1 or higher to appear here.
                 </p>
               </div>
-              <Button className="bg-gradient-to-r from-yellow-400 to-red-500 hover:from-yellow-500 hover:to-red-600 text-black font-semibold">
+              {/* <Button className="bg-gradient-to-r from-yellow-400 to-red-500 hover:from-yellow-500 hover:to-red-600 text-black font-semibold">
                 Join Community
-              </Button>
+              </Button> */}
             </div>
           ) : (
             <>
