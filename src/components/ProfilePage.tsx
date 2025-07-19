@@ -23,7 +23,7 @@ interface ProfileData {
   membershipLevel?: number;
 }
 
-const ProfilePage = () => {
+const ProfilePage: React.FC = () => {
   const { publicKey } = useWallet()
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
@@ -115,10 +115,12 @@ const ProfilePage = () => {
   useEffect(() => {
     return () => {
       if (profileData.profilePicture) {
-        URL.revokeObjectURL(URL.createObjectURL(profileData.profilePicture))
+        const url = URL.createObjectURL(profileData.profilePicture)
+        URL.revokeObjectURL(url)
       }
       if (profileData.coverPicture) {
-        URL.revokeObjectURL(URL.createObjectURL(profileData.coverPicture))
+        const url = URL.createObjectURL(profileData.coverPicture)
+        URL.revokeObjectURL(url)
       }
     }
   }, [profileData.profilePicture, profileData.coverPicture])
@@ -237,7 +239,7 @@ const ProfilePage = () => {
     }
   }
 
-  const handleGalleryUpload = async () => {
+  const handleGalleryUpload = async (): Promise<void> => {
     if (!galleryPhoto || !publicKey) return
     
     setIsUploadingGallery(true)
@@ -560,7 +562,7 @@ const ProfilePage = () => {
             </form>
           </div>
 
-          {/* Gallery Section - Only for users with membership level 0+ */}
+          {/* Gallery Section - Only for users with membership level 55+ */}
           {(profileData.membershipLevel !== undefined && profileData.membershipLevel >= 55) && (
           <div className="mt-8 bg-[#151e32] backdrop-blur-xl rounded-3xl shadow-xl shadow-black/30 border border-[#232c43] overflow-hidden">
             <div className="p-8">
