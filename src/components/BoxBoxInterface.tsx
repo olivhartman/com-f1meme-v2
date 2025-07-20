@@ -858,6 +858,7 @@ useEffect(() => {
                 tiktokUrl: existingProfile.tiktokUrl || "",
                 profilePictureUrl: existingProfile.profilePictureUrl || "",
                 coverPictureUrl: existingProfile.coverPictureUrl || "",
+                tgUrl: "",
               })
             } else {
               // If no existing profile, just update the level without other fields
@@ -868,6 +869,7 @@ useEffect(() => {
                 email: "",
                 instagramUrl: "",
                 tiktokUrl: "",
+                tgUrl: "",
               })
             }
             // console.log('Membership level synced to Airtable:', userLevel)
