@@ -170,7 +170,7 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
       </div>
 
       {/* Social links */}
-      {(member.instagramUrl || member.tiktokUrl || member.vkUrl) && (
+      {(member.instagramUrl || member.tiktokUrl || member.tgUrl) && (
         <div className="flex items-center gap-2 pt-2">
           {member.instagramUrl && (
             <SocialIcon
@@ -188,12 +188,12 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
               platform="TikTok"
             />
           )}
-          {member.vkUrl && (
+          {member.tgUrl && (
             <SocialIcon
-              url={member.vkUrl}
+              url={member.tgUrl}
               icon={<Globe className="w-4 h-4" />}
               hoverColor="hover:text-blue-400 hover:bg-blue-400/10"
-              platform="VK"
+              platform="Telegram"
             />
           )}
         </div>

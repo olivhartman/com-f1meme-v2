@@ -856,7 +856,6 @@ useEffect(() => {
                 email: existingProfile.email || "",
                 instagramUrl: existingProfile.instagramUrl || "",
                 tiktokUrl: existingProfile.tiktokUrl || "",
-                vkUrl: existingProfile.vkUrl || "",
                 profilePictureUrl: existingProfile.profilePictureUrl || "",
                 coverPictureUrl: existingProfile.coverPictureUrl || "",
               })
@@ -869,7 +868,6 @@ useEffect(() => {
                 email: "",
                 instagramUrl: "",
                 tiktokUrl: "",
-                vkUrl: "",
               })
             }
             // console.log('Membership level synced to Airtable:', userLevel)
