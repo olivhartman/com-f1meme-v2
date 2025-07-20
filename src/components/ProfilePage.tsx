@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { User, Instagram, Music, Globe, Upload, Save, Camera, Check, AlertCircle, X, Image, Plus } from "lucide-react"
+import { User, Instagram, Music, Send, Upload, Save, Camera, Check, AlertCircle, X, Image, Plus } from "lucide-react"
 import { airtableService, type ProfileData as AirtableProfileData, type GalleryPhoto } from "../api/airtable"
 import Loader from "./Loader";
 
@@ -13,7 +13,7 @@ interface ProfileData {
   email: string;
   instagramUrl: string;
   tiktokUrl: string;
-  vkUrl: string;
+  tgUrl: string;
   profilePicture: File | null;
   coverPicture: File | null;
   profilePictureUrl?: string;
@@ -30,7 +30,7 @@ const ProfilePage: React.FC = () => {
     email: "",
     instagramUrl: "",
     tiktokUrl: "",
-    vkUrl: "",
+    tgUrl: "",
     profilePicture: null,
     coverPicture: null,
     profilePictureUrl: "",
@@ -47,7 +47,7 @@ const ProfilePage: React.FC = () => {
     email?: string
     instagramUrl?: string
     tiktokUrl?: string
-    vkUrl?: string
+    tgUrl?: string
     profilePicture?: string
     coverPicture?: string
   }>({})
@@ -93,7 +93,7 @@ const ProfilePage: React.FC = () => {
               email: existingProfile.email || "",
               instagramUrl: existingProfile.instagramUrl,
               tiktokUrl: existingProfile.tiktokUrl,
-              vkUrl: existingProfile.vkUrl,
+              tgUrl: existingProfile.tgUrl,
               profilePicture: null,
               coverPicture: null,
               profilePictureUrl: existingProfile.profilePictureUrl,
@@ -140,13 +140,13 @@ const ProfilePage: React.FC = () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(value)) return "Enter a valid email address."
     }
-    if (["instagramUrl", "tiktokUrl", "vkUrl"].includes(field)) {
+    if (["instagramUrl", "tiktokUrl", "tgUrl"].includes(field)) {
       if (value && typeof value === "string" && value.trim() !== "") {
         try {
           const url = new URL(value)
           if (field === "instagramUrl" && !url.hostname.includes("instagram.com")) return "Must be an Instagram URL."
           if (field === "tiktokUrl" && !url.hostname.includes("tiktok.com")) return "Must be a TikTok URL."
-          if (field === "vkUrl" && !url.hostname.includes("vk.com")) return "Must be a VK URL."
+          if (field === "tgUrl" && !url.hostname.includes("t.me")) return "Must be a Telegram URL."
         } catch {
           return "Enter a valid URL."
         }
@@ -164,7 +164,7 @@ const ProfilePage: React.FC = () => {
     errors.email = validateField("email", profileData.email)
     errors.instagramUrl = validateField("instagramUrl", profileData.instagramUrl)
     errors.tiktokUrl = validateField("tiktokUrl", profileData.tiktokUrl)
-    errors.vkUrl = validateField("vkUrl", profileData.vkUrl)
+    errors.tgUrl = validateField("tgUrl", profileData.tgUrl)
     errors.profilePicture = validateField("profilePicture", profileData.profilePicture)
     errors.coverPicture = validateField("coverPicture", profileData.coverPicture)
     setFormErrors(errors)
@@ -196,7 +196,7 @@ const ProfilePage: React.FC = () => {
         email: profileData.email,
         instagramUrl: profileData.instagramUrl,
         tiktokUrl: profileData.tiktokUrl,
-        vkUrl: profileData.vkUrl,
+        tgUrl: profileData.tgUrl,
         profilePicture: profileData.profilePicture || undefined,
         coverPicture: profileData.coverPicture || undefined,
         walletAddress: publicKey.toBase58(),
@@ -387,9 +387,9 @@ const ProfilePage: React.FC = () => {
                         <Music className="h-5 w-5 text-slate-200" />
                       </div>
                     )}
-                    {profileData.vkUrl && (
+                    {profileData.tgUrl && (
                       <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-900 rounded-full flex items-center justify-center">
-                        <Globe className="h-5 w-5 text-white" />
+                        <Send className="h-5 w-5 text-white" />
                       </div>
                     )}
             </div>
@@ -533,28 +533,28 @@ const ProfilePage: React.FC = () => {
                   )}
               </div>
 
-              {/* VK Field */}
+              {/* Telegram Field */}
                 <div className="space-y-2 lg:col-span-2">
                   <label className="block text-sm font-semibold text-slate-200 flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-blue-400" />
-                    VK Profile
+                    <Send className="h-4 w-4 text-blue-400" />
+                    Telegram Profile
                   </label>
                 <input
                   type="url"
-                  value={profileData.vkUrl}
-                  onChange={(e) => handleInputChange("vkUrl", e.target.value)}
-                  onBlur={() => handleBlur("vkUrl")}
+                  value={profileData.tgUrl}
+                  onChange={(e) => handleInputChange("tgUrl", e.target.value)}
+                  onBlur={() => handleBlur("tgUrl")}
                     className={`w-full px-4 py-4 border-2 ${
-                      formErrors.vkUrl
+                      formErrors.tgUrl
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-blue-500 focus:ring-blue-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                  placeholder="https://vk.com/username"
+                  placeholder="https://t.me/username"
                 />
-                  {formErrors.vkUrl && (
+                  {formErrors.tgUrl && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
                       <AlertCircle className="h-4 w-4" />
-                      {formErrors.vkUrl}
+                      {formErrors.tgUrl}
                     </div>
                   )}
                 </div>
@@ -562,8 +562,7 @@ const ProfilePage: React.FC = () => {
             </form>
           </div>
 
-          {/* Gallery Section - Only for users with membership level 55+ */}
-          {(profileData.membershipLevel !== undefined && profileData.membershipLevel >= 55) && (
+          {/* Gallery Section - Always visible, but restricted for users below level 55 */}
           <div className="mt-8 bg-[#151e32] backdrop-blur-xl rounded-3xl shadow-xl shadow-black/30 border border-[#232c43] overflow-hidden">
             <div className="p-8">
               <div className="flex items-center gap-3 mb-8">
@@ -584,18 +583,17 @@ const ProfilePage: React.FC = () => {
                   <label className="block text-sm font-semibold text-slate-200">
                     Gallery Photo <span className="text-red-500">*</span>
                   </label>
-                  
                   <div
-                    className="relative w-full h-48 bg-[#1a2336] rounded-xl border-2 border-dashed border-[#232c43] group cursor-pointer hover:border-yellow-500/50 transition-all duration-300"
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => {
+                    className={`relative w-full h-48 bg-[#1a2336] rounded-xl border-2 border-dashed border-[#232c43] group cursor-pointer ${profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? 'opacity-60 pointer-events-none' : 'hover:border-yellow-500/50 transition-all duration-300'}`}
+                    onDragOver={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? undefined : (e) => e.preventDefault()}
+                    onDrop={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? undefined : (e) => {
                       e.preventDefault()
                       const file = e.dataTransfer.files[0]
                       if (file && file.type.startsWith("image/")) {
                         setGalleryPhoto(file)
                       }
                     }}
-                    onClick={() => galleryPhotoRef.current?.click()}
+                    onClick={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? undefined : () => galleryPhotoRef.current?.click()}
                   >
                     {galleryPhoto ? (
                       <img
@@ -624,6 +622,7 @@ const ProfilePage: React.FC = () => {
                     accept="image/*"
                     onChange={handleGalleryPhotoChange}
                     className="hidden"
+                    disabled={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55}
                   />
                 </div>
 
@@ -631,7 +630,7 @@ const ProfilePage: React.FC = () => {
                 <div className="space-y-4">
                   <button
                     onClick={handleGalleryUpload}
-                    disabled={!galleryPhoto || isUploadingGallery}
+                    disabled={profileData.membershipLevel === undefined || profileData.membershipLevel < 55 || !galleryPhoto || isUploadingGallery}
                     className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-yellow-500 to-yellow-700 hover:from-yellow-600 hover:to-yellow-800 text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-yellow-900/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
                   >
                     {isUploadingGallery ? (
@@ -647,6 +646,16 @@ const ProfilePage: React.FC = () => {
                     )}
                   </button>
                 </div>
+
+                {/* Upgrade message for users below level 55 */}
+                {profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 && (
+                  <div className="mt-4 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <span className="font-medium">Upgrade to Level 55+ to upload photos to the gallery!</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Gallery Message */}
@@ -668,7 +677,6 @@ const ProfilePage: React.FC = () => {
               )}
             </div>
           </div>
-        )}
 
       {/* Toast Notification */}
       {message && (

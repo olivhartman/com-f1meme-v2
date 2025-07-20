@@ -14,7 +14,7 @@ const FIELD_NAMES = {
   EMAIL: 'Email',
   INSTAGRAM_URL: 'Instagram URL',
   TIKTOK_URL: 'Tiktok URL',
-  VK_URL: 'VK URL',
+  TG_URL: 'TG URL',
   WALLET_ADDRESS: 'Wallet Address',
   PROFILE_PICTURE: 'Profile Picture',
   COVER_PICTURE: 'Cover Picture',
@@ -36,7 +36,7 @@ export interface ProfileData {
   email: string;
   instagramUrl: string;
   tiktokUrl: string;
-  vkUrl: string;
+  tgUrl: string;
   profilePicture?: File;
   coverPicture?: File;
   walletAddress: string;
@@ -181,13 +181,13 @@ export const airtableService = {
         console.log('No valid membership level provided, skipping field');
       }
 
-      // Only add TikTok and VK URLs if the fields exist in your table and have values
+      // Only add TikTok and TG URLs if the fields exist in your table and have values
       if (profileData.tiktokUrl && profileData.tiktokUrl.trim()) {
         fields[FIELD_NAMES.TIKTOK_URL] = profileData.tiktokUrl;
       }
       
-      if (profileData.vkUrl && profileData.vkUrl.trim()) {
-        fields[FIELD_NAMES.VK_URL] = profileData.vkUrl;
+      if (profileData.tgUrl && profileData.tgUrl.trim()) {
+        fields[FIELD_NAMES.TG_URL] = profileData.tgUrl;
       }
 
       // Handle profile picture attachment
@@ -409,7 +409,7 @@ export const airtableService = {
         email: record.fields[FIELD_NAMES.EMAIL] || '',
         instagramUrl: record.fields[FIELD_NAMES.INSTAGRAM_URL] || '',
         tiktokUrl: record.fields[FIELD_NAMES.TIKTOK_URL] || '',
-        vkUrl: record.fields[FIELD_NAMES.VK_URL] || '',
+        tgUrl: record.fields[FIELD_NAMES.TG_URL] || '',
         profilePicture: undefined, // We don't load existing images back as Files
         coverPicture: undefined,   // We don't load existing images back as Files
         walletAddress: record.fields[FIELD_NAMES.WALLET_ADDRESS] || '',
@@ -452,7 +452,7 @@ export const airtableService = {
         name: record.fields[FIELD_NAMES.NAME] || '',
         instagramUrl: record.fields[FIELD_NAMES.INSTAGRAM_URL] || '',
         tiktokUrl: record.fields[FIELD_NAMES.TIKTOK_URL] || '',
-        vkUrl: record.fields[FIELD_NAMES.VK_URL] || '',
+        tgUrl: record.fields[FIELD_NAMES.TG_URL] || '',
         profilePictureUrl: record.fields[FIELD_NAMES.PROFILE_PICTURE]?.[0]?.url || '',
         coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || '',
         walletAddress: record.fields[FIELD_NAMES.WALLET_ADDRESS] || '',

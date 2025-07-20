@@ -16,7 +16,7 @@ function WalletChangeListener() {
 
     if (currentWallet && previousWallet && previousWallet !== currentWallet) {
       sessionStorage.setItem("previousWallet", currentWallet)
-      window.location.href = window.location.href
+      window.location.reload()
     } else if (currentWallet) {
       sessionStorage.setItem("previousWallet", currentWallet)
     }

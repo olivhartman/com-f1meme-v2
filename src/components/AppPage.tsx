@@ -3,7 +3,6 @@ import Hero from "./Hero"
 import Tokenomics from "./Tokenomics"
 import Faqs from "./Faqs"
 import { Twitter, Send } from "lucide-react"
-import TwitterFeed from "./XFeed"
 import BoxBoxInterface from "./BoxBoxInterface"
 import { useEffect, useState } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
@@ -16,7 +15,6 @@ import type { F1boxbox } from "../types/boxbox"
 import Loader from "./Loader"
 
 import "@solana/wallet-adapter-react-ui/styles.css"
-import WalletContextWrapper from "./WalletContextWrapper";
 
 
 
@@ -186,7 +184,6 @@ export default function Home() {
   }
 
   return (
-    <WalletContextWrapper>
     <div className="relative min-h-screen text-white font-sans overflow-hidden">
         {/* <BackgroundElements /> */}
 
@@ -215,12 +212,6 @@ export default function Home() {
 
           <div className="relative z-10 w-full border-t-2 border-yellow-500/50 py-8 mt-16" />
 
-          <section id="twitter-feed" className="w-full py-16 md:py-16">
-            <TwitterFeed />
-          </section>
-
-          <div className="relative z-10 w-full border-t-2 border-yellow-500/50 py-8 mt-16" />
-
           <section id="tokenomics" className="w-full py-16 md:py-16">
             <Tokenomics />
           </section>
@@ -239,7 +230,7 @@ export default function Home() {
                 
                 <div className="flex gap-6 justify-center items-center w-full">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-yellow-500">BOXBOX</span>
+                    <img src="/assets/images/favicon.svg" alt="BOXBOX Logo" className="w-8 h-8 object-contain" />
                   </div>
                   
                   <div className="flex items-center gap-4">
@@ -269,7 +260,6 @@ export default function Home() {
           </div>
         </footer>
       </div>
-      </WalletContextWrapper>
     )
 }
 

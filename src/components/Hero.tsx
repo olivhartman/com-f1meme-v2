@@ -167,7 +167,7 @@ export default function Hero() {
       }
     }
     fetchLatestRace();
-    
+        
     // Refresh latest race info every 30 seconds (same as DriversStandings)
     const latestRaceInterval = setInterval(fetchLatestRace, 30000)
     return () => clearInterval(latestRaceInterval)
