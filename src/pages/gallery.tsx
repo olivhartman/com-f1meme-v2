@@ -84,8 +84,8 @@ const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
             loading="lazy"
           />
           
-          {/* Overlay with actions and caption */}
-          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4">
+          {/* Desktop Overlay with actions and caption */}
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 hidden sm:flex">
             {/* Caption */}
             {photo.caption && (
               <div className="text-center mb-4">
@@ -116,6 +116,43 @@ const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                 ) : (
                   <Download className="h-4 w-4 text-white" />
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile Overlay - Always visible on mobile */}
+          <div className="absolute inset-0 bg-black/40 flex flex-col justify-between p-3 sm:hidden">
+            {/* Top section for caption */}
+            {photo.caption && (
+              <div className="text-center">
+                <p className="text-white text-xs font-medium leading-relaxed max-w-full bg-black/50 backdrop-blur-sm rounded-lg px-2 py-1">
+                  {photo.caption}
+                </p>
+              </div>
+            )}
+            
+            {/* Bottom section for actions */}
+            <div className="flex justify-center gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={handleShare}
+                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 border-white/30 h-8 w-8 p-0"
+              >
+                <Share2 className="h-3 w-3 text-white" />
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={handleDownload}
+                disabled={isLoading}
+                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 border-white/30 h-8 w-8 p-0"
+              >
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent" />
+                ) : (
+                  <Download className="h-3 w-3 text-white" />
                 )}
               </Button>
             </div>
