@@ -21,6 +21,7 @@ export default function DriversStandings() {
   const [sessionInfo, setSessionInfo] = useState<Session>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const CACHE_KEY = 'f1_drivers_standings';
 
   useEffect(() => {
     async function fetchData() {
@@ -69,8 +70,24 @@ export default function DriversStandings() {
 
         setDrivers(enrichedDrivers)
         setLoading(false)
+        setError(null)
+        // Cache the result
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ drivers: enrichedDrivers, sessionInfo }))
       } catch (err) {
-        setError("Failed to fetch data")
+        // Try to load from cache
+        const cached = localStorage.getItem(CACHE_KEY)
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached)
+            setDrivers(parsed.drivers || [])
+            setSessionInfo(parsed.sessionInfo || {})
+            setError(null)
+          } catch {
+            setError("Race data temporarily unavailable. Please try again later.")
+          }
+        } else {
+          setError("Race data temporarily unavailable. Please try again later.")
+        }
         setLoading(false)
       }
     }

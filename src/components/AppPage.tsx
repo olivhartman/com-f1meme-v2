@@ -75,7 +75,7 @@ export default function Home() {
               email: existingProfile?.email || "",
               instagramUrl: existingProfile?.instagramUrl || "",
               tiktokUrl: existingProfile?.tiktokUrl || "",
-              vkUrl: existingProfile?.vkUrl || "",
+              tgUrl: existingProfile?.tgUrl || "",
               profilePictureUrl: existingProfile?.profilePictureUrl || "",
               coverPictureUrl: existingProfile?.coverPictureUrl || "",
             })
@@ -90,7 +90,7 @@ export default function Home() {
               email: "",
               instagramUrl: "",
               tiktokUrl: "",
-              vkUrl: "",
+              tgUrl: "",
             })
           }
           return
@@ -113,7 +113,7 @@ export default function Home() {
           email: existingProfile?.email || "",
           instagramUrl: existingProfile?.instagramUrl || "",
           tiktokUrl: existingProfile?.tiktokUrl || "",
-          vkUrl: existingProfile?.vkUrl || "",
+          tgUrl: existingProfile?.tgUrl || "",
           profilePictureUrl: existingProfile?.profilePictureUrl || "",
           coverPictureUrl: existingProfile?.coverPictureUrl || "",
         })
@@ -132,7 +132,7 @@ export default function Home() {
               email: existingProfile?.email || "",
               instagramUrl: existingProfile?.instagramUrl || "",
               tiktokUrl: existingProfile?.tiktokUrl || "",
-              vkUrl: existingProfile?.vkUrl || "",
+              tgUrl: existingProfile?.tgUrl || "",
               profilePictureUrl: existingProfile?.profilePictureUrl || "",
               coverPictureUrl: existingProfile?.coverPictureUrl || "",
             })
@@ -147,7 +147,7 @@ export default function Home() {
               email: "",
               instagramUrl: "",
               tiktokUrl: "",
-              vkUrl: "",
+              tgUrl: "",
             })
           }
         } else {
