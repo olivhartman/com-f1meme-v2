@@ -26,7 +26,7 @@ export default function DriversStandings() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Get session info first
+        // Try openf1 API first
         const sessionRes = await fetch("https://api.openf1.org/v1/sessions?session_key=latest")
         const sessionData = await sessionRes.json()
         const latestSession = sessionData[0] || {}
@@ -74,19 +74,42 @@ export default function DriversStandings() {
         // Cache the result
         localStorage.setItem(CACHE_KEY, JSON.stringify({ drivers: enrichedDrivers, sessionInfo }))
       } catch (err) {
-        // Try to load from cache
-        const cached = localStorage.getItem(CACHE_KEY)
-        if (cached) {
-          try {
-            const parsed = JSON.parse(cached)
-            setDrivers(parsed.drivers || [])
-            setSessionInfo(parsed.sessionInfo || {})
+        // Fallback: Jolpi Ergast Proxy
+        try {
+          const ergastRes = await fetch("https://api.jolpi.ca/ergast/f1/current/last/results.json")
+          const ergastData = await ergastRes.json()
+          const race = ergastData.MRData?.RaceTable?.Races?.[0]
+          if (race && race.Results) {
+            setSessionInfo({ meeting_name: race.raceName, session_name: "Race" })
+            const enrichedDrivers = race.Results.slice(0, 3).map((result: any) => ({
+              driver_number: parseInt(result.number, 10),
+              position: parseInt(result.position, 10),
+              full_name: `${result.Driver.givenName} ${result.Driver.familyName}`,
+              team_name: result.Constructor?.name,
+              team_color: undefined // Ergast does not provide team color
+            }))
+            setDrivers(enrichedDrivers)
             setError(null)
-          } catch {
+            setLoading(false)
+            // Cache the fallback result
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ drivers: enrichedDrivers, sessionInfo: { meeting_name: race.raceName, session_name: "Race" } }))
+            return
+          }
+        } catch {
+          // Try to load from cache
+          const cached = localStorage.getItem(CACHE_KEY)
+          if (cached) {
+            try {
+              const parsed = JSON.parse(cached)
+              setDrivers(parsed.drivers || [])
+              setSessionInfo(parsed.sessionInfo || {})
+              setError(null)
+            } catch {
+              setError("Race data temporarily unavailable. Please try again later.")
+            }
+          } else {
             setError("Race data temporarily unavailable. Please try again later.")
           }
-        } else {
-          setError("Race data temporarily unavailable. Please try again later.")
         }
         setLoading(false)
       }
