@@ -29,6 +29,7 @@ const GALLERY_FIELD_NAMES = {
   UPLOADED_BY: 'uploadedBy',
   UPLOADED_AT: 'uploadedAt',
   WALLET_ADDRESS: 'walletAddress',
+  CAPTION: 'caption',
 };
 
 export interface ProfileData {
@@ -53,6 +54,7 @@ export interface GalleryPhoto {
   uploadedBy: string;
   uploadedAt: string;
   walletAddress: string;
+  caption?: string;
 }
 
 export const airtableService = {
@@ -476,6 +478,7 @@ export const airtableService = {
         [GALLERY_FIELD_NAMES.UPLOADED_BY]: photo.uploadedBy,
         [GALLERY_FIELD_NAMES.UPLOADED_AT]: photo.uploadedAt,
         [GALLERY_FIELD_NAMES.WALLET_ADDRESS]: photo.walletAddress,
+        [GALLERY_FIELD_NAMES.CAPTION]: photo.caption || '',
       };
 
       const response = await fetch(`${AIRTABLE_API_URL}/${GALLERY_TABLE_NAME}`, {
@@ -531,6 +534,7 @@ export const airtableService = {
         uploadedBy: record.fields[GALLERY_FIELD_NAMES.UPLOADED_BY] || '',
         uploadedAt: record.fields[GALLERY_FIELD_NAMES.UPLOADED_AT] || '',
         walletAddress: record.fields[GALLERY_FIELD_NAMES.WALLET_ADDRESS] || '',
+        caption: record.fields[GALLERY_FIELD_NAMES.CAPTION] || '',
       }));
     } catch (error) {
       console.error('Error getting all gallery photos:', error);

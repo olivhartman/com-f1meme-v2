@@ -54,6 +54,7 @@ const ProfilePage: React.FC = () => {
   
   // Gallery state
   const [galleryPhoto, setGalleryPhoto] = useState<File | null>(null)
+  const [galleryCaption, setGalleryCaption] = useState("")
   const [isUploadingGallery, setIsUploadingGallery] = useState(false)
   const [galleryMessage, setGalleryMessage] = useState("")
   const galleryPhotoRef = useRef<HTMLInputElement>(null)
@@ -260,6 +261,7 @@ const ProfilePage: React.FC = () => {
         uploadedBy,
         uploadedAt: new Date().toISOString(),
         walletAddress: publicKey.toBase58(),
+        caption: galleryCaption.trim(),
       }
       
       // Save to Airtable
@@ -267,6 +269,7 @@ const ProfilePage: React.FC = () => {
       
       setGalleryMessage("Photo uploaded successfully!")
       setGalleryPhoto(null)
+      setGalleryCaption("")
       if (galleryPhotoRef.current) {
         galleryPhotoRef.current.value = ""
       }
@@ -622,6 +625,23 @@ const ProfilePage: React.FC = () => {
                     accept="image/*"
                     onChange={handleGalleryPhotoChange}
                     className="hidden"
+                    disabled={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55}
+                  />
+                </div>
+
+                {/* Caption Field */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-200">
+                    Caption (Optional)
+                  </label>
+                  <textarea
+                    value={galleryCaption}
+                    onChange={(e) => setGalleryCaption(e.target.value)}
+                    placeholder="Add a caption for your photo..."
+                    className={`w-full px-4 py-3 border-2 border-[#232c43] focus:border-yellow-500 focus:ring-yellow-200 rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm resize-none ${
+                      profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? 'opacity-60 pointer-events-none' : ''
+                    }`}
+                    rows={3}
                     disabled={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55}
                   />
                 </div>

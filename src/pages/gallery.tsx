@@ -84,8 +84,18 @@ const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
             loading="lazy"
           />
           
-          {/* Overlay with actions */}
-          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          {/* Overlay with actions and caption */}
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4">
+            {/* Caption */}
+            {photo.caption && (
+              <div className="text-center mb-4">
+                <p className="text-white text-sm font-medium leading-relaxed max-w-full">
+                  {photo.caption}
+                </p>
+              </div>
+            )}
+            
+            {/* Actions */}
             <div className="flex gap-3">
               <Button
                 size="sm"
