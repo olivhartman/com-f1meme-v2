@@ -563,7 +563,7 @@ const ProfilePage: React.FC = () => {
           </div>
 
           {/* Gallery Section - Only for users with membership level 55+ */}
-          {(profileData.membershipLevel !== undefined && profileData.membershipLevel >= 0) && (
+          {(profileData.membershipLevel !== undefined && profileData.membershipLevel >= 55) && (
           <div className="mt-8 bg-[#151e32] backdrop-blur-xl rounded-3xl shadow-xl shadow-black/30 border border-[#232c43] overflow-hidden">
             <div className="p-8">
               <div className="flex items-center gap-3 mb-8">
