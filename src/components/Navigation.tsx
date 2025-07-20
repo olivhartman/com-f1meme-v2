@@ -13,8 +13,6 @@ export default function Navigation({}: NavigationProps) {
   const [showConnectModal, setShowConnectModal] = useState(false)
   const wallet = useWallet()
   const { publicKey } = wallet
-  const navigate = useNavigate()
-  const prevPublicKey = useRef(publicKey);
 
   // Debug logging
   useEffect(() => {
@@ -33,21 +31,6 @@ export default function Navigation({}: NavigationProps) {
     }
   }, [publicKey, showConnectModal]);
 
-  useEffect(() => {
-    const handleDisconnect = () => {
-      window.location.reload();
-    };
-
-    if (wallet?.adapter) {
-      wallet.adapter.on("disconnect", handleDisconnect);
-    }
-
-    return () => {
-      if (wallet?.adapter) {
-        wallet.adapter.off("disconnect", handleDisconnect);
-      }
-    };
-  }, [wallet]);
 
   // Remove unused imports
   // import { ArrowLeft, ChevronLeft } from 'lucide-react';

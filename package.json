@@ -17,8 +17,8 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
-    "@metaplex-foundation/umi": "1.2.0",
-    "@metaplex-foundation/umi-bundle-defaults": "1.2.0",
+    "@metaplex-foundation/umi": "1.1.1",
+    "@metaplex-foundation/umi-bundle-defaults": "1.1.1",
     "@radix-ui/react-slot": "^1.1.2",
     "@solana/spl-token": "^0.4.13",
     "@solana/spl-token-metadata": "^0.1.6",
@@ -68,5 +68,9 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^6.2.1"
+  },
+  "overrides": {
+    "rimraf": "^4.0.0",
+    "glob": "^9.0.0"
   }
 }
