@@ -22,6 +22,7 @@ const AnimatedBackground = () => (
 
 const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
   const [isLoading, setIsLoading] = useState(false)
+  const [showMobileOverlay, setShowMobileOverlay] = useState(false)
 
   const handleDownload = async () => {
     setIsLoading(true)
@@ -65,6 +66,13 @@ const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
     }
   }
 
+  const handleImageClick = () => {
+    // On mobile, show overlay on click instead of hover
+    if (window.innerWidth <= 768) {
+      setShowMobileOverlay(!showMobileOverlay)
+    }
+  }
+
 
 
   return (
@@ -80,12 +88,13 @@ const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
           <img
             src={photo.url}
             alt={`Gallery photo by ${photo.uploadedBy}`}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
             loading="lazy"
+            onClick={handleImageClick}
           />
           
-          {/* Desktop Overlay with actions and caption */}
-          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 hidden sm:flex">
+          {/* Desktop Overlay with actions and caption (hover only) */}
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 hidden md:flex">
             {/* Caption */}
             {photo.caption && (
               <div className="text-center mb-4">
@@ -121,41 +130,56 @@ const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
             </div>
           </div>
 
-          {/* Mobile Overlay - Always visible on mobile */}
-          <div className="absolute inset-0 bg-black/40 flex flex-col justify-between p-3 sm:hidden">
-            {/* Top section for caption */}
+          {/* Mobile Overlay with actions and caption (click to show/hide) */}
+          <div className={`absolute inset-0 bg-black/80 transition-opacity duration-300 flex flex-col items-center justify-center p-4 md:hidden ${
+            showMobileOverlay ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}>
+            {/* Caption */}
             {photo.caption && (
-              <div className="text-center">
-                <p className="text-white text-xs font-medium leading-relaxed max-w-full bg-black/50 backdrop-blur-sm rounded-lg px-2 py-1">
+              <div className="text-center mb-6">
+                <p className="text-white text-base font-medium leading-relaxed max-w-full">
                   {photo.caption}
                 </p>
               </div>
             )}
             
-            {/* Bottom section for actions */}
-            <div className="flex justify-center gap-2">
+            {/* Actions */}
+            <div className="flex gap-4">
               <Button
-                size="sm"
+                size="lg"
                 variant="secondary"
                 onClick={handleShare}
-                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 border-white/30 h-8 w-8 p-0"
+                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 border-white/30"
               >
-                <Share2 className="h-3 w-3 text-white" />
+                <Share2 className="h-5 w-5 text-white" />
               </Button>
               <Button
-                size="sm"
+                size="lg"
                 variant="secondary"
                 onClick={handleDownload}
                 disabled={isLoading}
-                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 border-white/30 h-8 w-8 p-0"
+                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 border-white/30"
               >
                 {isLoading ? (
-                  <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent" />
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
                 ) : (
-                  <Download className="h-3 w-3 text-white" />
+                  <Download className="h-5 w-5 text-white" />
                 )}
               </Button>
             </div>
+
+            {/* Close button for mobile */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowMobileOverlay(false)
+              }}
+              className="absolute top-4 right-4 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"
+            >
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
 
