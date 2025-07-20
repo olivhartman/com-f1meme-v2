@@ -169,15 +169,19 @@ export default function Navigation({}: NavigationProps) {
               >
                 Gallery
               </Link>
-              {publicKey && (
+
                 <Link
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
+                to={publicKey ? "/profile" : "#"}
+                onClick={e => {
+                  if (!publicKey) {
+                    e.preventDefault();
+                    setShowConnectModal(true);
+                  }
+                }}
                   className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
                 >
                   Profile
                 </Link>
-              )}
             </nav>
           </motion.div>
         )}
