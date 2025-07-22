@@ -13,6 +13,11 @@ import { PublicKey } from "@solana/web3.js"
 import idl from "../idl/boxbox.json"
 import type { F1boxbox } from "../types/boxbox"
 import Loader from "./Loader"
+// MiniGallery component
+import { type GalleryPhoto } from "../api/airtable"
+import { Button } from "./ui/button"
+import { useNavigate } from "react-router-dom"
+import { PhotoCard } from "../pages/gallery"
 
 import "@solana/wallet-adapter-react-ui/styles.css"
 
@@ -210,6 +215,21 @@ export default function Home() {
             </div>
           </section>
 
+          <div className="relative z-10 w-full border-t-2 border-yellow-500/50 py-4 sm:py-8 mt-8 sm:mt-16" />
+
+          {/* Mini Gallery Section */}
+          <section className="w-full py-12">
+            {/* Mini Gallery Title */}
+            <div className="text-center mb-4">
+              <h2 className="text-4xl md:text-5xl font-bold text-yellow-400 mb-4 py-3">
+                Mini Gallery
+              </h2>
+            </div>
+            <div className="max-w-5xl mx-auto px-4">
+              <MiniGallery />
+            </div>
+          </section>
+
           <div className="relative z-10 w-full border-t-2 border-yellow-500/50 py-8 mt-16" />
 
           <section id="tokenomics" className="w-full py-16 md:py-16">
@@ -261,5 +281,49 @@ export default function Home() {
         </footer>
       </div>
     )
+}
+
+function MiniGallery() {
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([])
+  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    let mounted = true
+    airtableService.getAllGalleryPhotos().then((allPhotos) => {
+      if (mounted) {
+        setPhotos(allPhotos.slice(0, 12)) // prefetch more for quick nav
+        setLoading(false)
+      }
+    })
+    return () => { mounted = false }
+  }, [])
+
+  if (loading) {
+    return <div className="flex justify-center py-8 text-gray-400">Loading gallery...</div>
+  }
+  if (!photos.length) {
+    return <div className="flex justify-center py-8 text-gray-400">No photos yet. Be the first to upload!</div>
+  }
+  const showPhotos = photos.slice(0, 6);
+  const hasMore = photos.length > 6;
+  return (
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-12 mb-12">
+        {showPhotos.map((photo) => (
+          <PhotoCard key={photo.id} photo={photo} />
+        ))}
+        {/* Add placeholders to fill the last row if needed */}
+        {Array.from({ length: (2 - (showPhotos.length % 2)) % 2 }).map((_, idx) => (
+          <div key={`placeholder-${idx}`} className="invisible" />
+        ))}
+      </div>
+      {hasMore && (
+        <div className="flex justify-center">
+          <Button onClick={() => navigate('/gallery')} variant="secondary" size="lg" className="px-8">View More</Button>
+        </div>
+      )}
+    </div>
+  )
 }
 

@@ -11,7 +11,7 @@ import { Button } from "../components/ui/button"
 const AnimatedBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
     {/* Primary gradient orbs */}
-    <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-gradient-to-br from-yellow-400/30 via-amber-400/20 to-red-500/10 rounded-full blur-3xl animate-pulse-slow" />
+    <div className="absolute top-[-20%]oxboxweb3  left-[-10%] w-[500px] h-[500px] bg-gradient-to-br from-yellow-400/30 via-amber-400/20 to-red-500/10 rounded-full blur-3xl animate-pulse-slow" />
     <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-gradient-to-tr from-red-500/20 via-yellow-400/15 to-amber-300/10 rounded-full blur-3xl animate-pulse-slower" />
     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-gradient-to-r from-yellow-300/10 to-red-400/10 rounded-full blur-2xl animate-float" />
 
@@ -20,7 +20,7 @@ const AnimatedBackground = () => (
   </div>
 )
 
-const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
+export const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [showMobileOverlay, setShowMobileOverlay] = useState(false)
 
