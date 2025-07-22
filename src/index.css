@@ -5,7 +5,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-size: 16px; /* Base font size */
@@ -38,13 +38,13 @@ a:hover {
 }
 
 body {
+  font-family: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
   margin: 0;
   display: block;
   min-height: 100vh;
   min-width: 320px; /* Minimum width to prevent squishing */
   background-color: #111111;
   color: #9CA3AF;
-  font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   overflow-x: hidden;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); /* For notched devices */
 }
@@ -448,4 +448,8 @@ footer {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
+}
+
+h1, h2, h3, h4, h5, h6, div, span, p {
+  font-family: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
 }
