@@ -218,10 +218,10 @@ export default function Home() {
           <div className="relative z-10 w-full border-t-2 border-yellow-500/50 py-4 sm:py-8 mt-8 sm:mt-16" />
 
           {/* Mini Gallery Section */}
-          <section className="w-full py-12">
+          <section className="w-full py-12 backdrop-blur-xs">
             {/* Mini Gallery Title */}
-            <div className="text-center mb-4">
-              <h2 className="text-4xl md:text-5xl font-bold text-yellow-400 mb-4 py-3">
+            <div className="text-center mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent mb-4 py-3">
                 Mini Gallery
               </h2>
             </div>
