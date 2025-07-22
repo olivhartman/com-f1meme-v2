@@ -38,15 +38,24 @@ a:hover {
 }
 
 body {
-  font-family: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   margin: 0;
   display: block;
   min-height: 100vh;
-  min-width: 320px; /* Minimum width to prevent squishing */
+  min-width: 320px;
   background-color: #111111;
   color: #9CA3AF;
   overflow-x: hidden;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); /* For notched devices */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  font-size: 1.1rem;         /* slightly larger for readability */
+  line-height: 1.7;          /* more line spacing for readability */
+  letter-spacing: 0.01em;    /* subtle letter spacing */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  font-weight: 700;
 }
 
 h1 {
@@ -450,6 +459,6 @@ footer {
   background: rgba(0, 0, 0, 0.3);
 }
 
-h1, h2, h3, h4, h5, h6, div, span, p {
+h1, h2, h3, h4, h5, h6 {
   font-family: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
 }

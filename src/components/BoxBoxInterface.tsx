@@ -891,11 +891,11 @@ useEffect(() => {
           <div className="bg-black/20 backdrop-blur-sm rounded-lg p-6 max-w-md mx-auto transform transition-all duration-300 hover:bg-black/30">
             {wallet ? (
               <>
-                <p className="text-yellow-400 text-lg sm:text-xl md:text-xl font-bold mb-3 tracking-tight">
+                <h3 className="text-yellow-400 text-lg sm:text-xl md:text-xl font-bold mb-3 tracking-tight">
                   Total BOXBOX Locked
-                </p>
+                </h3>
                 <div className="flex flex-col items-center space-y-1">
-                  <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-50 tracking-wider">
+                  <p className="text-xl sm:text-3xl md:text-3xl font-bold text-gray-50 tracking-wider">
                     {formatNumber(totalLockedTokens)}
                   </p>
                   {/* <p className="text-yellow-500/80 text-sm sm:text-base uppercase tracking-widest font-medium">

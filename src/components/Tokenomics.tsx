@@ -171,7 +171,7 @@ export default function Tokenomics() {
         transition={{ duration: 0.5 }}
         className="text-center mb-16 relative z-10"
       >
-        <h2 className="text-5xl font-bold text-yellow-500 mb-4">Tokenomics</h2>
+        <h2 className="text-5xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent mb-4">Tokenomics</h2>
         <p className="text-gray-400 max-w-2xl mx-auto">
           Discover the economic model behind BOXBOX, the F1 Meme token powering our ecosystem
         </p>
