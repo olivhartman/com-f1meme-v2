@@ -119,7 +119,7 @@ button:focus-visible {
 
 .animate-marquee {
   display: flex;
-  animation: marquee 30s linear infinite;
+  animation: marquee 40s linear infinite;
   white-space: nowrap;
   width: max-content;
   height: 100%;

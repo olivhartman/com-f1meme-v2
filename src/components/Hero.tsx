@@ -43,7 +43,7 @@ export default function Hero() {
     minutes: 0,
     seconds: 0,
   })
-  const [newsItems] = useState<string[]>([
+  const [newsItems, setNewsItems] = useState<string[]>([
     "Yuki Tsunoda Racing in Red Bull in front Japanese Crowd 🏎️",
     "Maclaren Big Lead in both Championship, is it a bad sign?🔥",
     "Kimi winning his first Grand Prix soon 🔧",
@@ -171,6 +171,25 @@ export default function Hero() {
     // Refresh latest race info every 30 seconds (same as DriversStandings)
     const latestRaceInterval = setInterval(fetchLatestRace, 30000)
     return () => clearInterval(latestRaceInterval)
+  }, []);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const rssUrl = encodeURIComponent('https://www.motorsport.com/rss/f1/news/');
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+        if (data.items && Array.isArray(data.items)) {
+          // Use the latest 8 headlines for the marquee
+          const headlines = data.items.map((item) => item.title).slice(0, 8);
+          if (headlines.length > 0) setNewsItems(headlines);
+        }
+      } catch (err) {
+        // fallback to static newsItems
+      }
+    };
+    fetchNews();
   }, []);
 
   useEffect(() => {
@@ -394,9 +413,9 @@ export default function Hero() {
                           <div className="grid grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
                             {Object.entries(timeLeft).map(([unit, value]) => (
                               <div key={unit} className="text-center">
-                                <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tabular-nums block mb-1 sm:mb-2">
+                                <h5 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tabular-nums block mb-1 sm:mb-2">
                                   {value.toString().padStart(2, "0")}
-                                </span>
+                                </h5>
                                 <span className="text-xs font-medium uppercase tracking-widest text-yellow-500">
                                   {unit}
                                 </span>

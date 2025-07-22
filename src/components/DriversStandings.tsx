@@ -144,11 +144,11 @@ export default function DriversStandings() {
                   {driver.position === 1 ? "🥇" : driver.position === 2 ? "🥈" : "🥉"}
                 </span>
                 <div>
-                  <div className="font-bold">{driver.full_name || `Driver ${driver.driver_number}`}</div>
+                  <h6 className="font-bold">{driver.full_name || `Driver ${driver.driver_number}`}</h6>
                   <div className="text-sm opacity-75">{driver.team_name}</div>
                 </div>
               </div>
-              <div className="text-3xl font-bold">#{driver.driver_number}</div>
+              <h6 className="text-3xl font-bold">#{driver.driver_number}</h6>
             </CardContent>
           </Card>
         ))}
