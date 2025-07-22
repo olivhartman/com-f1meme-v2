@@ -182,7 +182,7 @@ export default function Hero() {
         const data = await res.json();
         if (data.items && Array.isArray(data.items)) {
           // Use the latest 8 headlines for the marquee
-          const headlines = data.items.map((item) => item.title).slice(0, 8);
+          const headlines = data.items.map((item: { title: string }) => item.title).slice(0, 8);
           if (headlines.length > 0) setNewsItems(headlines);
         }
       } catch (err) {
