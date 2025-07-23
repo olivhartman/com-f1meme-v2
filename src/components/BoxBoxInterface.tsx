@@ -756,8 +756,8 @@ useEffect(() => {
   //Dummy LevelDisplay Component
   const LevelDisplay = ({ level }: { level: number }) => (
     <div className="flex justify-center items-center mb-4 gap-4">
-      <span className="text-gray-400">Membership Level</span>
-      <span className="text-xl font-semibold">{level}</span>
+      <span className="text-gray-400 font-bold">Membership Level</span>
+      <h6 className="text-xl font-semibold">{level}</h6>
     </div>
   )
 
@@ -946,17 +946,17 @@ useEffect(() => {
                 {/* Stats Grid - 2 columns on mobile, 3 on larger screens */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="backdrop-blur-sm bg-black/20 p-4 rounded-lg">
-                    <span className="text-gray-400 text-sm">Token Balance</span>
-                    <span className="text-lg sm:text-xl font-semibold block mt-1">{formatNumber(tokenBalance)} BOXBOX</span>
+                    <span className="text-gray-400 font-bold text-sm">Token Balance</span>
+                    <h6 className="text-base font-semibold block mt-1">{formatNumber(tokenBalance)} BOXBOX</h6>
                   </div>
                   <div className="backdrop-blur-sm bg-black/20 p-4 rounded-lg">
-                    <span className="text-gray-400 text-sm">Membership Account</span>
-                    <span className="text-base sm:text-lg font-semibold block mt-1">
+                    <span className="text-gray-400 font-bold text-sm">Membership Account</span>
+                    <h6 className="text-base font-semibold block mt-1">
                       {isMembershipInitialized ? "Created" : "Yet to be created"}
-                    </span>
+                    </h6>
                   </div>
                   <div className="backdrop-blur-sm bg-black/20 p-4 rounded-lg relative">
-                    <span className="text-gray-400 text-sm">
+                    <span className="text-gray-400 font-bold text-sm">
                       Vault
                       <i
                         className="fas fa-info-circle text-blue-400 ml-1 cursor-pointer"
@@ -965,9 +965,9 @@ useEffect(() => {
                         onMouseLeave={() => window.innerWidth > 768 && setShowTooltip(false)}
                       ></i>
                     </span>
-                    <span className="text-base sm:text-lg font-semibold block mt-1">
+                    <h6 className="text-base font-semibold block mt-1">
                       {isEscrowInitialized ? "Created" : "Yet to be created"}
-                    </span>
+                    </h6>
                     {showTooltip && (
                       <span className="absolute left-0 -top-16 w-64 bg-gray-800 text-white text-xs px-4 py-2 rounded-lg shadow-lg z-10">
                         Vault and membership level reset at the end of each season
