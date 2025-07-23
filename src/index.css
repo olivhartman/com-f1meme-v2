@@ -176,23 +176,23 @@ button:focus-visible {
 
 /* Marquee text responsive sizing */
 .marquee-text {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
 @media (max-width: 768px) {
   .marquee-text {
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 1.1rem;
+    font-weight: 600;
   }
 }
 
 @media (max-width: 480px) {
   .marquee-text {
-    font-size: 0.7rem;
-    font-weight: 500;
+    font-size: 1rem;
+    font-weight: 600;
   }
 }
 
