@@ -323,7 +323,7 @@ function MiniGallery() {
           <Button onClick={() => navigate('/gallery')} variant="secondary" size="lg" className="px-8">View More</Button>
         </div>
       )}
-    </div>
-  )
+      </div>
+    )
 }
 

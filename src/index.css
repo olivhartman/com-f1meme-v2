@@ -112,13 +112,21 @@ button:focus-visible {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
 .animate-marquee {
   animation: marquee 40s linear infinite;
   /* You can use 60s for even slower scroll */
 }
+
 @media (max-width: 640px) {
   .animate-marquee {
-    animation-duration: 60s;
+    animation-duration: 80s; /* Slower on mobile for better readability */
+  }
+}
+
+@media (max-width: 480px) {
+  .animate-marquee {
+    animation-duration: 100s; /* Even slower on very small screens */
   }
 }
 
@@ -138,6 +146,7 @@ button:focus-visible {
   align-items: center;
   height: 100%;
   padding: 0.5rem 0; /* Add some vertical padding */
+  white-space: nowrap;
 }
 
 /* Add styles for the fixed marquee header */
@@ -157,13 +166,89 @@ button:focus-visible {
   z-index: 50; /* Ensure it's above other elements */
   
   @media (max-width: 768px) {
+    height: 36px;
+  }
+  
+  @media (max-width: 480px) {
     height: 32px;
   }
 }
 
-/* Optional: Pause animation on hover */
+/* Marquee text responsive sizing */
+.marquee-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .marquee-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 480px) {
+  .marquee-text {
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+}
+
+/* Marquee spacing responsive */
+.marquee-spacing {
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+
+@media (max-width: 768px) {
+  .marquee-spacing {
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .marquee-spacing {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+}
+
+/* Optional: Pause animation on hover/touch */
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+/* Pause on touch devices when user touches the marquee */
+@media (hover: none) and (pointer: coarse) {
+  .animate-marquee:active {
+    animation-play-state: paused;
+  }
+}
+
+/* Ensure smooth scrolling on mobile */
+@media (max-width: 768px) {
+  .marquee-container {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Optimize performance for mobile devices */
+@media (max-width: 768px) {
+  .animate-marquee {
+    will-change: transform;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation-duration: 120s !important;
+  }
 }
 
 @keyframes gradient-x {
@@ -386,9 +471,7 @@ footer {
 }
 
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind imports updated for v4 compatibility */
 
 @keyframes slide-in-tc {
   0% {
