@@ -352,15 +352,9 @@ export default function Hero() {
             <div className="animate-marquee inline-block">
               <span className="marquee-content">
                 {/* Larger spacer to prevent cut-off at start */}
-                <span className="marquee-spacing marquee-text text-transparent" style={{ minWidth: '3.5rem' }}>&nbsp;</span>
-                {newsItems.map((item, idx) => (
+                <span className="marquee-spacing marquee-text text-transparent" style={{ minWidth: '4rem' }}>&nbsp;</span>
+                {Array(3).fill(newsItems).flat().map((item, idx) => (
                   <span key={idx} className="marquee-spacing marquee-text text-gray-300">
-                    {item}
-                  </span>
-                ))}
-                {/* Duplicate for seamless loop */}
-                {newsItems.map((item, idx) => (
-                  <span key={`dup-${idx}`} className="marquee-spacing marquee-text text-gray-300">
                     {item}
                   </span>
                 ))}
