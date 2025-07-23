@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { User, Instagram, Music, Send, Upload, Save, Camera, Check, AlertCircle, X, Image, Plus } from "lucide-react"
+import { User, Instagram, Music, Send, Upload, Save, Camera, Check, AlertCircle, X, Plus } from "lucide-react"
 import { airtableService, type ProfileData as AirtableProfileData, type GalleryPhoto } from "../api/airtable"
 import Loader from "./Loader";
 
