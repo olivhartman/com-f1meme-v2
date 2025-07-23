@@ -172,27 +172,30 @@ button:focus-visible {
   @media (max-width: 480px) {
     height: 32px;
   }
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 /* Marquee text responsive sizing */
 .marquee-text {
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   white-space: nowrap;
 }
 
 @media (max-width: 768px) {
   .marquee-text {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 0.95rem;
+    font-weight: 500;
   }
 }
 
 @media (max-width: 480px) {
   .marquee-text {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 500;
   }
 }
 
