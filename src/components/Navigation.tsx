@@ -146,28 +146,36 @@ export default function Navigation({}: NavigationProps) {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
+                <h5>
                 Home
+                </h5>
               </Link>
               <Link
                 to="/community"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
+                <h5>
                 Community
+                </h5>
               </Link>
               <Link
                 to="/schedule"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
+                <h5>
                 Schedule
+                </h5>
               </Link>
               <Link
                 to="/gallery"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
+                <h5>
                 Gallery
+                </h5>
               </Link>
 
                 <Link
@@ -180,7 +188,9 @@ export default function Navigation({}: NavigationProps) {
                 }}
                   className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
                 >
+                  <h5>
                   Profile
+                  </h5>
                 </Link>
             </nav>
           </motion.div>

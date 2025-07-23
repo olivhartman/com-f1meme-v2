@@ -351,8 +351,8 @@ export default function Hero() {
           <div className="marquee-container overflow-x-hidden">
             <div className="animate-marquee inline-block">
               <span className="marquee-content">
-                {/* Larger spacer to prevent cut-off at start */}
-                <span className="marquee-spacing marquee-text text-transparent" style={{ minWidth: '4rem' }}>&nbsp;</span>
+                {/* Extra large spacer to prevent cut-off at start */}
+                <span className="marquee-spacing marquee-text text-transparent" style={{ minWidth: '8rem' }}>&nbsp;</span>
                 {Array(3).fill(newsItems).flat().map((item, idx) => (
                   <span key={idx} className="marquee-spacing marquee-text text-gray-300">
                     {item}

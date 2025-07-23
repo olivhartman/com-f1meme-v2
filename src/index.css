@@ -144,8 +144,9 @@ button:focus-visible {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 0.5rem 0; /* Add some vertical padding */
+  padding: 0.5rem 0;
   white-space: nowrap;
+  min-width: 200%;
 }
 
 /* Add styles for the fixed marquee header */
@@ -154,7 +155,7 @@ button:focus-visible {
   top: 0;
   left: 0;
   right: 0;
-  height: 40px; /* Set fixed height instead of auto */
+  height: clamp(32px, 6vw, 40px);
   display: flex;
   align-items: center;
   transform: translateZ(0);
@@ -178,7 +179,7 @@ button:focus-visible {
 
 /* Marquee text responsive sizing */
 .marquee-text {
-  font-size: 1.05rem;
+  font-size: clamp(0.85rem, 2.5vw, 1.1rem);
   font-weight: 600;
   letter-spacing: 0.04em;
   white-space: nowrap;

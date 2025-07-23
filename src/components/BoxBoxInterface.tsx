@@ -1126,7 +1126,11 @@ useEffect(() => {
         {!wallet && (
           <div className="backdrop-blur-sm bg-black/20 rounded-b-xl shadow-lg w-full overflow-hidden p-6 text-center">
             <p className="text-lg sm:text-xl font-medium text-gray-300 mb-3 text-center">
-              Connect your wallet to lock your BOXBOX tokens.
+              {typeof window !== 'undefined' && window.innerWidth <= 768 ? (
+                <span>Open f1meme.com with Phantom Wallet browser.</span>
+              ) : (
+                <span>Connect your wallet to lock your BOXBOX tokens.</span>
+              )}
             </p>
             <small className="text-sm text-gray-400 max-w-lg mx-auto block text-center">
               On your first wallet connection, your membership account and vault are automatically created. This requires approval for two transactions to cover the costs, so keep at least 0.001 SOL in your wallet.
