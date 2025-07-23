@@ -185,6 +185,7 @@ export default function Navigation({}: NavigationProps) {
                     e.preventDefault();
                     setShowConnectModal(true);
                   }
+                  setMobileMenuOpen(false); // Always close the menu
                 }}
                   className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
                 >
