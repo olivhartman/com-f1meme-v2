@@ -114,19 +114,18 @@ button:focus-visible {
 }
 
 .animate-marquee {
-  animation: marquee 40s linear infinite;
-  /* You can use 60s for even slower scroll */
+  animation: marquee 120s linear infinite;
 }
 
 @media (max-width: 640px) {
   .animate-marquee {
-    animation-duration: 80s; /* Slower on mobile for better readability */
+    animation-duration: 200s;
   }
 }
 
 @media (max-width: 480px) {
   .animate-marquee {
-    animation-duration: 100s; /* Even slower on very small screens */
+    animation-duration: 250s;
   }
 }
 
