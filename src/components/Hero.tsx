@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { motion } from "framer-motion"
 import { Clock } from "lucide-react"
 import { Card, CardContent } from "./ui/card"
@@ -55,6 +55,9 @@ export default function Hero() {
   const [player, setPlayer] = useState<null | { destroy: () => void }>(null)
   // Track last saved race to avoid duplicate saves
   const [lastSavedRace, setLastSavedRace] = useState<string | null>(null);
+  const marqueeContainerRef = useRef<HTMLDivElement>(null);
+  const marqueeContentRef = useRef<HTMLSpanElement>(null);
+  const [marqueeDuration, setMarqueeDuration] = useState(0);
 
   useEffect(() => {
     const CACHE_KEY = 'next_f1_race';
@@ -318,6 +321,21 @@ export default function Hero() {
     }
   }, [nextRace, timeLeft, lastSavedRace]);
 
+  useEffect(() => {
+    function updateMarqueeDuration() {
+      if (!marqueeContainerRef.current || !marqueeContentRef.current) return;
+      const containerWidth = marqueeContainerRef.current.offsetWidth;
+      const contentWidth = marqueeContentRef.current.scrollWidth;
+      // Set speed: 60px/sec (adjust as needed)
+      const speed = 60; // px per second
+      const duration = (contentWidth + containerWidth) / speed;
+      setMarqueeDuration(duration);
+    }
+    updateMarqueeDuration();
+    window.addEventListener('resize', updateMarqueeDuration);
+    return () => window.removeEventListener('resize', updateMarqueeDuration);
+  }, [newsItems]);
+
   return (
     <div className="min-h-screen pt-16 sm:pt-24 text-white font-sans relative">
       {/* Background Video Container */}
@@ -347,19 +365,26 @@ export default function Hero() {
         transition={{ duration: 0.5 }}
         className="fixed-marquee-header bg-black/40 backdrop-blur-md border-b border-yellow-500/20 z-30"
       >
-        <div className="flex justify-between items-center px-2 sm:px-4 w-full">
-          <div className="marquee-container overflow-x-hidden">
-            <div className="animate-marquee inline-block">
-              <span className="marquee-content">
-                {/* Extra large spacer to prevent cut-off at start */}
-                <span className="marquee-spacing marquee-text text-transparent" style={{ minWidth: '8rem' }}>&nbsp;</span>
-                {Array(3).fill(newsItems).flat().map((item, idx) => (
-                  <span key={idx} className="marquee-spacing marquee-text text-gray-300">
-                    {item}
-                  </span>
-                ))}
-              </span>
-            </div>
+        <div
+          className="marquee-container overflow-x-hidden"
+          ref={marqueeContainerRef}
+        >
+          <div
+            className="inline-block"
+            style={{
+              animation: marqueeDuration > 0 ? `marquee-js ${marqueeDuration}s linear infinite` : undefined,
+              willChange: 'transform',
+            }}
+          >
+            <span className="marquee-content" ref={marqueeContentRef}>
+              {/* Extra large spacer to prevent cut-off at start */}
+              <span className="marquee-spacing marquee-text text-transparent" style={{ minWidth: '8rem' }}>&nbsp;</span>
+              {Array(3).fill(newsItems).flat().map((item, idx) => (
+                <span key={idx} className="marquee-spacing marquee-text text-gray-300">
+                  {item}
+                </span>
+              ))}
+            </span>
           </div>
         </div>
       </motion.div>
