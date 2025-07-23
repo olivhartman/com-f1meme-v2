@@ -348,20 +348,21 @@ export default function Hero() {
         className="fixed-marquee-header bg-black/40 backdrop-blur-md border-b border-yellow-500/20 z-30"
       >
         <div className="flex justify-between items-center px-4 w-full">
-          <div className="marquee-container">
-            <div className="animate-marquee">
-              <div className="marquee-content">
-                {newsItems.map((item, index) => (
-                  <span key={index} className="mx-8 text-sm font-bold tracking-wider text-gray-300">
+          <div className="marquee-container overflow-x-hidden whitespace-nowrap">
+            <div className="animate-marquee inline-block">
+              <span className="marquee-content">
+                {newsItems.map((item, idx) => (
+                  <span key={idx} className="mx-8 text-sm font-bold tracking-wider text-gray-300">
                     {item}
                   </span>
                 ))}
-                {newsItems.map((item, index) => (
-                  <span key={`duplicate-${index}`} className="mx-8 text-sm font-bold tracking-wider text-gray-300">
+                {/* Duplicate for seamless loop */}
+                {newsItems.map((item, idx) => (
+                  <span key={`dup-${idx}`} className="mx-8 text-sm font-bold tracking-wider text-gray-300">
                     {item}
                   </span>
                 ))}
-              </div>
+              </span>
             </div>
           </div>
         </div>

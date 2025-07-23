@@ -109,27 +109,16 @@ button:focus-visible {
 }
 
 @keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
-
 .animate-marquee {
-  display: flex;
   animation: marquee 40s linear infinite;
-  white-space: nowrap;
-  width: max-content;
-  height: 100%;
-  align-items: center; /* Center content vertically */
-  
-  @media (max-width: 768px) {
-    animation-duration: 20s;
-  }
-  @media (max-width: 480px) {
-    animation-duration: 15s;
+  /* You can use 60s for even slower scroll */
+}
+@media (max-width: 640px) {
+  .animate-marquee {
+    animation-duration: 60s;
   }
 }
 
