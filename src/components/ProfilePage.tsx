@@ -568,16 +568,11 @@ const ProfilePage: React.FC = () => {
           {/* Gallery Section - Always visible, but restricted for users below level 55 */}
           <div className="mt-8 bg-[#151e32] backdrop-blur-xl rounded-3xl shadow-xl shadow-black/30 border border-[#232c43] overflow-hidden">
             <div className="p-8">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-xl flex items-center justify-center">
-                  <Image className="h-5 w-5 text-white" />
-                </div>
+              <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between mb-8 gap-2 sm:gap-3">
                 <h2 className="text-2xl font-bold text-slate-100">Gallery Upload</h2>
-                <div className="ml-auto">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
-                    Gallery Access
-                  </span>
-                </div>
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                  Gallery Access
+                </span>
               </div>
 
               <div className="space-y-6">

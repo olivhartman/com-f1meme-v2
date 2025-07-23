@@ -30,19 +30,9 @@ export default function Faqs() {
         "Token locking and unlocking are controlled by smart contract mechanisms. These processes can be used for various purposes, such as implementing vesting schedules for team tokens, enforcing staking periods, or managing liquidity. The smart contract defines conditions that must be met before tokens can be transferred or accessed, ensuring adherence to predefined rules.",
     },
     {
-      question: "What is Level 0?",
+      question: "What are the levels?",
       answer:
-        "Level 0 is the entry-level status for new accounts in our ecosystem. At this level, users have access to basic features and functionalities. It serves as a starting point for users to familiarize themselves with the platform and begin their journey towards higher membership tiers.",
-    },
-    {
-      question: "What is Level 1?",
-      answer:
-        "Level 1 is an elevated membership tier that offers enhanced benefits compared to Level 0. Users at this level may enjoy perks such as reduced fees, increased voting power, or access to exclusive content. Advancing to Level 1 typically requires meeting certain criteria, such as holding a specific amount of tokens or participating in platform activities.",
-    },
-    {
-      question: "What is Level 99?",
-      answer:
-        "Level 99 represents the pinnacle of membership within our ecosystem. This elite tier is reserved for the most dedicated and engaged users. Members at Level 99 enjoy premium features, maximum benefits, and potentially significant influence within the community. Achieving this level often requires substantial token holdings, long-term participation, or outstanding contributions to the ecosystem.",
+        "Levels in our ecosystem range from 0 to 99, where 0 is the lowest and 99 is the highest. To advance to the next level, a user must lock 10 million tokens. Users at at least level 55 have the opportunity to add pictures to the F1meme gallery section. Upgrading levels provides access to additional benefits and features, with higher levels unlocking more exclusive perks and opportunities.",
     },
   ]
 
