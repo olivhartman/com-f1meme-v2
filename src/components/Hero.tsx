@@ -136,11 +136,12 @@ export default function Hero() {
           const races = racesData.MRData.RaceTable.Races
           const now = new Date()
           
-          // Find the most recent completed race
+          // Find the most recent completed race (add 3 hours for race duration)
           let latestCompletedRace = null
           for (let i = races.length - 1; i >= 0; i--) {
             const raceDate = new Date(races[i].date)
-            if (raceDate < now) {
+            const raceEndTime = new Date(raceDate.getTime() + (3 * 60 * 60 * 1000))
+            if (raceEndTime < now) {
               latestCompletedRace = races[i]
               break
             }
@@ -153,16 +154,30 @@ export default function Hero() {
               session_name: 'Race'
             })
           } else {
-            // Fallback to openf1 API
-            const sessionRes = await fetch("https://api.openf1.org/v1/sessions?session_key=latest")
-            const sessionData = await sessionRes.json()
-            const latestSession = sessionData[0] || {}
-            console.log('[Hero] Latest session:', latestSession)
+            // Fallback to openf1 API - find the most recent race session
+            const sessionsRes = await fetch("https://api.openf1.org/v1/sessions")
+            const sessionsData = await sessionsRes.json()
             
-            setLatestRace({
-              meeting_name: latestSession.meeting_name,
-              session_name: latestSession.session_name
-            })
+            let latestRaceSession = null
+            for (const session of sessionsData) {
+              if (session.session_name === 'Race' && session.date) {
+                const sessionDate = new Date(session.date)
+                const sessionEndTime = new Date(sessionDate.getTime() + (3 * 60 * 60 * 1000))
+                if (sessionEndTime < now) {
+                  if (!latestRaceSession || sessionDate > new Date(latestRaceSession.date)) {
+                    latestRaceSession = session
+                  }
+                }
+              }
+            }
+            
+            if (latestRaceSession) {
+              console.log('[Hero] Latest race session:', latestRaceSession)
+              setLatestRace({
+                meeting_name: latestRaceSession.meeting_name,
+                session_name: latestRaceSession.session_name
+              })
+            }
           }
         }
       } catch (err) {
@@ -263,14 +278,27 @@ export default function Hero() {
         try {
           // Only log if nextRace is not null
           // console.log('[Winner Save] Fetching session for race:', nextRace.raceName, nextRace.date);
-          // Fetch latest session for this race (by date and name)
-          const sessionRes = await fetch('https://api.openf1.org/v1/sessions?meeting_key=latest');
-          const sessionData = await sessionRes.json();
-          console.log('[Winner Save] openf1 sessionData:', sessionData);
-          const session = sessionData[0];
-          if (!session) { console.log('[Winner Save] No session found'); return; }
-          // Fetch positions for this session
-          const posRes = await fetch(`https://api.openf1.org/v1/position?session_key=latest`);
+          // Find the specific race session for this race
+          const sessionsRes = await fetch('https://api.openf1.org/v1/sessions');
+          const sessionsData = await sessionsRes.json();
+          console.log('[Winner Save] openf1 sessionsData:', sessionsData);
+          
+          // Find the race session that matches the race name and date
+          const raceSession = sessionsData.find((s: any) => 
+            s.session_name === 'Race' && 
+            s.meeting_name === nextRace.raceName &&
+            s.date && s.date.startsWith(nextRace.date)
+          );
+          
+          if (!raceSession) { 
+            console.log('[Winner Save] No matching race session found for:', nextRace.raceName, nextRace.date); 
+            return; 
+          }
+          
+          console.log('[Winner Save] Found race session:', raceSession);
+          
+          // Fetch positions for this specific session
+          const posRes = await fetch(`https://api.openf1.org/v1/position?session_key=${raceSession.session_key}`);
           const posData = await posRes.json();
           console.log('[Winner Save] openf1 posData:', posData);
           // Get latest position for each driver (reduce logic from DriversStandings)
@@ -285,8 +313,8 @@ export default function Hero() {
             .sort((a: any, b: any) => a.position - b.position)
             .slice(0, 3);
           if (top3.length === 0) { console.log('[Winner Save] No top 3 finishers found'); return; }
-          // Fetch driver details for all top 3 (use session_key=latest)
-          const driversRes = await fetch(`https://api.openf1.org/v1/drivers?session_key=latest`);
+          // Fetch driver details for this specific session
+          const driversRes = await fetch(`https://api.openf1.org/v1/drivers?session_key=${raceSession.session_key}`);
           const driversData = await driversRes.json();
           console.log('[Winner Save] openf1 driversData:', driversData);
           const winnerEntries: WinnerEntry[] = top3.map((pos: any) => {
