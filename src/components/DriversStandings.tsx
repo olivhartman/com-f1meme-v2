@@ -29,6 +29,18 @@ interface DriverData {
   team_color?: string
 }
 
+interface ErgastResult {
+  number: string
+  position: string
+  Driver: {
+    givenName: string
+    familyName: string
+  }
+  Constructor?: {
+    name: string
+  }
+}
+
 export default function DriversStandings() {
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [sessionInfo, setSessionInfo] = useState<Session>({})
@@ -40,51 +52,155 @@ export default function DriversStandings() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Check if we need to invalidate cache (new race detected)
-        const checkForNewRace = async () => {
-          try {
-            const currentYear = new Date().getFullYear()
-            const racesRes = await fetch(`https://api.jolpi.ca/ergast/f1/${currentYear}.json`)
-            const racesData = await racesRes.json()
-            
-            if (racesData.MRData?.RaceTable?.Races?.length > 0) {
-              const races = racesData.MRData.RaceTable.Races
-              const now = new Date()
-              
-              // Find the most recent completed race
-              for (let i = races.length - 1; i >= 0; i--) {
-                const raceDate = new Date(races[i].date)
-                const raceEndTime = new Date(raceDate.getTime() + (3 * 60 * 60 * 1000))
-                if (raceEndTime < now) {
-                  // Check if this is a different race than what we have cached
-                  const cached = localStorage.getItem(CACHE_KEY)
-                  if (cached) {
-                    try {
-                      const parsed = JSON.parse(cached)
-                      if (parsed.sessionInfo?.meeting_name !== races[i].raceName) {
-                        console.log('[DriversStandings] New race detected, clearing cache')
-                        localStorage.removeItem(CACHE_KEY)
-                        return true // New race detected
-                      }
-                    } catch {
-                      // Invalid cache, remove it
-                      localStorage.removeItem(CACHE_KEY)
-                    }
-                  }
-                  break
-                }
-              }
-            }
-          } catch (err) {
-            console.error('[DriversStandings] Error checking for new race:', err)
+        // PRIORITY 1: Try Jolpi openf1 proxy with session_key=latest
+        console.log('[DriversStandings] Trying Jolpi openf1 proxy...')
+        
+        try {
+          // Get session info first
+          const sessionRes = await fetch("https://api.jolpi.ca/openf1/sessions?session_key=latest")
+        const sessionData = await sessionRes.json()
+        const latestSession = sessionData[0] || {}
+          
+          if (latestSession.session_key) {
+        setSessionInfo({
+          meeting_name: latestSession.meeting_name,
+          session_name: latestSession.session_name
+        })
+
+        // Get current positions
+            const posRes = await fetch(`https://api.jolpi.ca/openf1/position?session_key=${latestSession.session_key}`)
+        const posData = await posRes.json()
+        
+        // Get latest position for each driver
+            const latestPositions = posData.reduce((acc: Record<number, PositionData>, curr: PositionData) => {
+          if (!acc[curr.driver_number] || new Date(curr.date) > new Date(acc[curr.driver_number].date)) {
+            acc[curr.driver_number] = curr
           }
-          return false
+          return acc
+        }, {})
+
+        // Convert to array and get top 3
+            const top3 = (Object.values(latestPositions) as PositionData[])
+              .sort((a, b) => a.position - b.position)
+          .slice(0, 3)
+
+        // Get driver details
+            const driversRes = await fetch(`https://api.jolpi.ca/openf1/drivers?session_key=${latestSession.session_key}`)
+        const driversData = await driversRes.json()
+
+        // Combine data
+            const enrichedDrivers = (top3 as PositionData[]).map((pos) => {
+              const driverInfo = driversData.find((d: DriverData) => d.driver_number === pos.driver_number)
+          return {
+            driver_number: pos.driver_number,
+            position: pos.position,
+            full_name: driverInfo?.full_name,
+            team_name: driverInfo?.team_name,
+            team_color: driverInfo?.team_color
+          }
+        })
+
+        setDrivers(enrichedDrivers)
+        setLoading(false)
+        setError(null)
+            setLastUpdated(new Date().toISOString())
+            
+        // Cache the result
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ 
+              drivers: enrichedDrivers, 
+              sessionInfo: {
+                meeting_name: latestSession.meeting_name,
+                session_name: latestSession.session_name
+              },
+              lastUpdated: new Date().toISOString()
+            }))
+            return // Successfully got data from Jolpi, exit early
+          }
+        } catch (jolpiError) {
+          console.log('[DriversStandings] Jolpi openf1 proxy failed, trying api.openf1.org fallback:', jolpiError)
         }
 
-        // Check for new race first
-        await checkForNewRace()
+        // PRIORITY 2: Fallback to api.openf1.org with session_key=latest
+        console.log('[DriversStandings] Trying api.openf1.org fallback...')
+        
+        try {
+          // Get session info first
+          const sessionRes = await fetch("https://api.openf1.org/v1/sessions?session_key=latest")
+          const sessionData = await sessionRes.json()
+          const latestSession = sessionData[0] || {}
+          
+          if (latestSession.session_key) {
+            setSessionInfo({
+              meeting_name: latestSession.meeting_name,
+              session_name: latestSession.session_name
+            })
 
-        // First, try to get the most recent completed race from Ergast API
+            // Get current positions
+            const posRes = await fetch(`https://api.openf1.org/v1/position?session_key=${latestSession.session_key}`)
+            const posData = await posRes.json()
+
+            // Handle openf1 session in progress/auth error
+            if (posData.detail && typeof posData.detail === 'string' && posData.detail.includes('Session in progress')) {
+              throw new Error('Session in progress, access restricted')
+            }
+            
+            // Get latest position for each driver
+            const latestPositions = posData.reduce((acc: Record<number, PositionData>, curr: PositionData) => {
+              if (!acc[curr.driver_number] || new Date(curr.date) > new Date(acc[curr.driver_number].date)) {
+                acc[curr.driver_number] = curr
+              }
+              return acc
+            }, {})
+
+            // Convert to array and get top 3
+            const top3 = (Object.values(latestPositions) as PositionData[])
+              .sort((a, b) => a.position - b.position)
+              .slice(0, 3)
+
+            // Get driver details
+            const driversRes = await fetch(`https://api.openf1.org/v1/drivers?session_key=${latestSession.session_key}`)
+            const driversData = await driversRes.json()
+
+            // Handle openf1 session in progress/auth error for drivers
+            if (driversData.detail && typeof driversData.detail === 'string' && driversData.detail.includes('Session in progress')) {
+              throw new Error('Session in progress, access restricted')
+            }
+
+            // Combine data
+            const enrichedDrivers = (top3 as PositionData[]).map((pos) => {
+              const driverInfo = driversData.find((d: DriverData) => d.driver_number === pos.driver_number)
+              return {
+                driver_number: pos.driver_number,
+                position: pos.position,
+                full_name: driverInfo?.full_name,
+                team_name: driverInfo?.team_name,
+                team_color: driverInfo?.team_color
+              }
+            })
+
+            setDrivers(enrichedDrivers)
+            setLoading(false)
+            setError(null)
+            setLastUpdated(new Date().toISOString())
+            
+            // Cache the result
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ 
+              drivers: enrichedDrivers, 
+              sessionInfo: {
+                meeting_name: latestSession.meeting_name,
+                session_name: latestSession.session_name
+              },
+              lastUpdated: new Date().toISOString()
+            }))
+            return // Successfully got data from api.openf1.org, exit early
+          }
+        } catch (openf1Error) {
+          console.log('[DriversStandings] api.openf1.org failed, trying Ergast fallback:', openf1Error)
+        }
+
+        // PRIORITY 3: Fallback to Ergast API for completed main races only
+        console.log('[DriversStandings] Trying Ergast API fallback...')
+        
         const currentYear = new Date().getFullYear()
         const racesRes = await fetch(`https://api.jolpi.ca/ergast/f1/${currentYear}.json`)
         const racesData = await racesRes.json()
@@ -107,31 +223,31 @@ export default function DriversStandings() {
         }
 
         if (latestCompletedRace) {
-          console.log('[DriversStandings] Latest completed race:', latestCompletedRace.raceName)
+          console.log('[DriversStandings] Latest completed race from Ergast:', latestCompletedRace.raceName)
           
-          // Try to get results from Ergast first (usually faster than openf1)
+          // Try to get results from Ergast
           try {
             const resultsRes = await fetch(`https://api.jolpi.ca/ergast/f1/${currentYear}/${latestCompletedRace.round}/results.json`)
             const resultsData = await resultsRes.json()
             const race = resultsData.MRData?.RaceTable?.Races?.[0]
             
-            if (race && race.Results) {
+          if (race && race.Results) {
               setSessionInfo({ 
                 meeting_name: race.raceName, 
                 session_name: "Race" 
               })
               
-              const enrichedDrivers = (race.Results.slice(0, 3) as Array<any>).map((result) => ({
-                driver_number: parseInt(result.number, 10),
-                position: parseInt(result.position, 10),
-                full_name: `${result.Driver.givenName} ${result.Driver.familyName}`,
-                team_name: result.Constructor?.name,
+              const enrichedDrivers = (race.Results.slice(0, 3) as Array<ErgastResult>).map((result) => ({
+              driver_number: parseInt(result.number, 10),
+              position: parseInt(result.position, 10),
+              full_name: `${result.Driver.givenName} ${result.Driver.familyName}`,
+              team_name: result.Constructor?.name,
                 team_color: undefined // Ergast doesn't provide team color
-              }))
+            }))
               
-              setDrivers(enrichedDrivers)
+            setDrivers(enrichedDrivers)
               setLoading(false)
-              setError(null)
+            setError(null)
               setLastUpdated(new Date().toISOString())
               
               // Cache the result
@@ -140,112 +256,32 @@ export default function DriversStandings() {
                 sessionInfo: { meeting_name: race.raceName, session_name: "Race" },
                 lastUpdated: new Date().toISOString()
               }))
-              return
+            return
             }
           } catch (ergastError) {
-            console.log('[DriversStandings] Ergast results failed, trying openf1:', ergastError)
+            console.log('[DriversStandings] Ergast results failed:', ergastError)
           }
         }
 
-        // Fallback to openf1 API - try to find the specific session for the latest race
-        console.log('[DriversStandings] Trying openf1 API...')
-        
-        // Get all sessions and find the most recent race session
-        const sessionsRes = await fetch("https://api.openf1.org/v1/sessions")
-        const sessionsData = await sessionsRes.json()
-        
-        // Find the most recent completed race session
-        const now = new Date()
-        let latestRaceSession = null
-        
-        for (const session of sessionsData) {
-          if (session.session_name === 'Race' && session.date) {
-            const sessionDate = new Date(session.date)
-            // Add 3 hours for race duration
-            const sessionEndTime = new Date(sessionDate.getTime() + (3 * 60 * 60 * 1000))
-            if (sessionEndTime < now) {
-              if (!latestRaceSession || sessionDate > new Date(latestRaceSession.date)) {
-                latestRaceSession = session
-              }
-            }
-          }
-        }
-
-        if (latestRaceSession) {
-          console.log('[DriversStandings] Found latest race session:', latestRaceSession)
-          
-          setSessionInfo({
-            meeting_name: latestRaceSession.meeting_name,
-            session_name: latestRaceSession.session_name
-          })
-
-          // Get positions for this specific session
-          const posRes = await fetch(`https://api.openf1.org/v1/position?session_key=${latestRaceSession.session_key}`)
-          const posData = await posRes.json()
-          
-          // Get latest position for each driver
-          const latestPositions = posData.reduce((acc: Record<number, PositionData>, curr: PositionData) => {
-            if (!acc[curr.driver_number] || new Date(curr.date) > new Date(acc[curr.driver_number].date)) {
-              acc[curr.driver_number] = curr
-            }
-            return acc
-          }, {})
-
-          // Convert to array and get top 3
-          const top3 = (Object.values(latestPositions) as PositionData[])
-            .sort((a, b) => a.position - b.position)
-            .slice(0, 3)
-
-          // Get driver details for this session
-          const driversRes = await fetch(`https://api.openf1.org/v1/drivers?session_key=${latestRaceSession.session_key}`)
-          const driversData = await driversRes.json()
-
-          // Combine data
-          const enrichedDrivers = (top3 as PositionData[]).map((pos) => {
-            const driverInfo = driversData.find((d: DriverData) => d.driver_number === pos.driver_number)
-            return {
-              driver_number: pos.driver_number,
-              position: pos.position,
-              full_name: driverInfo?.full_name,
-              team_name: driverInfo?.team_name,
-              team_color: driverInfo?.team_color
-            }
-          })
-
-          setDrivers(enrichedDrivers)
-          setLoading(false)
-          setError(null)
-          setLastUpdated(new Date().toISOString())
-          
-          // Cache the result
-          localStorage.setItem(CACHE_KEY, JSON.stringify({ 
-            drivers: enrichedDrivers, 
-            sessionInfo: {
-              meeting_name: latestRaceSession.meeting_name,
-              session_name: latestRaceSession.session_name
-            },
-            lastUpdated: new Date().toISOString()
-          }))
-        } else {
-          throw new Error("No recent race session found")
-        }
+        // If we get here, all APIs failed
+        throw new Error("No recent session data available")
       } catch (err) {
         console.error('[DriversStandings] Error fetching data:', err)
         
-        // Try to load from cache
-        const cached = localStorage.getItem(CACHE_KEY)
-        if (cached) {
-          try {
-            const parsed = JSON.parse(cached)
-            setDrivers(parsed.drivers || [])
-            setSessionInfo(parsed.sessionInfo || {})
+          // Try to load from cache
+          const cached = localStorage.getItem(CACHE_KEY)
+          if (cached) {
+            try {
+              const parsed = JSON.parse(cached)
+              setDrivers(parsed.drivers || [])
+              setSessionInfo(parsed.sessionInfo || {})
             setLastUpdated(parsed.lastUpdated || null)
-            setError(null)
-          } catch {
+              setError(null)
+            } catch {
+              setError("Race data temporarily unavailable. Please try again later.")
+            }
+          } else {
             setError("Race data temporarily unavailable. Please try again later.")
-          }
-        } else {
-          setError("Race data temporarily unavailable. Please try again later.")
         }
         setLoading(false)
       }
@@ -263,7 +299,8 @@ export default function DriversStandings() {
   return (
     <div className="space-y-4">
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">{sessionInfo.meeting_name}</h2>
+        <h2 className="text-2xl font-bold font-['Orbitron']">{sessionInfo.meeting_name}</h2>
+        <p className="text-sm text-gray-400">{sessionInfo.session_name}</p>
         {lastUpdated && (
           <p className="text-sm text-gray-400">
             Last updated: {new Date(lastUpdated).toLocaleString()}
@@ -281,15 +318,15 @@ export default function DriversStandings() {
           >
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="text-2xl font-bold">
+                <span className="text-2xl font-bold font-['Orbitron']">
                   {driver.position === 1 ? "🥇" : driver.position === 2 ? "🥈" : "🥉"}
                 </span>
                 <div>
-                  <h6 className="font-bold">{driver.full_name || `Driver ${driver.driver_number}`}</h6>
+                  <div className="font-bold font-['Orbitron']">{driver.full_name || `Driver ${driver.driver_number}`}</div>
                   <div className="text-sm opacity-75">{driver.team_name}</div>
                 </div>
               </div>
-              <h6 className="text-3xl font-bold">#{driver.driver_number}</h6>
+              <div className="text-3xl font-bold font-['Orbitron']">#{driver.driver_number}</div>
             </CardContent>
           </Card>
         ))}

@@ -126,11 +126,54 @@ export default function Hero() {
     // Fetch latest race info for the standings display
     async function fetchLatestRace() {
       try {
-        // Get the most recent completed race from Ergast API
+        // PRIORITY 1: Try Jolpi openf1 proxy with session_key=latest
+        console.log('[Hero] Trying Jolpi openf1 proxy...')
+        
+        try {
+          // Get session info first
+          const sessionRes = await fetch("https://api.jolpi.ca/openf1/sessions?session_key=latest")
+          const sessionData = await sessionRes.json()
+          const latestSession = sessionData[0] || {}
+          
+          if (latestSession.session_key) {
+            console.log('[Hero] Found latest session from Jolpi:', latestSession)
+            setLatestRace({
+              meeting_name: latestSession.meeting_name,
+              session_name: latestSession.session_name
+            })
+            return // Successfully got data from Jolpi, exit early
+          }
+        } catch (jolpiError) {
+          console.log('[Hero] Jolpi openf1 proxy failed, trying api.openf1.org fallback:', jolpiError)
+        }
+
+        // PRIORITY 2: Fallback to api.openf1.org with session_key=latest
+        console.log('[Hero] Trying api.openf1.org fallback...')
+        
+        try {
+          // Get session info first
+          const sessionRes = await fetch("https://api.openf1.org/v1/sessions?session_key=latest")
+          const sessionData = await sessionRes.json()
+          const latestSession = sessionData[0] || {}
+          
+          if (latestSession.session_key) {
+            console.log('[Hero] Found latest session from api.openf1.org:', latestSession)
+            setLatestRace({
+              meeting_name: latestSession.meeting_name,
+              session_name: latestSession.session_name
+            })
+            return // Successfully got data from api.openf1.org, exit early
+          }
+        } catch (openf1Error) {
+          console.log('[Hero] api.openf1.org failed:', openf1Error)
+        }
+
+        // PRIORITY 3: Fallback to Ergast API for completed main races only
+        console.log('[Hero] Trying Ergast API fallback...')
+        
         const currentYear = new Date().getFullYear()
         const racesRes = await fetch(`https://api.jolpi.ca/ergast/f1/${currentYear}.json`)
         const racesData = await racesRes.json()
-        console.log('[Hero] Current season races:', racesData)
         
         if (racesData.MRData?.RaceTable?.Races?.length > 0) {
           const races = racesData.MRData.RaceTable.Races
@@ -148,36 +191,11 @@ export default function Hero() {
           }
           
           if (latestCompletedRace) {
-            console.log('[Hero] Latest completed race:', latestCompletedRace)
+            console.log('[Hero] Latest completed race from Ergast:', latestCompletedRace)
             setLatestRace({
               meeting_name: latestCompletedRace.raceName,
               session_name: 'Race'
             })
-          } else {
-            // Fallback to openf1 API - find the most recent race session
-            const sessionsRes = await fetch("https://api.openf1.org/v1/sessions")
-            const sessionsData = await sessionsRes.json()
-            
-            let latestRaceSession = null
-            for (const session of sessionsData) {
-              if (session.session_name === 'Race' && session.date) {
-                const sessionDate = new Date(session.date)
-                const sessionEndTime = new Date(sessionDate.getTime() + (3 * 60 * 60 * 1000))
-                if (sessionEndTime < now) {
-                  if (!latestRaceSession || sessionDate > new Date(latestRaceSession.date)) {
-                    latestRaceSession = session
-                  }
-                }
-              }
-            }
-            
-            if (latestRaceSession) {
-              console.log('[Hero] Latest race session:', latestRaceSession)
-              setLatestRace({
-                meeting_name: latestRaceSession.meeting_name,
-                session_name: latestRaceSession.session_name
-              })
-            }
           }
         }
       } catch (err) {
