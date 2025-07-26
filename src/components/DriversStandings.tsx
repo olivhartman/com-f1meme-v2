@@ -82,7 +82,7 @@ export default function DriversStandings() {
         }
 
         // Check for new race first
-        const hasNewRace = await checkForNewRace()
+        await checkForNewRace()
 
         // First, try to get the most recent completed race from Ergast API
         const currentYear = new Date().getFullYear()
@@ -121,7 +121,7 @@ export default function DriversStandings() {
                 session_name: "Race" 
               })
               
-              const enrichedDrivers = race.Results.slice(0, 3).map((result: any) => ({
+              const enrichedDrivers = (race.Results.slice(0, 3) as Array<any>).map((result) => ({
                 driver_number: parseInt(result.number, 10),
                 position: parseInt(result.position, 10),
                 full_name: `${result.Driver.givenName} ${result.Driver.familyName}`,
@@ -192,8 +192,8 @@ export default function DriversStandings() {
           }, {})
 
           // Convert to array and get top 3
-          const top3 = Object.values(latestPositions)
-            .sort((a: PositionData, b: PositionData) => a.position - b.position)
+          const top3 = (Object.values(latestPositions) as PositionData[])
+            .sort((a, b) => a.position - b.position)
             .slice(0, 3)
 
           // Get driver details for this session
@@ -201,7 +201,7 @@ export default function DriversStandings() {
           const driversData = await driversRes.json()
 
           // Combine data
-          const enrichedDrivers = top3.map((pos: PositionData) => {
+          const enrichedDrivers = (top3 as PositionData[]).map((pos) => {
             const driverInfo = driversData.find((d: DriverData) => d.driver_number === pos.driver_number)
             return {
               driver_number: pos.driver_number,
