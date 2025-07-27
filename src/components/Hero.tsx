@@ -59,6 +59,11 @@ export default function Hero() {
   const marqueeContentRef = useRef<HTMLSpanElement>(null);
   const [marqueeDuration, setMarqueeDuration] = useState(0);
 
+  // Debug useEffect to log latestRace changes
+  useEffect(() => {
+    console.log('[Hero] latestRace state updated:', latestRace)
+  }, [latestRace])
+
   useEffect(() => {
     const CACHE_KEY = 'next_f1_race';
     // Always show whatever is in localStorage immediately (even if stale)
@@ -125,22 +130,51 @@ export default function Hero() {
     
     // Fetch latest race info for the standings display
     async function fetchLatestRace() {
+      console.log('[Hero] fetchLatestRace function called')
       try {
         // PRIORITY 1: Try Jolpi openf1 proxy with session_key=latest
         console.log('[Hero] Trying Jolpi openf1 proxy...')
         
-        try {
-          // Get session info first
-          const sessionRes = await fetch("https://api.jolpi.ca/openf1/sessions?session_key=latest")
+      try {
+          // Get all sessions first, then find the most recent one with results
+          const sessionRes = await fetch("https://api.jolpi.ca/openf1/sessions")
           const sessionData = await sessionRes.json()
-          const latestSession = sessionData[0] || {}
+          console.log('[Hero] All sessions from Jolpi:', sessionData)
           
-          if (latestSession.session_key) {
-            console.log('[Hero] Found latest session from Jolpi:', latestSession)
-            setLatestRace({
-              meeting_name: latestSession.meeting_name,
-              session_name: latestSession.session_name
-            })
+          // Find the most recent session that has position data
+          let latestSessionWithResults = null
+          
+          // Sort sessions by date (most recent first)
+          const sortedSessions = sessionData
+            .filter((session: any) => session.date)
+            .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+          
+          // Check each session for position data
+          for (const session of sortedSessions) {
+            try {
+              const posRes = await fetch(`https://api.jolpi.ca/openf1/position?session_key=${session.session_key}`)
+              const posData = await posRes.json()
+              
+              // If this session has position data, use it
+              if (posData && Array.isArray(posData) && posData.length > 0) {
+                latestSessionWithResults = session
+                console.log('[Hero] Found session with results:', session)
+                break
+              }
+            } catch (error) {
+              console.log('[Hero] No position data for session:', session.session_key)
+              continue
+            }
+          }
+          
+          if (latestSessionWithResults) {
+            console.log('[Hero] Found latest session from Jolpi:', latestSessionWithResults)
+            const newLatestRace = {
+              meeting_name: latestSessionWithResults.meeting_name,
+              session_name: latestSessionWithResults.session_name
+            }
+            console.log('[Hero] Setting latestRace to:', newLatestRace)
+            setLatestRace(newLatestRace)
             return // Successfully got data from Jolpi, exit early
           }
         } catch (jolpiError) {
@@ -154,14 +188,17 @@ export default function Hero() {
           // Get session info first
           const sessionRes = await fetch("https://api.openf1.org/v1/sessions?session_key=latest")
           const sessionData = await sessionRes.json()
+          console.log('[Hero] api.openf1.org sessionData:', sessionData)
           const latestSession = sessionData[0] || {}
           
           if (latestSession.session_key) {
             console.log('[Hero] Found latest session from api.openf1.org:', latestSession)
-            setLatestRace({
-              meeting_name: latestSession.meeting_name,
+            const newLatestRace = {
+              meeting_name: latestSession.meeting_name || `${latestSession.country_name} Grand Prix`,
               session_name: latestSession.session_name
-            })
+            }
+            console.log('[Hero] Setting latestRace to:', newLatestRace)
+            setLatestRace(newLatestRace)
             return // Successfully got data from api.openf1.org, exit early
           }
         } catch (openf1Error) {
@@ -451,7 +488,9 @@ export default function Hero() {
               </h3>
               <div className="flex items-center justify-center lg:justify-start gap-3 sm:gap-4">
                 <div className="h-1 w-16 sm:w-20 lg:w-24 bg-gradient-to-r from-yellow-500 to-yellow-300" />
-                <p className="text-sm sm:text-lg lg:text-xl font-light tracking-wider text-gray-300">{latestRace.meeting_name || nextRace?.raceName || "Loading..."}</p>
+                <p className="text-sm sm:text-lg lg:text-xl font-light tracking-wider text-gray-300">
+                  {latestRace.meeting_name ? latestRace.meeting_name : (nextRace?.raceName || "Loading...")}
+                </p>
               </div>
             </div>
 

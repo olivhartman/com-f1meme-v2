@@ -47,6 +47,7 @@ export default function DriversStandings() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
+  const [allSessions, setAllSessions] = useState<Array<{meeting_name: string, session_name: string, date: string, hasResults: boolean}>>([])
   const CACHE_KEY = 'f1_drivers_standings';
 
   useEffect(() => {
@@ -56,19 +57,67 @@ export default function DriversStandings() {
         console.log('[DriversStandings] Trying Jolpi openf1 proxy...')
         
         try {
-          // Get session info first
-          const sessionRes = await fetch("https://api.jolpi.ca/openf1/sessions?session_key=latest")
+          // Get all sessions first, then find the most recent one with results
+          const sessionRes = await fetch("https://api.jolpi.ca/openf1/sessions")
         const sessionData = await sessionRes.json()
-        const latestSession = sessionData[0] || {}
+          console.log('[DriversStandings] All sessions from Jolpi:', sessionData)
           
-          if (latestSession.session_key) {
-        setSessionInfo({
-          meeting_name: latestSession.meeting_name,
-          session_name: latestSession.session_name
-        })
+          // Find the most recent session that has position data
+          let latestSessionWithResults = null
+          
+          // Sort sessions by date (most recent first)
+          const sortedSessions = sessionData
+            .filter((session: { date?: string }) => session.date)
+            .sort((a: { date: string }, b: { date: string }) => new Date(b.date).getTime() - new Date(a.date).getTime())
+          
+          // Debug: List all sessions with their results
+          console.log('[DriversStandings] === ALL SESSIONS WITH RESULTS ===')
+          const sessionsWithResults: Array<{meeting_name: string, session_name: string, date: string, hasResults: boolean}> = []
+          
+          for (const session of sortedSessions) {
+            try {
+              const posRes = await fetch(`https://api.jolpi.ca/openf1/position?session_key=${session.session_key}`)
+              const posData = await posRes.json()
+              
+              const hasResults = posData && Array.isArray(posData) && posData.length > 0
+              sessionsWithResults.push({
+                meeting_name: session.meeting_name,
+                session_name: session.session_name,
+                date: session.date,
+                hasResults
+              })
+              
+              if (hasResults) {
+                console.log(`[DriversStandings] ✅ ${session.meeting_name} - ${session.session_name} (${session.date}) - ${posData.length} position records`)
+                if (!latestSessionWithResults) {
+                  latestSessionWithResults = session
+                }
+              } else {
+                console.log(`[DriversStandings] ❌ ${session.meeting_name} - ${session.session_name} (${session.date}) - No position data`)
+              }
+            } catch {
+              sessionsWithResults.push({
+                meeting_name: session.meeting_name,
+                session_name: session.session_name,
+                date: session.date,
+                hasResults: false
+              })
+              console.log(`[DriversStandings] ❌ ${session.meeting_name} - ${session.session_name} (${session.date}) - Error fetching position data`)
+              continue
+            }
+          }
+          
+          setAllSessions(sessionsWithResults)
+          console.log('[DriversStandings] === END SESSIONS LIST ===')
+          
+          if (latestSessionWithResults) {
+            setSessionInfo({
+              meeting_name: latestSessionWithResults.meeting_name || `${latestSessionWithResults.country_name} Grand Prix`,
+              session_name: latestSessionWithResults.session_name
+            })
 
-        // Get current positions
-            const posRes = await fetch(`https://api.jolpi.ca/openf1/position?session_key=${latestSession.session_key}`)
+            // Get current positions
+            const posRes = await fetch(`https://api.jolpi.ca/openf1/position?session_key=${latestSessionWithResults.session_key}`)
         const posData = await posRes.json()
         
         // Get latest position for each driver
@@ -85,7 +134,7 @@ export default function DriversStandings() {
           .slice(0, 3)
 
         // Get driver details
-            const driversRes = await fetch(`https://api.jolpi.ca/openf1/drivers?session_key=${latestSession.session_key}`)
+            const driversRes = await fetch(`https://api.jolpi.ca/openf1/drivers?session_key=${latestSessionWithResults.session_key}`)
         const driversData = await driversRes.json()
 
         // Combine data
@@ -109,8 +158,8 @@ export default function DriversStandings() {
             localStorage.setItem(CACHE_KEY, JSON.stringify({ 
               drivers: enrichedDrivers, 
               sessionInfo: {
-                meeting_name: latestSession.meeting_name,
-                session_name: latestSession.session_name
+                meeting_name: latestSessionWithResults.meeting_name,
+                session_name: latestSessionWithResults.session_name
               },
               lastUpdated: new Date().toISOString()
             }))
@@ -301,12 +350,8 @@ export default function DriversStandings() {
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold font-['Orbitron']">{sessionInfo.meeting_name}</h2>
         <p className="text-sm text-gray-400">{sessionInfo.session_name}</p>
-        {lastUpdated && (
-          <p className="text-sm text-gray-400">
-            Last updated: {new Date(lastUpdated).toLocaleString()}
-          </p>
-        )}
       </div>
+      
       <div className="grid gap-4">
         {drivers.map((driver) => (
           <Card 
