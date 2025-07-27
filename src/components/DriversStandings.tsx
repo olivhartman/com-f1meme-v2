@@ -46,8 +46,6 @@ export default function DriversStandings() {
   const [sessionInfo, setSessionInfo] = useState<Session>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null)
-  const [allSessions, setAllSessions] = useState<Array<{meeting_name: string, session_name: string, date: string, hasResults: boolean}>>([])
   const CACHE_KEY = 'f1_drivers_standings';
 
   useEffect(() => {
@@ -107,7 +105,6 @@ export default function DriversStandings() {
             }
           }
           
-          setAllSessions(sessionsWithResults)
           console.log('[DriversStandings] === END SESSIONS LIST ===')
           
           if (latestSessionWithResults) {
@@ -149,20 +146,18 @@ export default function DriversStandings() {
           }
         })
 
-        setDrivers(enrichedDrivers)
+                setDrivers(enrichedDrivers)
         setLoading(false)
         setError(null)
-            setLastUpdated(new Date().toISOString())
-            
+        
         // Cache the result
-            localStorage.setItem(CACHE_KEY, JSON.stringify({ 
-              drivers: enrichedDrivers, 
-              sessionInfo: {
-                meeting_name: latestSessionWithResults.meeting_name,
-                session_name: latestSessionWithResults.session_name
-              },
-              lastUpdated: new Date().toISOString()
-            }))
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ 
+          drivers: enrichedDrivers, 
+          sessionInfo: {
+            meeting_name: latestSessionWithResults.meeting_name,
+            session_name: latestSessionWithResults.session_name
+          }
+        }))
             return // Successfully got data from Jolpi, exit early
           }
         } catch (jolpiError) {
@@ -230,7 +225,6 @@ export default function DriversStandings() {
             setDrivers(enrichedDrivers)
             setLoading(false)
             setError(null)
-            setLastUpdated(new Date().toISOString())
             
             // Cache the result
             localStorage.setItem(CACHE_KEY, JSON.stringify({ 
@@ -238,8 +232,7 @@ export default function DriversStandings() {
               sessionInfo: {
                 meeting_name: latestSession.meeting_name,
                 session_name: latestSession.session_name
-              },
-              lastUpdated: new Date().toISOString()
+              }
             }))
             return // Successfully got data from api.openf1.org, exit early
           }
@@ -294,17 +287,15 @@ export default function DriversStandings() {
                 team_color: undefined // Ergast doesn't provide team color
             }))
               
-            setDrivers(enrichedDrivers)
-              setLoading(false)
+                        setDrivers(enrichedDrivers)
+            setLoading(false)
             setError(null)
-              setLastUpdated(new Date().toISOString())
-              
-              // Cache the result
-              localStorage.setItem(CACHE_KEY, JSON.stringify({ 
-                drivers: enrichedDrivers, 
-                sessionInfo: { meeting_name: race.raceName, session_name: "Race" },
-                lastUpdated: new Date().toISOString()
-              }))
+            
+            // Cache the result
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ 
+              drivers: enrichedDrivers, 
+              sessionInfo: { meeting_name: race.raceName, session_name: "Race" }
+            }))
             return
             }
           } catch (ergastError) {
@@ -317,21 +308,20 @@ export default function DriversStandings() {
       } catch (err) {
         console.error('[DriversStandings] Error fetching data:', err)
         
-          // Try to load from cache
+                    // Try to load from cache
           const cached = localStorage.getItem(CACHE_KEY)
           if (cached) {
             try {
               const parsed = JSON.parse(cached)
               setDrivers(parsed.drivers || [])
               setSessionInfo(parsed.sessionInfo || {})
-            setLastUpdated(parsed.lastUpdated || null)
               setError(null)
             } catch {
               setError("Race data temporarily unavailable. Please try again later.")
             }
           } else {
             setError("Race data temporarily unavailable. Please try again later.")
-        }
+          }
         setLoading(false)
       }
     }
