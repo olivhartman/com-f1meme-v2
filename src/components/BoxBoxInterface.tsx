@@ -59,7 +59,7 @@ const TransactionLink = ({ signature }: { signature: string }) => (
   </a>
 )
 
-const QUICKNODE_WS_URL = 'wss://late-dawn-firefly.solana-mainnet.quiknode.pro/b32292a16b41afcac0bf7022a5c34e4d57c7f58f/';
+const QUICKNODE_WS_URL = 'wss://warmhearted-dawn-market.solana-mainnet.quiknode.pro/7e4374434d7bb18c04e5c23db44a545468e4e50f/';
 
 const BoxBoxInterface: React.FC = () => {
   const { connection } = useConnection()
