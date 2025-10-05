@@ -265,14 +265,14 @@ export default function Tokenomics() {
                       </p>
                     </motion.div>
 
-                    <motion.div variants={item}>
+                    {/* <motion.div variants={item}>
                       <Button
                         className="w-full bg-yellow-500 hover:bg-yellow-500/80 text-black font-bold py-4 rounded-full mt-6 transition-all duration-300"
                         size="lg"
                       >
                         SWAP NOW
                       </Button>
-                    </motion.div>
+                    </motion.div> */}
                   </motion.div>
                 </>
               )}
