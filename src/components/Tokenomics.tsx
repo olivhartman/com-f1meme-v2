@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion"
 import { Card, CardContent } from "./ui/card"
-import { Button } from "./ui/button"
 import { Info, Copy } from "lucide-react"
 import { useState, useEffect } from "react"
 
