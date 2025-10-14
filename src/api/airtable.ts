@@ -1,36 +1,7 @@
 import { cloudinaryService } from './cloudinary';
 
-// Airtable REST API service using Personal Access Tokens
-const API_TOKEN = import.meta.env.VITE_AIRTABLE_PAT;
-const BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID;
-
-const AIRTABLE_API_URL = `https://api.airtable.com/v0/${BASE_ID}`;
-
-// Table and field names - update these to match your Airtable structure
-const TABLE_NAME = 'Profile';
-const GALLERY_TABLE_NAME = 'GalleryPhoto';
-const FIELD_NAMES = {
-  NAME: 'Name',
-  EMAIL: 'Email',
-  INSTAGRAM_URL: 'Instagram URL',
-  TIKTOK_URL: 'Tiktok URL',
-  TG_URL: 'TG URL',
-  WALLET_ADDRESS: 'Wallet Address',
-  PROFILE_PICTURE: 'Profile Picture',
-  COVER_PICTURE: 'Cover Picture',
-  CREATED_AT: 'Created At',
-  UPDATED_AT: 'Updated At',
-  MEMBERSHIP_LEVEL: 'Membership Level',
-};
-
-const GALLERY_FIELD_NAMES = {
-  ID: 'id',
-  URL: 'url',
-  UPLOADED_BY: 'uploadedBy',
-  UPLOADED_AT: 'uploadedAt',
-  WALLET_ADDRESS: 'walletAddress',
-  CAPTION: 'caption',
-};
+// Backend API base URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.f1meme.com';
 
 export interface ProfileData {
   name: string;
@@ -58,115 +29,27 @@ export interface GalleryPhoto {
 }
 
 export const airtableService = {
-  // Get all fields from the Profile table
-  async getTableFields(): Promise<void> {
-    try {
-      console.log('Getting table fields...');
-      // Explicitly request all fields including Created At and Updated At
-      const response = await fetch(`${AIRTABLE_API_URL}/${TABLE_NAME}?maxRecords=1&fields[]=${FIELD_NAMES.CREATED_AT}&fields[]=${FIELD_NAMES.UPDATED_AT}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${API_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Get table fields error response:', errorText);
-        throw new Error(`Get table fields failed: ${response.status} ${response.statusText} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      console.log('Table structure:', data);
-      
-      if (data.records && data.records.length > 0) {
-        const firstRecord = data.records[0];
-        console.log('Available fields:', Object.keys(firstRecord.fields));
-        console.log('Field values:', firstRecord.fields);
-        console.log('Created At:', firstRecord.fields[FIELD_NAMES.CREATED_AT]);
-        console.log('Updated At:', firstRecord.fields[FIELD_NAMES.UPDATED_AT]);
-        console.log('Membership Level field exists:', FIELD_NAMES.MEMBERSHIP_LEVEL in firstRecord.fields);
-      } else {
-        console.log('No records found in table');
-      }
-    } catch (error) {
-      console.error('Error getting table fields:', error);
-      throw error;
-    }
-  },
-
-  // Check if a specific field exists in the table
-  async checkFieldExists(fieldName: string): Promise<boolean> {
-    try {
-      const response = await fetch(`${AIRTABLE_API_URL}/${TABLE_NAME}?maxRecords=1`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${API_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        return false;
-      }
-
-      const data = await response.json();
-      if (data.records && data.records.length > 0) {
-        const firstRecord = data.records[0];
-        return fieldName in firstRecord.fields;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error checking field existence:', error);
-      return false;
-    }
-  },
-
   // Create or update profile
   async upsertProfile(profileData: ProfileData): Promise<void> {
     try {
       console.log('Starting upsertProfile with wallet:', profileData.walletAddress);
-      console.log('API Token available:', !!API_TOKEN);
-      console.log('Base ID available:', !!BASE_ID);
       
-      if (!API_TOKEN) {
-        throw new Error('Airtable Personal Access Token is not configured');
-      }
-      
-      if (!BASE_ID) {
-        throw new Error('Airtable Base ID is not configured');
-      }
-      
-      // Prepare fields object - only include fields that exist in your table
-      const fields: any = {
-        [FIELD_NAMES.WALLET_ADDRESS]: profileData.walletAddress,
-        [FIELD_NAMES.UPDATED_AT]: new Date().toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) + ' at ' + new Date().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }),
+      // Prepare payload
+      const payload: any = {
+        walletAddress: profileData.walletAddress,
       };
 
       // Only add fields that have actual values (not empty strings)
       if (profileData.name && profileData.name.trim()) {
-        fields[FIELD_NAMES.NAME] = profileData.name;
+        payload.name = profileData.name;
       }
       
       if (profileData.email && profileData.email.trim()) {
-        fields[FIELD_NAMES.EMAIL] = profileData.email;
+        payload.email = profileData.email;
       }
       
       if (profileData.instagramUrl && profileData.instagramUrl.trim()) {
-        fields[FIELD_NAMES.INSTAGRAM_URL] = profileData.instagramUrl;
+        payload.instagramUrl = profileData.instagramUrl;
       }
 
       // Handle membership level with validation
@@ -174,22 +57,16 @@ export const airtableService = {
         const levelValue = Math.max(0, Math.min(profileData.membershipLevel, 999)); // Ensure it's a valid positive number
         console.log('Original membership level:', profileData.membershipLevel);
         console.log('Validated membership level:', levelValue);
-        console.log('Type of levelValue:', typeof levelValue);
-        
-        // Convert to string since Airtable field is Single Line Text
-        fields[FIELD_NAMES.MEMBERSHIP_LEVEL] = String(levelValue);
-        console.log('Setting membership level to:', String(levelValue), 'Type:', typeof String(levelValue));
-      } else {
-        console.log('No valid membership level provided, skipping field');
+        payload.membershipLevel = levelValue;
       }
 
       // Only add TikTok and TG URLs if the fields exist in your table and have values
       if (profileData.tiktokUrl && profileData.tiktokUrl.trim()) {
-        fields[FIELD_NAMES.TIKTOK_URL] = profileData.tiktokUrl;
+        payload.tiktokUrl = profileData.tiktokUrl;
       }
       
       if (profileData.tgUrl && profileData.tgUrl.trim()) {
-        fields[FIELD_NAMES.TG_URL] = profileData.tgUrl;
+        payload.tgUrl = profileData.tgUrl;
       }
 
       // Handle profile picture attachment
@@ -197,10 +74,7 @@ export const airtableService = {
         console.log('Processing profile picture:', profileData.profilePicture.name);
         try {
           const imageUrl = await cloudinaryService.uploadImage(profileData.profilePicture);
-          fields[FIELD_NAMES.PROFILE_PICTURE] = [{
-            url: imageUrl,
-            filename: profileData.profilePicture.name
-          }];
+          payload.profilePictureUrl = imageUrl;
           console.log('Profile picture uploaded successfully');
         } catch (error) {
           console.error('Failed to upload profile picture:', error);
@@ -213,10 +87,7 @@ export const airtableService = {
         console.log('Processing cover picture:', profileData.coverPicture.name);
         try {
           const imageUrl = await cloudinaryService.uploadImage(profileData.coverPicture);
-          fields[FIELD_NAMES.COVER_PICTURE] = [{
-            url: imageUrl,
-            filename: profileData.coverPicture.name
-          }];
+          payload.coverPictureUrl = imageUrl;
           console.log('Cover picture uploaded successfully');
         } catch (error) {
           console.error('Failed to upload cover picture:', error);
@@ -224,134 +95,24 @@ export const airtableService = {
         }
       }
 
-      console.log('Prepared fields:', fields);
+      console.log('Prepared payload:', payload);
 
-      // First, try to find existing record
-      console.log('Searching for existing record...');
-      const searchUrl = `${AIRTABLE_API_URL}/${TABLE_NAME}?filterByFormula=${encodeURIComponent(`{${FIELD_NAMES.WALLET_ADDRESS}} = '${profileData.walletAddress}'`)}`;
-      console.log('Search URL:', searchUrl);
-      
-      const searchResponse = await fetch(searchUrl, {
-        method: 'GET',
+      // Call the backend API
+      const response = await fetch(`${API_BASE_URL}/f1meme/profiles/upsert/${profileData.walletAddress}`, {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${API_TOKEN}`,
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify(payload)
       });
 
-      console.log('Search response status:', searchResponse.status);
-      console.log('Search response headers:', Object.fromEntries(searchResponse.headers.entries()));
-
-      if (!searchResponse.ok) {
-        const errorText = await searchResponse.text();
-        console.error('Search error response:', errorText);
-        throw new Error(`Search failed: ${searchResponse.status} ${searchResponse.statusText} - ${errorText}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Upsert profile error response:', errorText);
+        throw new Error(`Upsert profile failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
-      const searchData = await searchResponse.json();
-      console.log('Found existing records:', searchData.records?.length || 0);
-
-      if (searchData.records && searchData.records.length > 0) {
-        // Update existing record
-        console.log('Updating existing record with ID:', searchData.records[0].id);
-        const updateResponse = await fetch(`${AIRTABLE_API_URL}/${TABLE_NAME}`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${API_TOKEN}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            records: [{
-              id: searchData.records[0].id,
-              fields: fields
-            }]
-          })
-        });
-
-        if (!updateResponse.ok) {
-          const errorData = await updateResponse.text();
-          console.error('Update error response:', errorData);
-          throw new Error(`Update failed: ${updateResponse.status} ${updateResponse.statusText} - ${errorData}`);
-        }
-
-        console.log('Record updated successfully');
-      } else {
-        // Add Created At for new records
-        fields[FIELD_NAMES.CREATED_AT] = new Date().toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) + ' at ' + new Date().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        });
-        
-        // Create new record
-        console.log('Creating new record...');
-        const createResponse = await fetch(`${AIRTABLE_API_URL}/${TABLE_NAME}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${API_TOKEN}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            records: [{
-              fields: fields
-            }]
-          })
-        });
-
-        if (!createResponse.ok) {
-          const errorData = await createResponse.text();
-          console.error('Create error response:', errorData);
-          
-          // Handle specific field validation errors
-          if (createResponse.status === 422) {
-            try {
-              const errorJson = JSON.parse(errorData);
-              if (errorJson.error?.type === 'INVALID_VALUE_FOR_COLUMN') {
-                console.error('Field validation error:', errorJson.error.message);
-                
-                // Try without the problematic field
-                delete fields[FIELD_NAMES.MEMBERSHIP_LEVEL];
-                console.log('Retrying without membership level field...');
-                
-                const retryResponse = await fetch(`${AIRTABLE_API_URL}/${TABLE_NAME}`, {
-                  method: 'POST',
-                  headers: {
-                    'Authorization': `Bearer ${API_TOKEN}`,
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                    records: [{
-                      fields: fields
-                    }]
-                  })
-                });
-                
-                if (!retryResponse.ok) {
-                  const retryErrorData = await retryResponse.text();
-                  throw new Error(`Create failed (retry): ${retryResponse.status} ${retryResponse.statusText} - ${retryErrorData}`);
-                }
-                
-                console.log('Record created successfully (without membership level)');
-                return;
-              }
-            } catch (parseError) {
-              console.error('Failed to parse error response:', parseError);
-            }
-          }
-          
-          throw new Error(`Create failed: ${createResponse.status} ${createResponse.statusText} - ${errorData}`);
-        }
-
-        console.log('Record created successfully');
-      }
+      console.log('Profile upserted successfully');
     } catch (error) {
       console.error('Error upserting profile:', error);
       if (typeof error === 'object' && error !== null) {
@@ -375,10 +136,9 @@ export const airtableService = {
   async getProfile(walletAddress: string): Promise<ProfileData | null> {
     try {
       console.log('Getting profile for wallet:', walletAddress);
-      const response = await fetch(`${AIRTABLE_API_URL}/${TABLE_NAME}?filterByFormula=${encodeURIComponent(`{${FIELD_NAMES.WALLET_ADDRESS}} = '${walletAddress}'`)}`, {
+      const response = await fetch(`${API_BASE_URL}/f1meme/profiles/wallet/${walletAddress}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${API_TOKEN}`,
           'Content-Type': 'application/json'
         }
       });
@@ -390,36 +150,26 @@ export const airtableService = {
       }
 
       const data = await response.json();
-      console.log('Found records:', data.records?.length || 0);
+      console.log('Profile data:', data);
 
-      if (!data.records || data.records.length === 0) {
+      if (!data || !data.walletAddress) {
         return null;
-      }
-
-      const record = data.records[0];
-      
-      // Handle membership level as string (since it's stored as Single Line Text)
-      let membershipLevel = 0;
-      if (record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL]) {
-        const levelStr = String(record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL]);
-        const levelNum = parseInt(levelStr, 10);
-        membershipLevel = isNaN(levelNum) ? 0 : levelNum;
       }
       
       return {
-        name: record.fields[FIELD_NAMES.NAME] || '',
-        email: record.fields[FIELD_NAMES.EMAIL] || '',
-        instagramUrl: record.fields[FIELD_NAMES.INSTAGRAM_URL] || '',
-        tiktokUrl: record.fields[FIELD_NAMES.TIKTOK_URL] || '',
-        tgUrl: record.fields[FIELD_NAMES.TG_URL] || '',
+        name: data.name || '',
+        email: data.email || '',
+        instagramUrl: data.instagramUrl || '',
+        tiktokUrl: data.tiktokUrl || '',
+        tgUrl: data.tgUrl || '',
         profilePicture: undefined, // We don't load existing images back as Files
         coverPicture: undefined,   // We don't load existing images back as Files
-        walletAddress: record.fields[FIELD_NAMES.WALLET_ADDRESS] || '',
-        createdAt: record.fields[FIELD_NAMES.CREATED_AT] || undefined,
-        updatedAt: record.fields[FIELD_NAMES.UPDATED_AT] || undefined,
-        profilePictureUrl: record.fields[FIELD_NAMES.PROFILE_PICTURE]?.[0]?.url || '',
-        coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || '',
-        membershipLevel: membershipLevel,
+        walletAddress: data.walletAddress || '',
+        createdAt: data.createdAt || undefined,
+        updatedAt: data.updatedAt || undefined,
+        profilePictureUrl: data.profilePictureUrl || '',
+        coverPictureUrl: data.coverPictureUrl || '',
+        membershipLevel: data.membershipLevel || 0,
       };
     } catch (error) {
       console.error('Error getting profile:', error);
@@ -430,10 +180,9 @@ export const airtableService = {
   // Get all profiles (for community page)
   async getAllProfiles(): Promise<ProfileData[]> {
     try {
-      const response = await fetch(`${AIRTABLE_API_URL}/${TABLE_NAME}`, {
+      const response = await fetch(`${API_BASE_URL}/f1meme/profiles/all`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${API_TOKEN}`,
           'Content-Type': 'application/json'
         }
       });
@@ -441,25 +190,17 @@ export const airtableService = {
         throw new Error('Failed to fetch all profiles');
       }
       const data = await response.json();
-      return (data.records || []).map((record: any) => {
-        // Handle membership level as string (since it's stored as Single Line Text)
-        let membershipLevel = 0;
-        if (record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL]) {
-          const levelStr = String(record.fields[FIELD_NAMES.MEMBERSHIP_LEVEL]);
-          const levelNum = parseInt(levelStr, 10);
-          membershipLevel = isNaN(levelNum) ? 0 : levelNum;
-        }
-        
+      return (data.profiles || []).map((profile: any) => {
         return {
-        name: record.fields[FIELD_NAMES.NAME] || '',
-        instagramUrl: record.fields[FIELD_NAMES.INSTAGRAM_URL] || '',
-        tiktokUrl: record.fields[FIELD_NAMES.TIKTOK_URL] || '',
-        tgUrl: record.fields[FIELD_NAMES.TG_URL] || '',
-        profilePictureUrl: record.fields[FIELD_NAMES.PROFILE_PICTURE]?.[0]?.url || '',
-        coverPictureUrl: record.fields[FIELD_NAMES.COVER_PICTURE]?.[0]?.url || '',
-        walletAddress: record.fields[FIELD_NAMES.WALLET_ADDRESS] || '',
-          membershipLevel: membershipLevel,
-        // Do not include email
+          name: profile.name || '',
+          instagramUrl: profile.instagramUrl || '',
+          tiktokUrl: profile.tiktokUrl || '',
+          tgUrl: profile.tgUrl || '',
+          profilePictureUrl: profile.profilePictureUrl || '',
+          coverPictureUrl: profile.coverPictureUrl || '',
+          walletAddress: profile.walletAddress || '',
+          membershipLevel: profile.membershipLevel || 0,
+          // Do not include email
         };
       });
     } catch (error) {
@@ -473,25 +214,20 @@ export const airtableService = {
     try {
       console.log('Uploading gallery photo:', photo);
       
-      const fields = {
-        [GALLERY_FIELD_NAMES.URL]: photo.url,
-        [GALLERY_FIELD_NAMES.UPLOADED_BY]: photo.uploadedBy,
-        [GALLERY_FIELD_NAMES.UPLOADED_AT]: photo.uploadedAt,
-        [GALLERY_FIELD_NAMES.WALLET_ADDRESS]: photo.walletAddress,
-        [GALLERY_FIELD_NAMES.CAPTION]: photo.caption || '',
+      const payload = {
+        url: photo.url,
+        uploadedBy: photo.uploadedBy,
+        uploadedAt: photo.uploadedAt,
+        walletAddress: photo.walletAddress,
+        caption: photo.caption || '',
       };
 
-      const response = await fetch(`${AIRTABLE_API_URL}/${GALLERY_TABLE_NAME}`, {
+      const response = await fetch(`${API_BASE_URL}/f1meme/gallery/upload`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${API_TOKEN}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          records: [{
-            fields
-          }]
-        })
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
@@ -511,10 +247,9 @@ export const airtableService = {
   async getAllGalleryPhotos(): Promise<GalleryPhoto[]> {
     try {
       console.log('Getting all gallery photos...');
-      const response = await fetch(`${AIRTABLE_API_URL}/${GALLERY_TABLE_NAME}?view=Grid%20view&sort[0][field]=${GALLERY_FIELD_NAMES.UPLOADED_AT}&sort[0][direction]=desc`, {
+      const response = await fetch(`${API_BASE_URL}/f1meme/gallery/all`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${API_TOKEN}`,
           'Content-Type': 'application/json'
         }
       });
@@ -528,67 +263,136 @@ export const airtableService = {
       const data = await response.json();
       console.log('All gallery photos data:', data);
 
-      return data.records.map((record: any) => ({
-        id: record.id,
-        url: record.fields[GALLERY_FIELD_NAMES.URL] || '',
-        uploadedBy: record.fields[GALLERY_FIELD_NAMES.UPLOADED_BY] || '',
-        uploadedAt: record.fields[GALLERY_FIELD_NAMES.UPLOADED_AT] || '',
-        walletAddress: record.fields[GALLERY_FIELD_NAMES.WALLET_ADDRESS] || '',
-        caption: record.fields[GALLERY_FIELD_NAMES.CAPTION] || '',
+      return (data.photos || []).map((photo: any) => ({
+        id: photo.id,
+        url: photo.url || '',
+        uploadedBy: photo.uploadedBy || '',
+        uploadedAt: photo.uploadedAt || '',
+        walletAddress: photo.walletAddress || '',
+        caption: photo.caption || '',
       }));
     } catch (error) {
       console.error('Error getting all gallery photos:', error);
       throw error;
     }
+  },
+
+  async getGalleryPhotosByWallet(walletAddress: string): Promise<GalleryPhoto[]> {
+    try {
+      console.log('Getting gallery photos for wallet:', walletAddress);
+      const response = await fetch(`${API_BASE_URL}/f1meme/gallery/wallet/${walletAddress}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Get gallery photos by wallet error response:', errorText);
+        throw new Error(`Get gallery photos by wallet failed: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Gallery photos by wallet data:', data);
+
+      return (data.photos || []).map((photo: any) => ({
+        id: photo.id,
+        url: photo.url || '',
+        uploadedBy: photo.uploadedBy || '',
+        uploadedAt: photo.uploadedAt || '',
+        walletAddress: photo.walletAddress || '',
+        caption: photo.caption || '',
+      }));
+    } catch (error) {
+      console.error('Error getting gallery photos by wallet:', error);
+      throw error;
+    }
+  },
+
+  async deleteGalleryPhoto(id: string): Promise<void> {
+    try {
+      console.log('Deleting gallery photo:', id);
+      const response = await fetch(`${API_BASE_URL}/f1meme/gallery/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Delete gallery photo error response:', errorText);
+        throw new Error(`Delete gallery photo failed: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      console.log('Gallery photo deleted successfully');
+    } catch (error) {
+      console.error('Error deleting gallery photo:', error);
+      throw error;
+    }
   }
 };
 
-// Always send an array of records, and all fields as strings
-async function saveRecordToAirtable(tableName: string, fields: Record<string, unknown> | Record<string, unknown>[]): Promise<void> {
-  if (!API_TOKEN) throw new Error('Airtable Personal Access Token is not configured');
-  if (!BASE_ID) throw new Error('Airtable Base ID is not configured');
-  const recordsArray = Array.isArray(fields)
-    ? fields
-    : [fields];
-  // Convert all field values to strings
-  recordsArray.forEach(record => {
-    const fields = record.fields as Record<string, unknown>;
-    Object.keys(fields).forEach(key => {
-      if (typeof fields[key] !== 'string') {
-        fields[key] = (fields[key] as any)?.toString?.() ?? '';
-      }
-    });
-  });
-  const response = await fetch(`${AIRTABLE_API_URL}/${tableName}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${API_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ records: recordsArray }),
-  });
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Airtable save failed: ${response.status} ${response.statusText} - ${errorText}`);
-  }
-}
-
-// Save F1 schedule entry to 'F1 Schedule' table
+// Save F1 schedule entry
 export async function saveF1ScheduleEntry(entry: {
   raceName: string;
   date: string;
   time: string;
   circuit: string;
 }): Promise<void> {
-  // Map your entry fields to Airtable field names as needed
-  const fields = {
-    'Race Name': entry.raceName,
-    'Date': entry.date,
-    'Time': entry.time,
-    'Circuit': entry.circuit,
-    'Created At': new Date().toISOString(),
+  const payload = {
+    raceName: entry.raceName,
+    date: entry.date,
+    time: entry.time,
+    circuit: entry.circuit,
   };
-  await saveRecordToAirtable('F1 Schedule', fields);
+
+  const response = await fetch(`${API_BASE_URL}/f1meme/f1-schedule`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Save F1 schedule failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+}
+
+// Get all F1 schedule entries
+export async function getAllF1ScheduleEntries(): Promise<any[]> {
+  const response = await fetch(`${API_BASE_URL}/f1meme/f1-schedule/all`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Get F1 schedule failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.schedule || [];
+}
+
+// Delete F1 schedule entry
+export async function deleteF1ScheduleEntry(id: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/f1meme/f1-schedule/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Delete F1 schedule failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
 }
 
 // Save a race winner to the 'Winners' table
@@ -600,16 +404,27 @@ export async function saveRaceWinner(entry: {
   raceName: string;
   raceDate: string;
 }): Promise<void> {
-  const fields = {
-    'Driver Number': entry.driverNumber,
-    'Full Name': entry.fullName,
-    'Team Name': entry.teamName || '',
-    'Team Color': entry.teamColor || '',
-    'Race Name': entry.raceName,
-    'Race Date': entry.raceDate,
-    'Created At': new Date().toISOString(),
+  const payload = {
+    driverNumber: entry.driverNumber,
+    fullName: entry.fullName,
+    teamName: entry.teamName || '',
+    teamColor: entry.teamColor || '',
+    raceName: entry.raceName,
+    raceDate: entry.raceDate,
   };
-  await saveRecordToAirtable('Winners', fields);
+
+  const response = await fetch(`${API_BASE_URL}/f1meme/winners/save`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Save race winner failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
 }
 
 // Save top 3 race winners to the 'Winners' table
@@ -628,34 +443,89 @@ export function normalizeRaceKey(raceName: string, raceDate: string, driverName:
   return `${raceName.trim().toLowerCase()}|${new Date(raceDate).toISOString().slice(0, 10)}|${driverName.trim().toLowerCase()}|${position}`;
 }
 
-// All fields are sent as strings to match Airtable 'single line text' fields
+// Save multiple race winners
 export async function saveRaceWinners(entries: WinnerEntry[]): Promise<void> {
-  const records = entries.map(entry => ({
-    fields: {
-      'Position': entry.position.toString(),
-      'Driver Number': entry.driverNumber.toString(),
-      'Full Name': entry.fullName || '',
-      'Team Name': entry.teamName || '',
-      'Team Color': entry.teamColor || '',
-      'Race Name': entry.raceName,
-      'Race Date': entry.raceDate,
-      'Race Key': normalizeRaceKey(entry.raceName, entry.raceDate, entry.fullName || '', entry.position),
-      'Created At': new Date().toISOString(),
-    }
+  const payload = entries.map(entry => ({
+    position: entry.position,
+    driverNumber: entry.driverNumber,
+    fullName: entry.fullName || '',
+    teamName: entry.teamName || '',
+    teamColor: entry.teamColor || '',
+    raceName: entry.raceName,
+    raceDate: entry.raceDate,
   }));
-  await saveRecordToAirtable('Winners', records);
+
+  const response = await fetch(`${API_BASE_URL}/f1meme/winners/save-multiple`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ winners: payload }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Save race winners failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+}
+
+// Get all winners
+export async function getAllWinners(): Promise<any[]> {
+  const response = await fetch(`${API_BASE_URL}/f1meme/winners/all`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Get winners failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.winners || [];
+}
+
+// Get winners by race
+export async function getWinnersByRace(raceName: string, raceDate: string): Promise<any[]> {
+  const response = await fetch(`${API_BASE_URL}/f1meme/winners/by-race?raceName=${encodeURIComponent(raceName)}&raceDate=${encodeURIComponent(raceDate)}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Get winners by race failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.winners || [];
 }
 
 // Check if any winner for this race/driver/position exists
 export async function winnersExistForRace(raceName: string, raceDate: string, fullName: string, position: number): Promise<boolean> {
-  const raceKey = normalizeRaceKey(raceName, raceDate, fullName, position);
-  const filter = `{Race Key} = '${raceKey}'`;
-  const response = await fetch(`${AIRTABLE_API_URL}/Winners?filterByFormula=${encodeURIComponent(filter)}`, {
-    headers: {
-      'Authorization': `Bearer ${API_TOKEN}`,
-      'Content-Type': 'application/json'
-    }
+  const params = new URLSearchParams({
+    raceName,
+    raceDate,
+    fullName,
+    position: position.toString(),
   });
+
+  const response = await fetch(`${API_BASE_URL}/f1meme/winners/exists?${params}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Check winners exists failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+
   const data = await response.json();
-  return (data.records && data.records.length > 0);
+  return data.exists || false;
 }

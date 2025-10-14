@@ -86,7 +86,6 @@ const ProfilePage: React.FC = () => {
     const loadProfile = async () => {
       if (publicKey) {
         try {
-          await airtableService.getTableFields()
           const existingProfile = await airtableService.getProfile(publicKey.toBase58())
           if (existingProfile) {
             setProfileData({
