@@ -75,7 +75,7 @@ export const airtableService = {
         try {
           const imageUrl = await cloudinaryService.uploadImage(profileData.profilePicture);
           payload.profilePictureUrl = imageUrl;
-          console.log('Profile picture uploaded successfully');
+          console.log('Profile picture uploaded successfully, URL:', imageUrl);
         } catch (error) {
           console.error('Failed to upload profile picture:', error);
           // Continue without the image if upload fails
@@ -88,14 +88,14 @@ export const airtableService = {
         try {
           const imageUrl = await cloudinaryService.uploadImage(profileData.coverPicture);
           payload.coverPictureUrl = imageUrl;
-          console.log('Cover picture uploaded successfully');
+          console.log('Cover picture uploaded successfully, URL:', imageUrl);
         } catch (error) {
           console.error('Failed to upload cover picture:', error);
           // Continue without the image if upload fails
         }
       }
 
-      console.log('Prepared payload:', payload);
+      console.log('Final payload being sent to API:', JSON.stringify(payload, null, 2));
 
       // Call the backend API
       const response = await fetch(`${API_BASE_URL}/f1meme/profiles/upsert/${profileData.walletAddress}`, {
@@ -114,10 +114,13 @@ export const airtableService = {
 
       // Handle empty responses (like 204 No Content)
       const responseText = await response.text();
+      console.log('Upsert response status:', response.status);
+      console.log('Upsert response text:', responseText);
+      
       if (responseText && responseText.trim() !== '') {
         try {
           const data = JSON.parse(responseText);
-          console.log('Upsert response data:', data);
+          console.log('Upsert response data:', JSON.stringify(data, null, 2));
         } catch (parseError) {
           console.log('Upsert response is not JSON, treating as success');
         }
@@ -175,13 +178,14 @@ export const airtableService = {
         throw new Error(`Invalid JSON response: ${parseError}`);
       }
       
-      console.log('Profile data:', data);
+      console.log('Raw profile data from API:', JSON.stringify(data, null, 2));
 
       if (!data || (!data.wallet_address && !data.walletAddress)) {
+        console.log('No profile data found or missing wallet address');
         return null;
       }
       
-      return {
+      const profile = {
         name: data.name || '',
         email: data.email || '',
         instagramUrl: data.instagram_url || data.instagramUrl || '',
@@ -196,6 +200,9 @@ export const airtableService = {
         coverPictureUrl: data.cover_picture_url || data.coverPictureUrl || '',
         membershipLevel: data.membership_level || data.membershipLevel || 0,
       };
+      
+      console.log('Processed profile data:', JSON.stringify(profile, null, 2));
+      return profile;
     } catch (error) {
       console.error('Error getting profile:', error);
       throw error;
