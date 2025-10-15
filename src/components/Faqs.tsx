@@ -4,8 +4,10 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronDown } from "lucide-react"
 import { Card, CardContent } from "./ui/card"
+import { useTranslation } from "../i18n/TranslationContext"
 
 export default function Faqs() {
+  const { t } = useTranslation()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   const faqs = [
@@ -60,9 +62,9 @@ export default function Faqs() {
         transition={{ duration: 0.5 }}
         className="text-center mb-8 sm:mb-16 relative z-10"
       >
-        <h2 className="text-4xl sm:text-5xl font-bold text-yellow-500 mb-4">FAQ</h2>
+        <h2 className="text-4xl sm:text-5xl font-bold text-yellow-500 mb-4">{t.additional.faq}</h2>
         <p className="text-gray-400 max-w-2xl mx-auto px-4">
-          Frequently Asked Questions
+          {t.additional.faqDesc}
         </p>
       </motion.div>
 
@@ -113,28 +115,28 @@ export default function Faqs() {
       <motion.div className="mt-16 text-center">
         <Card className="backdrop-blur-sm border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 max-w-2xl mx-auto">
           <CardContent className="p-8">
-            <h3 className="text-2xl font-bold text-white mb-4">Still have questions?</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">{t.additional.stillHaveQuestions}</h3>
             <p className="text-gray-300 mb-6">
-              Join our community channels to get more information and stay updated on the latest developments.
+              {t.additional.joinCommunity}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <a
                 href="https://x.com/F1memeBoxbox"
                 className="px-6 py-3 bg-black/40 hover:bg-black/60 text-white rounded-full transition-colors duration-300 flex items-center gap-2"
               >
-                <span>Twitter</span>
+                <span>{t.additional.twitter}</span>
               </a>
               <a
                 href="#"
                 className="px-6 py-3 bg-black/40 hover:bg-black/60 text-white rounded-full transition-colors duration-300 flex items-center gap-2"
               >
-                <span>Telegram</span>
+                <span>{t.additional.telegram}</span>
               </a>
               <a
                 href="#"
                 className="px-6 py-3 bg-black/40 hover:bg-black/60 text-white rounded-full transition-colors duration-300 flex items-center gap-2"
               >
-                <span>Youtube</span>
+                <span>{t.additional.youtube}</span>
               </a>
             </div>
           </CardContent>

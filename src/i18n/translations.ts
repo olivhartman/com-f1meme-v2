@@ -189,6 +189,103 @@ export interface Translations {
     miniGallery: string;
     loadingGalleryHome: string;
     noPhotosYetHome: string;
+    // Profile page
+    addCoverPhoto: string;
+    clickOrDragToUpload: string;
+    addPhoto: string;
+    yourName: string;
+    saveProfile: string;
+    profileInfo: string;
+    personalInfo: string;
+    name: string;
+    email: string;
+    socialLinks: string;
+    instagramUrl: string;
+    tiktokUrl: string;
+    telegramUrl: string;
+    galleryUpload: string;
+    uploadPhoto: string;
+    dragOrClick: string;
+    nameRequired: string;
+    nameMinLength: string;
+    nameMaxLength: string;
+    emailRequired: string;
+    validEmail: string;
+    validInstagramUrl: string;
+    validTiktokUrl: string;
+    validTelegramUrl: string;
+    validUrl: string;
+    imageFileRequired: string;
+    fillRequiredFields: string;
+    profileUpdatedSuccess: string;
+    errorUpdatingProfile: string;
+    photoUploadedSuccess: string;
+    errorUploadingPhoto: string;
+    walletNotConnected: string;
+    // Hero section
+    latestRaceResults: string;
+    currentRace: string;
+    nextRace: string;
+    raceDate: string;
+    // Countdown
+    days: string;
+    hours: string;
+    minutes: string;
+    seconds: string;
+    // BoxBox Interface
+    totalBoxboxLocked: string;
+    connectWalletToView: string;
+    boxboxPremium: string;
+    membershipLevel: string;
+    membershipAccount: string;
+    yetToBeCreated: string;
+    created: string;
+    tokenBalance: string;
+    vault: string;
+    vaultTooltip: string;
+    amountToLock: string;
+    lockTokens: string;
+    processing: string;
+    activeLocks: string;
+    noActiveLocks: string;
+    lockedAmount: string;
+    releaseDate: string;
+    unlockTokens: string;
+    unlocking: string;
+    locked: string;
+    keepSolForGas: string;
+    unlockedTokens: string;
+    noUnlockedTokens: string;
+    unlockedAmount: string;
+    unlockedDate: string;
+    connectWalletToLock: string;
+    openWithPhantom: string;
+    firstConnectionInfo: string;
+    // Tokenomics
+    tokenomics: string;
+    tokenomicsDesc: string;
+    tokenDetails: string;
+    address: string;
+    totalSupply: string;
+    nameSymbol: string;
+    tokenPrice: string;
+    volume24h: string;
+    liquidity: string;
+    marketCap: string;
+    change24h: string;
+    trades24h: string;
+    liquidityInfo: string;
+    // FAQs
+    faq: string;
+    faqDesc: string;
+    stillHaveQuestions: string;
+    joinCommunity: string;
+    twitter: string;
+    telegram: string;
+    youtube: string;
+    // Footer
+    poweredBy: string;
+    allRightsReserved: string;
   };
 }
 
@@ -363,6 +460,103 @@ export const translations: Record<string, Translations> = {
       miniGallery: "Mini Gallery",
       loadingGalleryHome: "Loading gallery...",
       noPhotosYetHome: "No photos yet. Be the first to upload!",
+      // Profile page
+      addCoverPhoto: "Add Cover Photo",
+      clickOrDragToUpload: "Click or drag to upload",
+      addPhoto: "Add Photo",
+      yourName: "Your Name",
+      saveProfile: "Save Profile",
+      profileInfo: "Profile Information",
+      personalInfo: "Personal Information",
+      name: "Name",
+      email: "Email",
+      socialLinks: "Social Links",
+      instagramUrl: "Instagram URL",
+      tiktokUrl: "TikTok URL",
+      telegramUrl: "Telegram URL",
+      galleryUpload: "Gallery Upload",
+      uploadPhoto: "Upload Photo",
+      dragOrClick: "Drag or click to upload",
+      nameRequired: "Name is required (2+ chars).",
+      nameMinLength: "Name must be at least 2 characters.",
+      nameMaxLength: "Name must be at most 32 characters.",
+      emailRequired: "Email is required.",
+      validEmail: "Enter a valid email address.",
+      validInstagramUrl: "Must be an Instagram URL.",
+      validTiktokUrl: "Must be a TikTok URL.",
+      validTelegramUrl: "Must be a Telegram URL.",
+      validUrl: "Enter a valid URL.",
+      imageFileRequired: "File must be an image.",
+      fillRequiredFields: "Please fill the required fields.",
+      profileUpdatedSuccess: "Profile updated successfully!",
+      errorUpdatingProfile: "Error updating profile. Please try again.",
+      photoUploadedSuccess: "Photo uploaded successfully!",
+      errorUploadingPhoto: "Error uploading photo. Please try again.",
+      walletNotConnected: "Wallet not connected",
+      // Hero section
+      latestRaceResults: "Latest Race Results",
+      currentRace: "Current Race",
+      nextRace: "Next Race",
+      raceDate: "Race Date",
+      // Countdown
+      days: "Days",
+      hours: "Hours",
+      minutes: "Minutes",
+      seconds: "Seconds",
+      // BoxBox Interface
+      totalBoxboxLocked: "Total BOXBOX Locked",
+      connectWalletToView: "Connect wallet to view\ntotal locked tokens",
+      boxboxPremium: "BoxBox Premium",
+      membershipLevel: "Membership Level",
+      membershipAccount: "Membership Account",
+      yetToBeCreated: "Yet to be created",
+      created: "Created",
+      tokenBalance: "Token Balance",
+      vault: "Vault",
+      vaultTooltip: "Vault and membership level reset at the end of each season",
+      amountToLock: "Amount to Lock (BOXBOX)",
+      lockTokens: "Lock Tokens",
+      processing: "Processing...",
+      activeLocks: "Active Locks",
+      noActiveLocks: "There are no active locks.",
+      lockedAmount: "Locked Amount",
+      releaseDate: "Release Date",
+      unlockTokens: "Unlock Tokens",
+      unlocking: "Unlocking...",
+      locked: "Locked",
+      keepSolForGas: "⚠️ Keep at least 0.01 SOL in your wallet for gas fee.",
+      unlockedTokens: "Unlocked Tokens",
+      noUnlockedTokens: "There are no unlocked tokens.",
+      unlockedAmount: "Unlocked Amount",
+      unlockedDate: "Unlocked Date",
+      connectWalletToLock: "Connect your wallet to lock your BOXBOX tokens.",
+      openWithPhantom: "Open f1meme.com with Phantom Wallet browser.",
+      firstConnectionInfo: "On your first wallet connection, your membership account and vault are automatically created. This requires approval for two transactions to cover the costs, so keep at least 0.001 SOL in your wallet.",
+      // Tokenomics
+      tokenomics: "Tokenomics",
+      tokenomicsDesc: "Discover the economic model behind BOXBOX, the F1 Meme token powering our ecosystem",
+      tokenDetails: "Token Details",
+      address: "Address",
+      totalSupply: "Total Supply",
+      nameSymbol: "Name(Symbol)",
+      tokenPrice: "Token Price",
+      volume24h: "24h Volume",
+      liquidity: "Liquidity",
+      marketCap: "Market Cap",
+      change24h: "24h Change",
+      trades24h: "24h Trades",
+      liquidityInfo: "Currently the Liquidity is very low, if you have trouble buying large amount of BOXBOX tokens, please consider doing multiple swap in smaller amount.",
+      // FAQs
+      faq: "FAQ",
+      faqDesc: "Frequently Asked Questions",
+      stillHaveQuestions: "Still have questions?",
+      joinCommunity: "Join our community channels to get more information and stay updated on the latest developments.",
+      twitter: "Twitter",
+      telegram: "Telegram",
+      youtube: "Youtube",
+      // Footer
+      poweredBy: "Powered by",
+      allRightsReserved: "All rights reserved",
     },
   },
   zh: {
@@ -535,6 +729,103 @@ export const translations: Record<string, Translations> = {
       miniGallery: "迷你相册",
       loadingGalleryHome: "加载相册...",
       noPhotosYetHome: "暂无照片。成为第一个上传者！",
+      // Profile page
+      addCoverPhoto: "添加封面照片",
+      clickOrDragToUpload: "点击或拖拽上传",
+      addPhoto: "添加照片",
+      yourName: "您的姓名",
+      saveProfile: "保存资料",
+      profileInfo: "个人资料",
+      personalInfo: "个人信息",
+      name: "姓名",
+      email: "邮箱",
+      socialLinks: "社交链接",
+      instagramUrl: "Instagram链接",
+      tiktokUrl: "TikTok链接",
+      telegramUrl: "Telegram链接",
+      galleryUpload: "相册上传",
+      uploadPhoto: "上传照片",
+      dragOrClick: "拖拽或点击上传",
+      nameRequired: "姓名必填（至少2个字符）。",
+      nameMinLength: "姓名至少需要2个字符。",
+      nameMaxLength: "姓名最多32个字符。",
+      emailRequired: "邮箱必填。",
+      validEmail: "请输入有效的邮箱地址。",
+      validInstagramUrl: "必须是Instagram链接。",
+      validTiktokUrl: "必须是TikTok链接。",
+      validTelegramUrl: "必须是Telegram链接。",
+      validUrl: "请输入有效的链接。",
+      imageFileRequired: "文件必须是图片。",
+      fillRequiredFields: "请填写必填字段。",
+      profileUpdatedSuccess: "资料更新成功！",
+      errorUpdatingProfile: "更新资料失败，请重试。",
+      photoUploadedSuccess: "照片上传成功！",
+      errorUploadingPhoto: "照片上传失败，请重试。",
+      walletNotConnected: "钱包未连接",
+      // Hero section
+      latestRaceResults: "最新比赛结果",
+      currentRace: "当前比赛",
+      nextRace: "下一场比赛",
+      raceDate: "比赛日期",
+      // Countdown
+      days: "天",
+      hours: "小时",
+      minutes: "分钟",
+      seconds: "秒",
+      // BoxBox Interface
+      totalBoxboxLocked: "总锁定BOXBOX",
+      connectWalletToView: "连接钱包查看\n总锁定代币",
+      boxboxPremium: "BoxBox高级版",
+      membershipLevel: "会员等级",
+      membershipAccount: "会员账户",
+      yetToBeCreated: "尚未创建",
+      created: "已创建",
+      tokenBalance: "代币余额",
+      vault: "保险库",
+      vaultTooltip: "保险库和会员等级在每个赛季结束时重置",
+      amountToLock: "锁定数量 (BOXBOX)",
+      lockTokens: "锁定代币",
+      processing: "处理中...",
+      activeLocks: "活跃锁定",
+      noActiveLocks: "没有活跃的锁定。",
+      lockedAmount: "锁定数量",
+      releaseDate: "释放日期",
+      unlockTokens: "解锁代币",
+      unlocking: "解锁中...",
+      locked: "已锁定",
+      keepSolForGas: "⚠️ 请在钱包中保留至少0.01 SOL作为手续费。",
+      unlockedTokens: "已解锁代币",
+      noUnlockedTokens: "没有已解锁的代币。",
+      unlockedAmount: "已解锁数量",
+      unlockedDate: "解锁日期",
+      connectWalletToLock: "连接钱包以锁定您的BOXBOX代币。",
+      openWithPhantom: "使用Phantom钱包浏览器打开f1meme.com。",
+      firstConnectionInfo: "首次连接钱包时，您的会员账户和保险库会自动创建。这需要批准两笔交易来支付费用，因此请在钱包中保留至少0.001 SOL。",
+      // Tokenomics
+      tokenomics: "代币经济学",
+      tokenomicsDesc: "探索BOXBOX背后的经济模型，这是推动我们生态系统的F1 Meme代币",
+      tokenDetails: "代币详情",
+      address: "地址",
+      totalSupply: "总供应量",
+      nameSymbol: "名称(符号)",
+      tokenPrice: "代币价格",
+      volume24h: "24小时交易量",
+      liquidity: "流动性",
+      marketCap: "市值",
+      change24h: "24小时变化",
+      trades24h: "24小时交易",
+      liquidityInfo: "目前流动性较低，如果您在购买大量BOXBOX代币时遇到困难，请考虑分多次小额交换。",
+      // FAQs
+      faq: "常见问题",
+      faqDesc: "常见问题解答",
+      stillHaveQuestions: "还有问题吗？",
+      joinCommunity: "加入我们的社区频道，获取更多信息并了解最新发展动态。",
+      twitter: "推特",
+      telegram: "电报",
+      youtube: "YouTube",
+      // Footer
+      poweredBy: "技术支持",
+      allRightsReserved: "版权所有",
     },
   },
 };

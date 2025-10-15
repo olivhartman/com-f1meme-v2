@@ -7,6 +7,7 @@ import { useWallet } from "@solana/wallet-adapter-react"
 import { User, Instagram, Music, Send, Upload, Save, Camera, Check, AlertCircle, X, Plus } from "lucide-react"
 import { airtableService, type ProfileData as AirtableProfileData, type GalleryPhoto } from "../api/airtable"
 import Loader from "./Loader";
+import { useTranslation } from "../i18n/TranslationContext";
 
 interface ProfileData {
   name: string;

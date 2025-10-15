@@ -15,6 +15,7 @@ import { LockIcon, UnlockIcon, ExternalLinkIcon, XIcon } from "lucide-react"
 import { useAtom } from "jotai"
 import { totalLockedTokensAtom } from "../atoms/totalLocked"
 import { airtableService } from "../api/airtable"
+import { useTranslation } from "../i18n/TranslationContext"
 
 // interface MembershipAccount {
 //   owner: PublicKey
@@ -62,6 +63,7 @@ const TransactionLink = ({ signature }: { signature: string }) => (
 const QUICKNODE_WS_URL = 'wss://winter-silent-lake.solana-mainnet.quiknode.pro/3e452fad7a2a3061d83b097d144b06b2e5230b2f/';
 
 const BoxBoxInterface: React.FC = () => {
+  const { t } = useTranslation()
   const { connection } = useConnection()
   const wallet = useAnchorWallet()
   const { publicKey, sendTransaction } = useWallet()
@@ -756,7 +758,7 @@ useEffect(() => {
   //Dummy LevelDisplay Component
   const LevelDisplay = ({ level }: { level: number }) => (
     <div className="flex justify-center items-center mb-4 gap-4">
-      <span className="text-gray-400 font-bold">Membership Level</span>
+      <span className="text-gray-400 font-bold">{t.additional.membershipLevel}</span>
       <h6 className="text-xl font-semibold">{level}</h6>
     </div>
   )
@@ -892,7 +894,7 @@ useEffect(() => {
             {wallet ? (
               <>
                 <h3 className="text-yellow-400 text-lg sm:text-xl md:text-xl font-bold mb-3 tracking-tight">
-                  Total BOXBOX Locked
+                  {t.additional.totalBoxboxLocked}
                 </h3>
                 <div className="flex flex-col items-center space-y-1">
                   <p className="text-xl sm:text-3xl md:text-3xl font-bold text-gray-50 tracking-wider">
@@ -904,15 +906,15 @@ useEffect(() => {
                 </div>
               </>
             ) : (
-              <p className="text-gray-400 text-lg sm:text-xl font-medium leading-relaxed">
-                Connect wallet to view<br />total locked tokens
+              <p className="text-gray-400 text-lg sm:text-xl font-medium leading-relaxed whitespace-pre-line">
+                {t.additional.connectWalletToView}
               </p>
             )}
           </div>
         </div>
 
         <div className="rounded-t-xl p-3 sm:p-4 mb-4 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-          <h3 className="text-xl sm:text-2xl font-bold text-yellow-500 text-center sm:text-left">BoxBox Premium</h3>
+          <h3 className="text-xl sm:text-2xl font-bold text-yellow-500 text-center sm:text-left">{t.additional.boxboxPremium}</h3>
           <div className="flex items-center w-full sm:w-auto justify-center sm:justify-end">
             <WalletMultiButton className="w-full sm:w-auto" />
           </div>
@@ -946,18 +948,18 @@ useEffect(() => {
                 {/* Stats Grid - 2 columns on mobile, 3 on larger screens */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="backdrop-blur-sm bg-black/20 p-4 rounded-lg">
-                    <span className="text-gray-400 font-bold text-sm">Token Balance</span>
+                    <span className="text-gray-400 font-bold text-sm">{t.additional.tokenBalance}</span>
                     <h6 className="text-base font-semibold block mt-1">{formatNumber(tokenBalance)} BOXBOX</h6>
                   </div>
                   <div className="backdrop-blur-sm bg-black/20 p-4 rounded-lg">
-                    <span className="text-gray-400 font-bold text-sm">Membership Account</span>
+                    <span className="text-gray-400 font-bold text-sm">{t.additional.membershipAccount}</span>
                     <h6 className="text-base font-semibold block mt-1">
-                      {isMembershipInitialized ? "Created" : "Yet to be created"}
+                      {isMembershipInitialized ? t.additional.created : t.additional.yetToBeCreated}
                     </h6>
                   </div>
                   <div className="backdrop-blur-sm bg-black/20 p-4 rounded-lg relative">
                     <span className="text-gray-400 font-bold text-sm">
-                      Vault
+                      {t.additional.vault}
                       <i
                         className="fas fa-info-circle text-blue-400 ml-1 cursor-pointer"
                         onClick={() => setShowTooltip(!showTooltip)}
@@ -966,11 +968,11 @@ useEffect(() => {
                       ></i>
                     </span>
                     <h6 className="text-base font-semibold block mt-1">
-                      {isEscrowInitialized ? "Created" : "Yet to be created"}
+                      {isEscrowInitialized ? t.additional.created : t.additional.yetToBeCreated}
                     </h6>
                     {showTooltip && (
                       <span className="absolute left-0 -top-16 w-64 bg-gray-800 text-white text-xs px-4 py-2 rounded-lg shadow-lg z-10">
-                        Vault and membership level reset at the end of each season
+                        {t.additional.vaultTooltip}
                       </span>
                     )}
                   </div>
@@ -980,7 +982,7 @@ useEffect(() => {
                 <div className="space-y-4 bg-[#1a1b23] p-4 sm:p-6 rounded-lg mt-6">
                   <div>
                     <label htmlFor="amountToLock" className="block text-sm font-medium text-gray-400 mb-3 text-center">
-                      Amount to Lock (BOXBOX)
+                      {t.additional.amountToLock}
                     </label>
                     <div className="relative flex items-center">
                       <button
@@ -1026,12 +1028,12 @@ useEffect(() => {
                   >
                     {isProcessing ? (
                       <div className="flex items-center">
-                        <p>Processing...</p>
+                        <p>{t.additional.processing}</p>
                       </div>
                     ) : (
                       <>
                         <LockIcon className="mr-2 h-5 w-5" />
-                        Lock Tokens
+                        {t.additional.lockTokens}
                       </>
                     )}
                   </button>
@@ -1039,10 +1041,10 @@ useEffect(() => {
 
                 {/* Active Locks Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg sm:text-xl font-semibold text-center">Active Locks</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-center">{t.additional.activeLocks}</h3>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {locks.filter((lock) => lock.isLocked).length === 0 ? (
-                      <p className="text-gray-400 col-span-full text-center">There are no active locks.</p>
+                      <p className="text-gray-400 col-span-full text-center">{t.additional.noActiveLocks}</p>
                     ) : (
                       locks
                         .filter((lock) => lock.isLocked)
@@ -1050,11 +1052,11 @@ useEffect(() => {
                           <div key={lock.id} className="bg-[#1a1b23] p-4 rounded-lg">
                             <div className="space-y-3">
                               <div className="text-center">
-                                <span className="text-gray-400 text-sm">Locked Amount</span>
+                                <span className="text-gray-400 text-sm">{t.additional.lockedAmount}</span>
                                 <span className="text-lg sm:text-xl font-semibold block mt-1">{formatNumber(lock.amount)} BOXBOX</span>
                               </div>
                               <div className="text-center">
-                                <span className="text-gray-400 text-sm">Release Date</span>
+                                <span className="text-gray-400 text-sm">{t.additional.releaseDate}</span>
                                 <span className="text-base block mt-1">{lock.releaseDate.toLocaleString()}</span>
                               </div>
                               <button
@@ -1068,23 +1070,22 @@ useEffect(() => {
                               >
                                 <div className="flex items-center">
                                   {unlockingLockId === lock.id ? (
-                                    <p>Unlocking...</p>
+                                    <p>{t.additional.unlocking}</p>
                                   ) : lock.canUnlock ? (
                                     <>
                                       <UnlockIcon className="mr-2 h-5 w-5" />
-                                      <p>Unlock Tokens</p>
+                                      <p>{t.additional.unlockTokens}</p>
                                     </>
                                   ) : (
                                     <>
                                       <LockIcon className="mr-2 h-5 w-5" />
-                                      <p>Locked</p>
+                                      <p>{t.additional.locked}</p>
                                     </>
                                   )}
                                 </div>
                               </button>
                               <small className="text-gray-50 text-xs block mt-2 text-center font-medium">
-                                ⚠️ Keep at least <span className="font-semibold">0.01 SOL</span> in your wallet for
-                                {lock.canUnlock ? " unlocking" : " future unlocking"} gas fee.
+                                {t.additional.keepSolForGas}
                               </small>
                             </div>
                           </div>
@@ -1095,21 +1096,21 @@ useEffect(() => {
 
                 {/* Unlocked Tokens Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg sm:text-xl font-semibold text-center">Unlocked Tokens</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-center">{t.additional.unlockedTokens}</h3>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {locks.filter((lock) => !lock.isLocked).length === 0 ? (
-                      <p className="text-gray-400 col-span-full text-center">There are no unlocked tokens.</p>
+                      <p className="text-gray-400 col-span-full text-center">{t.additional.noUnlockedTokens}</p>
                     ) : (
                       locks
                         .filter((lock) => !lock.isLocked)
                         .map((lock) => (
                           <div key={lock.id} className="bg-[#1a1b23] p-4 rounded-lg">
                             <div className="text-center">
-                              <span className="text-gray-400 text-sm">Unlocked Amount</span>
+                              <span className="text-gray-400 text-sm">{t.additional.unlockedAmount}</span>
                               <span className="text-lg sm:text-xl font-semibold block mt-1">{formatNumber(lock.amount)} BOXBOX</span>
                             </div>
                             <div className="mt-3 text-center">
-                              <span className="text-gray-400 text-sm">Unlocked Date</span>
+                              <span className="text-gray-400 text-sm">{t.additional.unlockedDate}</span>
                               <span className="text-base block mt-1">{lock.releaseDate.toLocaleString()}</span>
                             </div>
                           </div>
@@ -1127,13 +1128,13 @@ useEffect(() => {
           <div className="backdrop-blur-sm bg-black/20 rounded-b-xl shadow-lg w-full overflow-hidden p-6 text-center">
             <p className="text-lg sm:text-xl font-medium text-gray-300 mb-3 text-center">
               {typeof window !== 'undefined' && window.innerWidth <= 768 ? (
-                <span>Open f1meme.com with Phantom Wallet browser.</span>
+                <span>{t.additional.openWithPhantom}</span>
               ) : (
-                <span>Connect your wallet to lock your BOXBOX tokens.</span>
+                <span>{t.additional.connectWalletToLock}</span>
               )}
             </p>
             <small className="text-sm text-gray-400 max-w-lg mx-auto block text-center">
-              On your first wallet connection, your membership account and vault are automatically created. This requires approval for two transactions to cover the costs, so keep at least 0.001 SOL in your wallet.
+              {t.additional.firstConnectionInfo}
             </small>
           </div>
         )}

@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { Card, CardContent } from "./ui/card"
 import { Info, Copy } from "lucide-react"
 import { useState, useEffect } from "react"
+import { useTranslation } from "../i18n/TranslationContext"
 
 interface TokenDetails {
   address: string
@@ -22,6 +23,7 @@ interface TokenDetails {
 }
 
 export default function Tokenomics() {
+  const { t } = useTranslation()
   const [tokenDetails, setTokenDetails] = useState<TokenDetails>({
     address: "A5D4sQ3gWgM7QHFRyo3ZavKa9jMjkfHSNR6rX5TNJB8y",
     totalSupply: "-",
@@ -170,9 +172,9 @@ export default function Tokenomics() {
         transition={{ duration: 0.5 }}
         className="text-center mb-16 relative z-10"
       >
-        <h2 className="text-5xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent mb-4">Tokenomics</h2>
+        <h2 className="text-5xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent mb-4">{t.additional.tokenomics}</h2>
         <p className="text-gray-400 max-w-2xl mx-auto">
-          Discover the economic model behind BOXBOX, the F1 Meme token powering our ecosystem
+          {t.additional.tokenomicsDesc}
         </p>
       </motion.div>
 
@@ -183,7 +185,7 @@ export default function Tokenomics() {
               {error ? (
                 <div className="text-red-500 text-center">{error}</div>
               ) : loading ? (
-                <div className="text-gray-400 text-center">Loading token details...</div>
+                <div className="text-gray-400 text-center">{t.additional.tokenDetails}...</div>
               ) : (
                 <>
                   {/* <h3 className="text-2xl sm:text-3xl font-bold text-white mb-6">Token details</h3> */}
@@ -193,7 +195,7 @@ export default function Tokenomics() {
                       variants={item}
                       className="grid grid-cols-[120px_1fr] sm:grid-cols-[140px_1fr] gap-y-3 sm:gap-y-4 border border-gray-700/50 rounded-lg overflow-hidden"
                     >
-                      <div className="text-gray-400 p-3 backdrop-blur-sm bg-black/20">Address</div>
+                      <div className="text-gray-400 p-3 backdrop-blur-sm bg-black/20">{t.additional.address}</div>
                       <div className="group flex items-center text-white font-mono break-all p-3 backdrop-blur-sm bg-black/10">
                         {tokenDetails.address}
                         <button
@@ -207,45 +209,45 @@ export default function Tokenomics() {
 
                     <motion.div variants={item}>
                       <div className="grid grid-cols-[120px_1fr] sm:grid-cols-[140px_1fr] gap-y-3 sm:gap-y-4 border border-gray-700/50 rounded-lg overflow-hidden">
-                        <div className="text-gray-400 p-3 bg-gray-800/50">Total Supply</div>
+                        <div className="text-gray-400 p-3 bg-gray-800/50">{t.additional.totalSupply}</div>
                         <div className="text-white p-3 bg-gray-800/30 flex items-center gap-2">
                           {tokenDetails.totalSupply}
                         </div>
 
-                        <div className="text-gray-400 p-3 bg-gray-800/50">Name(Symbol)</div>
+                        <div className="text-gray-400 p-3 bg-gray-800/50">{t.additional.nameSymbol}</div>
                         <div className="text-white p-3 bg-gray-800/30 flex items-center gap-2">
                           {tokenDetails.name}
                           <span className="text-gray-400">{tokenDetails.symbol}</span>
                         </div>
 
-                        <div className="text-gray-400 p-3 bg-gray-800/50">Token Price</div>
+                        <div className="text-gray-400 p-3 bg-gray-800/50">{t.additional.tokenPrice}</div>
                         <div className="text-yellow-500 p-3 bg-gray-800/30 flex items-center gap-2">
                           {tokenDetails.price}
                         </div>
 
-                        <div className="text-gray-400 p-3 bg-gray-800/50">24h Volume</div>
+                        <div className="text-gray-400 p-3 bg-gray-800/50">{t.additional.volume24h}</div>
                         <div className="text-white p-3 bg-gray-800/30 flex items-center gap-2">
                           {tokenDetails.volume24h}
                         </div>
 
-                        <div className="text-gray-400 p-3 bg-gray-800/50">Liquidity</div>
+                        <div className="text-gray-400 p-3 bg-gray-800/50">{t.additional.liquidity}</div>
                         <div className="text-white p-3 bg-gray-800/30 flex items-center gap-2">
                           {tokenDetails.liquidity}
                         </div>
 
-                        <div className="text-gray-400 p-3 bg-gray-800/50">Market Cap</div>
+                        <div className="text-gray-400 p-3 bg-gray-800/50">{t.additional.marketCap}</div>
                         <div className="text-white p-3 bg-gray-800/30 flex items-center gap-2">
                           {tokenDetails.marketCap}
                         </div>
 
-                        <div className="text-gray-400 p-3 bg-gray-800/50">24h Change</div>
+                        <div className="text-gray-400 p-3 bg-gray-800/50">{t.additional.change24h}</div>
                         <div className={`p-3 bg-gray-800/30 flex items-center gap-2 ${
                           parseFloat(tokenDetails.priceChange24h) > 0 ? 'text-green-500' : 'text-red-500'
                         }`}>
                           {tokenDetails.priceChange24h}
                         </div>
 
-                        <div className="text-gray-400 p-3 bg-gray-800/50">24h Trades</div>
+                        <div className="text-gray-400 p-3 bg-gray-800/50">{t.additional.trades24h}</div>
                         <div className="text-white p-3 bg-gray-800/30 flex items-center gap-2">
                           <span className="text-green-500">↑{tokenDetails.transactions24h.buys}</span>
                           <span className="text-red-500">↓{tokenDetails.transactions24h.sells}</span>
@@ -259,8 +261,7 @@ export default function Tokenomics() {
                     >
                       <Info className="flex-shrink-0 mt-1" size={20} />
                       <p className="text-sm">
-                        Currently the Liquidity is very low, if you have trouble buying large amount of BOXBOX tokens,
-                        please consider doing multiple swap in smaller amount.
+                        {t.additional.liquidityInfo}
                       </p>
                     </motion.div>
 

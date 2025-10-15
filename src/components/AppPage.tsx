@@ -270,7 +270,7 @@ export default function Home() {
               </div>
 
               <p className="text-sm text-gray-400">
-                &copy; {new Date().getFullYear()} F1 Meme. All rights reserved.
+                &copy; {new Date().getFullYear()} F1 Meme. {t.additional.allRightsReserved}.
               </p>
 
               <p className="text-[12px] text-gray-400 max-w-3xl text-center px-4">

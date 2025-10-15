@@ -486,7 +486,7 @@ export default function Hero() {
           >
             <div className="text-center lg:text-left">
               <h3 className="text-2xl sm:text-4xl lg:text-3xl xl:text-5xl font-extrabold text-white tracking-tight leading-none mb-3 sm:mb-4 lg:mb-6 bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent">
-                Latest Race Result
+                {t.additional.latestRaceResults}
               </h3>
               <div className="flex items-center justify-center lg:justify-start gap-3 sm:gap-4">
                 <div className="h-1 w-16 sm:w-20 lg:w-24 bg-gradient-to-r from-yellow-500 to-yellow-300" />
@@ -526,7 +526,10 @@ export default function Hero() {
                                   {value.toString().padStart(2, "0")}
                                 </h5>
                                 <span className="text-xs font-medium uppercase tracking-widest text-yellow-500">
-                                  {unit}
+                                  {unit === 'days' ? t.additional.days : 
+                                   unit === 'hours' ? t.additional.hours :
+                                   unit === 'minutes' ? t.additional.minutes :
+                                   unit === 'seconds' ? t.additional.seconds : unit}
                                 </span>
                               </div>
                             ))}
@@ -536,7 +539,7 @@ export default function Hero() {
                     </Card>
 
                     <p className="text-sm sm:text-base font-light tracking-wider text-gray-400 text-center">
-                      {t.schedule.raceDay} {" "}
+                      {t.additional.raceDate} {" "}
                       <span className="text-yellow-500 font-medium block mt-1">
                         {nextRace ? new Date(`${nextRace.date}T${nextRace.time}`).toLocaleString("en-US", {
                           weekday: "long",
