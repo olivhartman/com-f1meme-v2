@@ -36,7 +36,7 @@ export const airtableService = {
       
       // Prepare payload
       const payload: any = {
-        wallet_address: profileData.walletAddress,
+        walletAddress: profileData.walletAddress,
       };
 
       // Only add fields that have actual values (not empty strings)
@@ -49,7 +49,7 @@ export const airtableService = {
       }
       
       if (profileData.instagramUrl && profileData.instagramUrl.trim()) {
-        payload.instagram_url = profileData.instagramUrl;
+        payload.instagramUrl = profileData.instagramUrl;
       }
 
       // Handle membership level with validation
@@ -57,16 +57,16 @@ export const airtableService = {
         const levelValue = Math.max(0, Math.min(profileData.membershipLevel, 999)); // Ensure it's a valid positive number
         console.log('Original membership level:', profileData.membershipLevel);
         console.log('Validated membership level:', levelValue);
-        payload.membership_level = levelValue;
+        payload.membershipLevel = levelValue;
       }
 
       // Only add TikTok and TG URLs if the fields exist in your table and have values
       if (profileData.tiktokUrl && profileData.tiktokUrl.trim()) {
-        payload.tiktok_url = profileData.tiktokUrl;
+        payload.tiktokUrl = profileData.tiktokUrl;
       }
       
       if (profileData.tgUrl && profileData.tgUrl.trim()) {
-        payload.tg_url = profileData.tgUrl;
+        payload.tgUrl = profileData.tgUrl;
       }
 
       // Handle profile picture attachment
@@ -74,7 +74,7 @@ export const airtableService = {
         console.log('Processing profile picture:', profileData.profilePicture.name);
         try {
           const imageUrl = await cloudinaryService.uploadImage(profileData.profilePicture);
-          payload.profile_picture_url = imageUrl;
+          payload.profilePictureUrl = imageUrl;
           console.log('Profile picture uploaded successfully');
         } catch (error) {
           console.error('Failed to upload profile picture:', error);
@@ -87,7 +87,7 @@ export const airtableService = {
         console.log('Processing cover picture:', profileData.coverPicture.name);
         try {
           const imageUrl = await cloudinaryService.uploadImage(profileData.coverPicture);
-          payload.cover_picture_url = imageUrl;
+          payload.coverPictureUrl = imageUrl;
           console.log('Cover picture uploaded successfully');
         } catch (error) {
           console.error('Failed to upload cover picture:', error);
@@ -152,24 +152,24 @@ export const airtableService = {
       const data = await response.json();
       console.log('Profile data:', data);
 
-      if (!data || !data.wallet_address) {
+      if (!data || (!data.wallet_address && !data.walletAddress)) {
         return null;
       }
       
       return {
         name: data.name || '',
         email: data.email || '',
-        instagramUrl: data.instagram_url || '',
-        tiktokUrl: data.tiktok_url || '',
-        tgUrl: data.tg_url || '',
+        instagramUrl: data.instagram_url || data.instagramUrl || '',
+        tiktokUrl: data.tiktok_url || data.tiktokUrl || '',
+        tgUrl: data.tg_url || data.tgUrl || '',
         profilePicture: undefined, // We don't load existing images back as Files
         coverPicture: undefined,   // We don't load existing images back as Files
-        walletAddress: data.wallet_address || '',
-        createdAt: data.created_at || undefined,
-        updatedAt: data.updated_at || undefined,
-        profilePictureUrl: data.profile_picture_url || '',
-        coverPictureUrl: data.cover_picture_url || '',
-        membershipLevel: data.membership_level || 0,
+        walletAddress: data.wallet_address || data.walletAddress || '',
+        createdAt: data.created_at || data.createdAt || undefined,
+        updatedAt: data.updated_at || data.updatedAt || undefined,
+        profilePictureUrl: data.profile_picture_url || data.profilePictureUrl || '',
+        coverPictureUrl: data.cover_picture_url || data.coverPictureUrl || '',
+        membershipLevel: data.membership_level || data.membershipLevel || 0,
       };
     } catch (error) {
       console.error('Error getting profile:', error);
@@ -193,13 +193,13 @@ export const airtableService = {
       return (data.profiles || []).map((profile: any) => {
         return {
           name: profile.name || '',
-          instagramUrl: profile.instagram_url || '',
-          tiktokUrl: profile.tiktok_url || '',
-          tgUrl: profile.tg_url || '',
-          profilePictureUrl: profile.profile_picture_url || '',
-          coverPictureUrl: profile.cover_picture_url || '',
-          walletAddress: profile.wallet_address || '',
-          membershipLevel: profile.membership_level || 0,
+          instagramUrl: profile.instagram_url || profile.instagramUrl || '',
+          tiktokUrl: profile.tiktok_url || profile.tiktokUrl || '',
+          tgUrl: profile.tg_url || profile.tgUrl || '',
+          profilePictureUrl: profile.profile_picture_url || profile.profilePictureUrl || '',
+          coverPictureUrl: profile.cover_picture_url || profile.coverPictureUrl || '',
+          walletAddress: profile.wallet_address || profile.walletAddress || '',
+          membershipLevel: profile.membership_level || profile.membershipLevel || 0,
         // Do not include email
         };
       });
