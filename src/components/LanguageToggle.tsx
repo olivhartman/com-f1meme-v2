@@ -3,7 +3,7 @@ import { useTranslation } from '../i18n/TranslationContext';
 import { Globe, ChevronDown } from 'lucide-react';
 
 const languages = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'en', name: 'Eng', flag: '🇺🇸' },
   { code: 'zh', name: '中文', flag: '🇨🇳' },
 ];
 

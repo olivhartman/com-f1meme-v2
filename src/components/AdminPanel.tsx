@@ -36,6 +36,8 @@ export const AdminPanel: React.FC = () => {
       try {
         setLoading(true);
         const allProfiles = await airtableService.getAllProfiles();
+        console.log('Raw profiles from API:', allProfiles);
+        console.log('First profile sample:', allProfiles[0]);
         setUsers(allProfiles);
         setFilteredUsers(allProfiles);
       } catch (error) {
@@ -186,7 +188,7 @@ export const AdminPanel: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="px-4 pb-8">
+      <div className="px-4 pb-8 mt-6"> 
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card className="bg-slate-900/80 border-white/10">
@@ -289,6 +291,12 @@ export const AdminPanel: React.FC = () => {
                           <div className="text-white font-medium">
                             {user.name || 'N/A'}
                           </div>
+                          {/* Debug: Show all available fields */}
+                          {index === 0 && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              Debug: {JSON.stringify(Object.keys(user))}
+                            </div>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-slate-300">
@@ -338,6 +346,12 @@ export const AdminPanel: React.FC = () => {
                           <div className="text-slate-400 text-sm">
                             {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                           </div>
+                          {/* Debug: Show created date fields */}
+                          {index === 0 && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              Created: {user.createdAt || 'undefined'}
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))}
