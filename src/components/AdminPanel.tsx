@@ -14,10 +14,11 @@ interface AdminUserData extends ProfileData {
 
 export const AdminPanel: React.FC = () => {
   const { t } = useTranslation();
-  const { publicKey } = useWallet();
+  const { publicKey, connected, connecting } = useWallet();
   const [users, setUsers] = useState<AdminUserData[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<AdminUserData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [walletLoading, setWalletLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showNonZeroOnly, setShowNonZeroOnly] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,10 +26,36 @@ export const AdminPanel: React.FC = () => {
   // Check if current user is admin
   const isAdmin = publicKey?.toBase58() === ADMIN_WALLET_ADDRESS;
 
+  // Wait for wallet to be connected before checking admin status
   useEffect(() => {
-    if (!isAdmin) {
-      setError('Access denied. Admin privileges required.');
-      setLoading(false);
+    const checkWalletStatus = () => {
+      if (connecting) {
+        // Still connecting, keep loading
+        return;
+      }
+      
+      if (!connected && !publicKey) {
+        // Not connected and no public key, give it a bit more time
+        setTimeout(checkWalletStatus, 500);
+        return;
+      }
+      
+      // Wallet connection resolved
+      setWalletLoading(false);
+      
+      if (!isAdmin) {
+        setError('Access denied. Admin privileges required.');
+        setLoading(false);
+        return;
+      }
+    };
+
+    checkWalletStatus();
+  }, [connected, connecting, publicKey, isAdmin]);
+
+  // Fetch users only after wallet is loaded and user is confirmed as admin
+  useEffect(() => {
+    if (walletLoading || !isAdmin) {
       return;
     }
 
@@ -48,7 +75,7 @@ export const AdminPanel: React.FC = () => {
     };
 
     fetchUsers();
-  }, [isAdmin]);
+  }, [walletLoading, isAdmin]);
 
   // Filter users based on search term and membership level
   useEffect(() => {
@@ -134,12 +161,14 @@ export const AdminPanel: React.FC = () => {
     );
   }
 
-  if (loading) {
+  if (walletLoading || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#FBEB04] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">{t.admin.loadingUsers}</p>
+          <p className="text-white text-lg">
+            {walletLoading ? 'Connecting wallet...' : t.admin.loadingUsers}
+          </p>
         </div>
       </div>
     );
