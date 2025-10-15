@@ -112,6 +112,17 @@ export const airtableService = {
         throw new Error(`Upsert profile failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
+      // Handle empty responses (like 204 No Content)
+      const responseText = await response.text();
+      if (responseText && responseText.trim() !== '') {
+        try {
+          const data = JSON.parse(responseText);
+          console.log('Upsert response data:', data);
+        } catch (parseError) {
+          console.log('Upsert response is not JSON, treating as success');
+        }
+      }
+
       console.log('Profile upserted successfully');
     } catch (error) {
       console.error('Error upserting profile:', error);
@@ -149,7 +160,21 @@ export const airtableService = {
         throw new Error(`Get profile failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
-      const data = await response.json();
+      // Handle empty responses (like 204 No Content)
+      const responseText = await response.text();
+      if (!responseText || responseText.trim() === '') {
+        console.log('Empty response received, returning null');
+        return null;
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', responseText);
+        throw new Error(`Invalid JSON response: ${parseError}`);
+      }
+      
       console.log('Profile data:', data);
 
       if (!data || (!data.wallet_address && !data.walletAddress)) {
@@ -189,7 +214,21 @@ export const airtableService = {
       if (!response.ok) {
         throw new Error('Failed to fetch all profiles');
       }
-      const data = await response.json();
+      
+      // Handle empty responses
+      const responseText = await response.text();
+      if (!responseText || responseText.trim() === '') {
+        console.log('Empty response received for getAllProfiles, returning empty array');
+        return [];
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse JSON response for getAllProfiles:', responseText);
+        throw new Error(`Invalid JSON response: ${parseError}`);
+      }
       return (data.profiles || []).map((profile: any) => {
         return {
           name: profile.name || '',
@@ -216,9 +255,9 @@ export const airtableService = {
       
       const payload = {
         url: photo.url,
-        uploaded_by: photo.uploadedBy,
-        uploaded_at: photo.uploadedAt,
-        wallet_address: photo.walletAddress,
+        uploadedBy: photo.uploadedBy,
+        uploadedAt: photo.uploadedAt,
+        walletAddress: photo.walletAddress,
         caption: photo.caption || '',
       };
 
@@ -266,9 +305,9 @@ export const airtableService = {
       return (data.photos || []).map((photo: any) => ({
         id: photo.id,
         url: photo.url || '',
-        uploadedBy: photo.uploaded_by || '',
-        uploadedAt: photo.uploaded_at || '',
-        walletAddress: photo.wallet_address || '',
+        uploadedBy: photo.uploaded_by || photo.uploadedBy || '',
+        uploadedAt: photo.uploaded_at || photo.uploadedAt || '',
+        walletAddress: photo.wallet_address || photo.walletAddress || '',
         caption: photo.caption || '',
       }));
     } catch (error) {
@@ -299,9 +338,9 @@ export const airtableService = {
       return (data.photos || []).map((photo: any) => ({
         id: photo.id,
         url: photo.url || '',
-        uploadedBy: photo.uploaded_by || '',
-        uploadedAt: photo.uploaded_at || '',
-        walletAddress: photo.wallet_address || '',
+        uploadedBy: photo.uploaded_by || photo.uploadedBy || '',
+        uploadedAt: photo.uploaded_at || photo.uploadedAt || '',
+        walletAddress: photo.wallet_address || photo.walletAddress || '',
         caption: photo.caption || '',
       }));
     } catch (error) {
@@ -342,7 +381,7 @@ export async function saveF1ScheduleEntry(entry: {
   circuit: string;
 }): Promise<void> {
   const payload = {
-    race_name: entry.raceName,
+    raceName: entry.raceName,
     date: entry.date,
     time: entry.time,
     circuit: entry.circuit,
@@ -405,12 +444,12 @@ export async function saveRaceWinner(entry: {
   raceDate: string;
 }): Promise<void> {
   const payload = {
-    driver_number: entry.driverNumber,
-    full_name: entry.fullName,
-    team_name: entry.teamName || '',
-    team_color: entry.teamColor || '',
-    race_name: entry.raceName,
-    race_date: entry.raceDate,
+    driverNumber: entry.driverNumber,
+    fullName: entry.fullName,
+    teamName: entry.teamName || '',
+    teamColor: entry.teamColor || '',
+    raceName: entry.raceName,
+    raceDate: entry.raceDate,
   };
 
   const response = await fetch(`${API_BASE_URL}/f1meme/winners/save`, {
@@ -447,12 +486,12 @@ export function normalizeRaceKey(raceName: string, raceDate: string, driverName:
 export async function saveRaceWinners(entries: WinnerEntry[]): Promise<void> {
   const payload = entries.map(entry => ({
     position: entry.position,
-    driver_number: entry.driverNumber,
-    full_name: entry.fullName || '',
-    team_name: entry.teamName || '',
-    team_color: entry.teamColor || '',
-    race_name: entry.raceName,
-    race_date: entry.raceDate,
+    driverNumber: entry.driverNumber,
+    fullName: entry.fullName || '',
+    teamName: entry.teamName || '',
+    teamColor: entry.teamColor || '',
+    raceName: entry.raceName,
+    raceDate: entry.raceDate,
   }));
 
   const response = await fetch(`${API_BASE_URL}/f1meme/winners/save-multiple`, {
@@ -489,7 +528,7 @@ export async function getAllWinners(): Promise<any[]> {
 
 // Get winners by race
 export async function getWinnersByRace(raceName: string, raceDate: string): Promise<any[]> {
-  const response = await fetch(`${API_BASE_URL}/f1meme/winners/by-race?race_name=${encodeURIComponent(raceName)}&race_date=${encodeURIComponent(raceDate)}`, {
+  const response = await fetch(`${API_BASE_URL}/f1meme/winners/by-race?raceName=${encodeURIComponent(raceName)}&raceDate=${encodeURIComponent(raceDate)}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -508,9 +547,9 @@ export async function getWinnersByRace(raceName: string, raceDate: string): Prom
 // Check if any winner for this race/driver/position exists
 export async function winnersExistForRace(raceName: string, raceDate: string, fullName: string, position: number): Promise<boolean> {
   const params = new URLSearchParams({
-    race_name: raceName,
-    race_date: raceDate,
-    full_name: fullName,
+    raceName: raceName,
+    raceDate: raceDate,
+    fullName: fullName,
     position: position.toString(),
   });
 
