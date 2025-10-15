@@ -307,6 +307,7 @@ export interface Translations {
     // Footer
     poweredBy: string;
     allRightsReserved: string;
+    disclaimer: string;
   };
 }
 
@@ -599,6 +600,7 @@ export const translations: Record<string, Translations> = {
       // Footer
       poweredBy: "Powered by",
       allRightsReserved: "All rights reserved",
+      disclaimer: "This is a meme project which is unofficial and is not associated in any way with the Formula 1 companies. F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks of Formula One Licensing B.V",
     },
   },
   zh: {
@@ -889,6 +891,7 @@ export const translations: Record<string, Translations> = {
       // Footer
       poweredBy: "技术支持",
       allRightsReserved: "版权所有",
+      disclaimer: "这是一个非官方的模因项目，与F1公司没有任何关联。F1、FORMULA ONE、FORMULA 1、FIA FORMULA ONE WORLD CHAMPIONSHIP、GRAND PRIX及相关标记是Formula One Licensing B.V的商标。",
     },
   },
 };

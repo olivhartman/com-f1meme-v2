@@ -274,9 +274,7 @@ export default function Home() {
               </p>
 
               <p className="text-[12px] text-gray-400 max-w-3xl text-center px-4">
-                This is a meme project which is unofficial and is not associated in any way with the Formula 1 companies. 
-                F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks 
-                of Formula One Licensing B.V
+                {t.additional.disclaimer}
               </p>
             </div>
           </div>
