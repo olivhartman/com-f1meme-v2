@@ -342,7 +342,7 @@ export async function saveF1ScheduleEntry(entry: {
   circuit: string;
 }): Promise<void> {
   const payload = {
-    raceName: entry.raceName,
+    race_name: entry.raceName,
     date: entry.date,
     time: entry.time,
     circuit: entry.circuit,
@@ -405,12 +405,12 @@ export async function saveRaceWinner(entry: {
   raceDate: string;
 }): Promise<void> {
   const payload = {
-    driverNumber: entry.driverNumber,
-    fullName: entry.fullName,
-    teamName: entry.teamName || '',
-    teamColor: entry.teamColor || '',
-    raceName: entry.raceName,
-    raceDate: entry.raceDate,
+    driver_number: entry.driverNumber,
+    full_name: entry.fullName,
+    team_name: entry.teamName || '',
+    team_color: entry.teamColor || '',
+    race_name: entry.raceName,
+    race_date: entry.raceDate,
   };
 
   const response = await fetch(`${API_BASE_URL}/f1meme/winners/save`, {
@@ -447,12 +447,12 @@ export function normalizeRaceKey(raceName: string, raceDate: string, driverName:
 export async function saveRaceWinners(entries: WinnerEntry[]): Promise<void> {
   const payload = entries.map(entry => ({
     position: entry.position,
-    driverNumber: entry.driverNumber,
-    fullName: entry.fullName || '',
-    teamName: entry.teamName || '',
-    teamColor: entry.teamColor || '',
-    raceName: entry.raceName,
-    raceDate: entry.raceDate,
+    driver_number: entry.driverNumber,
+    full_name: entry.fullName || '',
+    team_name: entry.teamName || '',
+    team_color: entry.teamColor || '',
+    race_name: entry.raceName,
+    race_date: entry.raceDate,
   }));
 
   const response = await fetch(`${API_BASE_URL}/f1meme/winners/save-multiple`, {
@@ -489,7 +489,7 @@ export async function getAllWinners(): Promise<any[]> {
 
 // Get winners by race
 export async function getWinnersByRace(raceName: string, raceDate: string): Promise<any[]> {
-  const response = await fetch(`${API_BASE_URL}/f1meme/winners/by-race?raceName=${encodeURIComponent(raceName)}&raceDate=${encodeURIComponent(raceDate)}`, {
+  const response = await fetch(`${API_BASE_URL}/f1meme/winners/by-race?race_name=${encodeURIComponent(raceName)}&race_date=${encodeURIComponent(raceDate)}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -508,9 +508,9 @@ export async function getWinnersByRace(raceName: string, raceDate: string): Prom
 // Check if any winner for this race/driver/position exists
 export async function winnersExistForRace(raceName: string, raceDate: string, fullName: string, position: number): Promise<boolean> {
   const params = new URLSearchParams({
-    raceName,
-    raceDate,
-    fullName,
+    race_name: raceName,
+    race_date: raceDate,
+    full_name: fullName,
     position: position.toString(),
   });
 
