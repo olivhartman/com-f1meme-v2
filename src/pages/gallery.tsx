@@ -213,13 +213,29 @@ const Gallery: React.FC = () => {
     const fetchPhotos = async () => {
       try {
         const allPhotos = await airtableService.getAllGalleryPhotos()
+        console.log('Raw photos from API:', allPhotos)
+        
         // Filter out photos with invalid data
-        const validPhotos = allPhotos.filter(photo => 
-          photo.url && 
-          photo.uploadedBy && 
-          photo.uploadedAt && 
-          !isNaN(new Date(photo.uploadedAt).getTime())
-        )
+        const validPhotos = allPhotos.filter(photo => {
+          const hasUrl = !!photo.url
+          const hasUploadedBy = !!photo.uploadedBy
+          const hasUploadedAt = !!photo.uploadedAt
+          const isValidDate = photo.uploadedAt && !isNaN(new Date(photo.uploadedAt).getTime())
+          
+          console.log('Photo validation:', {
+            id: photo.id,
+            hasUrl,
+            hasUploadedBy,
+            hasUploadedAt,
+            uploadedAt: photo.uploadedAt,
+            isValidDate,
+            valid: hasUrl && hasUploadedBy && hasUploadedAt && isValidDate
+          })
+          
+          return hasUrl && hasUploadedBy && hasUploadedAt && isValidDate
+        })
+        
+        console.log('Valid photos after filtering:', validPhotos)
         setPhotos(validPhotos)
       } catch (err) {
         console.error("Failed to fetch photos:", err)
