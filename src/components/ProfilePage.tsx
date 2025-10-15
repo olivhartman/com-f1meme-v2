@@ -25,6 +25,7 @@ interface ProfileData {
 }
 
 const ProfilePage: React.FC = () => {
+  const { t } = useTranslation()
   const { publicKey } = useWallet()
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
@@ -133,28 +134,28 @@ const ProfilePage: React.FC = () => {
 
   function validateField(field: keyof ProfileData, value: string | File | null): string | undefined {
     if (field === "name") {
-      if (!value || typeof value !== "string" || value.trim().length < 2) return "Name is required (2+ chars)."
-      if (value.length > 32) return "Name must be at most 32 characters."
+      if (!value || typeof value !== "string" || value.trim().length < 2) return t.additional.nameRequired
+      if (value.length > 32) return t.additional.nameMaxLength
     }
     if (field === "email") {
-      if (!value || typeof value !== "string") return "Email is required."
+      if (!value || typeof value !== "string") return t.additional.emailRequired
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(value)) return "Enter a valid email address."
+      if (!emailRegex.test(value)) return t.additional.validEmail
     }
     if (["instagramUrl", "tiktokUrl", "tgUrl"].includes(field)) {
       if (value && typeof value === "string" && value.trim() !== "") {
         try {
           const url = new URL(value)
-          if (field === "instagramUrl" && !url.hostname.includes("instagram.com")) return "Must be an Instagram URL."
-          if (field === "tiktokUrl" && !url.hostname.includes("tiktok.com")) return "Must be a TikTok URL."
-          if (field === "tgUrl" && !url.hostname.includes("t.me")) return "Must be a Telegram URL."
+          if (field === "instagramUrl" && !url.hostname.includes("instagram.com")) return t.additional.validInstagramUrl
+          if (field === "tiktokUrl" && !url.hostname.includes("tiktok.com")) return t.additional.validTiktokUrl
+          if (field === "tgUrl" && !url.hostname.includes("t.me")) return t.additional.validTelegramUrl
         } catch {
-          return "Enter a valid URL."
+          return t.additional.validUrl
         }
       }
     }
     if ((field === "profilePicture" || field === "coverPicture") && value) {
-      if (value instanceof File && !value.type.startsWith("image/")) return "File must be an image."
+      if (value instanceof File && !value.type.startsWith("image/")) return t.additional.imageFileRequired
     }
     return undefined
   }
@@ -186,12 +187,12 @@ const ProfilePage: React.FC = () => {
     const valid = validateAll()
     if (!valid) {
       setIsLoading(false)
-      setMessage("Please fill the required fields.")
+      setMessage(t.additional.fillRequiredFields)
       return
     }
 
     try {
-      if (!publicKey) throw new Error("Wallet not connected")
+      if (!publicKey) throw new Error(t.additional.walletNotConnected)
       const airtableData: AirtableProfileData = {
         name: profileData.name,
         email: profileData.email,
@@ -204,10 +205,10 @@ const ProfilePage: React.FC = () => {
         membershipLevel: typeof profileData.membershipLevel === 'number' ? profileData.membershipLevel : 0,
       }
       await airtableService.upsertProfile(airtableData)
-      setMessage("Profile updated successfully!")
+      setMessage(t.additional.profileUpdatedSuccess)
     } catch (error) {
       console.error("Error updating profile:", error)
-      setMessage("Error updating profile. Please try again.")
+      setMessage(t.additional.errorUpdatingProfile)
     } finally {
       setIsLoading(false)
     }
@@ -267,7 +268,7 @@ const ProfilePage: React.FC = () => {
       // Save to Airtable
       await airtableService.uploadGalleryPhoto(galleryPhotoData)
       
-      setGalleryMessage("Photo uploaded successfully!")
+      setGalleryMessage(t.additional.photoUploadedSuccess)
       setGalleryPhoto(null)
       setGalleryCaption("")
       if (galleryPhotoRef.current) {
@@ -275,7 +276,7 @@ const ProfilePage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error uploading gallery photo:", error)
-      setGalleryMessage("Error uploading photo. Please try again.")
+      setGalleryMessage(t.additional.errorUploadingPhoto)
     } finally {
       setIsUploadingGallery(false)
     }
@@ -309,8 +310,8 @@ const ProfilePage: React.FC = () => {
             ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400/80">
                   <Camera className="h-16 w-16 mb-3" />
-                  <p className="text-lg font-medium">Add Cover Photo</p>
-                  <p className="text-sm opacity-75">Click or drag to upload</p>
+                  <p className="text-lg font-medium">{t.additional.addCoverPhoto}</p>
+                  <p className="text-sm opacity-75">{t.additional.clickOrDragToUpload}</p>
                 </div>
             )}
 
@@ -350,7 +351,7 @@ const ProfilePage: React.FC = () => {
                 ) : (
                         <div className="flex flex-col items-center text-slate-400">
                           <User className="h-12 w-12 mb-2" />
-                          <span className="text-xs font-medium">Add Photo</span>
+                          <span className="text-xs font-medium">{t.additional.addPhoto}</span>
                         </div>
                 )}
                     </div>
@@ -374,7 +375,7 @@ const ProfilePage: React.FC = () => {
                 {/* Profile Info */}
                 <div className="flex-1 flex flex-col items-center sm:items-start mt-4 sm:mt-8">
                   <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-slate-100 to-slate-400 bg-clip-text text-transparent mb-2">
-                    {profileData.name || "Your Name"}
+                    {profileData.name || t.additional.yourName}
                   </h1>
                   <p className="text-slate-300 font-medium">{profileData.email}</p>
 
@@ -414,7 +415,7 @@ const ProfilePage: React.FC = () => {
                 ) : (
                   <>
                     <Save className="h-5 w-5" />
-                        <span>Save Changes</span>
+                        <span>{t.additional.saveProfile}</span>
                   </>
                 )}
               </button>
@@ -430,14 +431,14 @@ const ProfilePage: React.FC = () => {
                 <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-xl flex items-center justify-center">
                   <User className="h-5 w-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-100">Personal Details</h2>
+                <h2 className="text-2xl font-bold text-slate-100">{t.additional.personalInfo}</h2>
   </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Name Field */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200">
-                    Display Name <span className="text-red-500">*</span>
+                    {t.additional.name} <span className="text-red-500">*</span>
                   </label>
                 <input
                   type="text"
@@ -449,7 +450,7 @@ const ProfilePage: React.FC = () => {
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-yellow-500 focus:ring-yellow-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                  placeholder="Enter your display name"
+                  placeholder={t.additional.name}
                 />
                   {formErrors.name && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
@@ -462,7 +463,7 @@ const ProfilePage: React.FC = () => {
               {/* Email Field */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200">
-                    Email Address <span className="text-red-500">*</span>
+                    {t.additional.email} <span className="text-red-500">*</span>
                   </label>
                 <input
                   type="email"
@@ -474,7 +475,7 @@ const ProfilePage: React.FC = () => {
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-yellow-500 focus:ring-yellow-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                  placeholder="Enter your email address"
+                  placeholder={t.additional.email}
                 />
                   {formErrors.email && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
@@ -488,7 +489,7 @@ const ProfilePage: React.FC = () => {
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200 flex items-center gap-2">
                     <Instagram className="h-4 w-4 text-pink-500" />
-                    Instagram Profile
+                    {t.additional.instagramUrl}
                   </label>
                 <input
                   type="url"
@@ -500,7 +501,7 @@ const ProfilePage: React.FC = () => {
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-pink-500 focus:ring-pink-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                  placeholder="https://instagram.com/username"
+                  placeholder={t.additional.instagramUrl}
                 />
                   {formErrors.instagramUrl && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
@@ -514,7 +515,7 @@ const ProfilePage: React.FC = () => {
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200 flex items-center gap-2">
                     <Music className="h-4 w-4 text-slate-100" />
-                    TikTok Profile
+                    {t.additional.tiktokUrl}
                   </label>
                 <input
                   type="url"
@@ -526,7 +527,7 @@ const ProfilePage: React.FC = () => {
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-yellow-500 focus:ring-yellow-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                  placeholder="https://tiktok.com/username"
+                  placeholder={t.additional.tiktokUrl}
                 />
                   {formErrors.tiktokUrl && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
@@ -540,7 +541,7 @@ const ProfilePage: React.FC = () => {
                 <div className="space-y-2 lg:col-span-2">
                   <label className="block text-sm font-semibold text-slate-200 flex items-center gap-2">
                     <Send className="h-4 w-4 text-blue-400" />
-                    Telegram Profile
+                    {t.additional.telegramUrl}
                   </label>
                 <input
                   type="url"
@@ -552,7 +553,7 @@ const ProfilePage: React.FC = () => {
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-blue-500 focus:ring-blue-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                  placeholder="https://t.me/username"
+                  placeholder={t.additional.telegramUrl}
                 />
                   {formErrors.tgUrl && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
@@ -569,7 +570,7 @@ const ProfilePage: React.FC = () => {
           <div className="mt-8 bg-[#151e32] backdrop-blur-xl rounded-3xl shadow-xl shadow-black/30 border border-[#232c43] overflow-hidden">
             <div className="p-8">
               <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between mb-8 gap-2 sm:gap-3">
-                <h2 className="text-2xl font-bold text-slate-100">Gallery Upload</h2>
+                <h2 className="text-2xl font-bold text-slate-100">{t.additional.galleryUpload}</h2>
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
                   Gallery Access
                 </span>
@@ -579,7 +580,7 @@ const ProfilePage: React.FC = () => {
                 {/* Photo Upload */}
                 <div className="space-y-4">
                   <label className="block text-sm font-semibold text-slate-200">
-                    Gallery Photo <span className="text-red-500">*</span>
+                    {t.additional.uploadPhoto} <span className="text-red-500">*</span>
                   </label>
                   <div
                     className={`relative w-full h-48 bg-[#1a2336] rounded-xl border-2 border-dashed border-[#232c43] group cursor-pointer ${profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? 'opacity-60 pointer-events-none' : 'hover:border-yellow-500/50 transition-all duration-300'}`}
@@ -602,8 +603,8 @@ const ProfilePage: React.FC = () => {
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400/80">
                         <Plus className="h-12 w-12 mb-3" />
-                        <p className="text-lg font-medium">Add Gallery Photo</p>
-                        <p className="text-sm opacity-75">Click or drag to upload</p>
+                        <p className="text-lg font-medium">{t.additional.uploadPhoto}</p>
+                        <p className="text-sm opacity-75">{t.additional.dragOrClick}</p>
                       </div>
                     )}
 
