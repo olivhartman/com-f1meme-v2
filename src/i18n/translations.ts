@@ -304,6 +304,8 @@ export interface Translations {
       addCaptionPlaceholder: string;
       uploadToGallery: string;
       upgradeToLevel55: string;
+      // Drivers standings
+      loadingStandings: string;
     // Footer
     poweredBy: string;
     allRightsReserved: string;
@@ -597,6 +599,8 @@ export const translations: Record<string, Translations> = {
       addCaptionPlaceholder: "Add a caption for your photo...",
       uploadToGallery: "Upload to Gallery",
       upgradeToLevel55: "Upgrade to Level 55+ to upload photos to the gallery!",
+      // Drivers standings
+      loadingStandings: "Loading standings...",
       // Footer
       poweredBy: "Powered by",
       allRightsReserved: "All rights reserved",
@@ -888,6 +892,8 @@ export const translations: Record<string, Translations> = {
       addCaptionPlaceholder: "为您的照片添加说明文字...",
       uploadToGallery: "上传到画廊",
       upgradeToLevel55: "升级到55级或以上才能上传照片到画廊！",
+      // Drivers standings
+      loadingStandings: "加载排名中...",
       // Footer
       poweredBy: "技术支持",
       allRightsReserved: "版权所有",

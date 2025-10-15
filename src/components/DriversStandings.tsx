@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent } from "./ui/card"
+import { useTranslation } from "../i18n/TranslationContext"
 
 interface Driver {
   driver_number: number
@@ -42,6 +43,7 @@ interface ErgastResult {
 }
 
 export default function DriversStandings() {
+  const { t } = useTranslation()
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [sessionInfo, setSessionInfo] = useState<Session>({})
   const [loading, setLoading] = useState(true)
@@ -332,7 +334,7 @@ export default function DriversStandings() {
     return () => clearInterval(interval)
   }, [])
 
-  if (loading) return <div>Loading standings...</div>
+  if (loading) return <div>{t.additional.loadingStandings}</div>
   if (error) return <div>{error}</div>
 
   return (
