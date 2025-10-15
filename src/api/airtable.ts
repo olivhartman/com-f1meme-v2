@@ -36,7 +36,7 @@ export const airtableService = {
       
       // Prepare payload
       const payload: any = {
-        walletAddress: profileData.walletAddress,
+        wallet_address: profileData.walletAddress,
       };
 
       // Only add fields that have actual values (not empty strings)
@@ -49,7 +49,7 @@ export const airtableService = {
       }
       
       if (profileData.instagramUrl && profileData.instagramUrl.trim()) {
-        payload.instagramUrl = profileData.instagramUrl;
+        payload.instagram_url = profileData.instagramUrl;
       }
 
       // Handle membership level with validation
@@ -57,16 +57,16 @@ export const airtableService = {
         const levelValue = Math.max(0, Math.min(profileData.membershipLevel, 999)); // Ensure it's a valid positive number
         console.log('Original membership level:', profileData.membershipLevel);
         console.log('Validated membership level:', levelValue);
-        payload.membershipLevel = levelValue;
+        payload.membership_level = levelValue;
       }
 
       // Only add TikTok and TG URLs if the fields exist in your table and have values
       if (profileData.tiktokUrl && profileData.tiktokUrl.trim()) {
-        payload.tiktokUrl = profileData.tiktokUrl;
+        payload.tiktok_url = profileData.tiktokUrl;
       }
       
       if (profileData.tgUrl && profileData.tgUrl.trim()) {
-        payload.tgUrl = profileData.tgUrl;
+        payload.tg_url = profileData.tgUrl;
       }
 
       // Handle profile picture attachment
@@ -74,7 +74,7 @@ export const airtableService = {
         console.log('Processing profile picture:', profileData.profilePicture.name);
         try {
           const imageUrl = await cloudinaryService.uploadImage(profileData.profilePicture);
-          payload.profilePictureUrl = imageUrl;
+          payload.profile_picture_url = imageUrl;
           console.log('Profile picture uploaded successfully');
         } catch (error) {
           console.error('Failed to upload profile picture:', error);
@@ -87,7 +87,7 @@ export const airtableService = {
         console.log('Processing cover picture:', profileData.coverPicture.name);
         try {
           const imageUrl = await cloudinaryService.uploadImage(profileData.coverPicture);
-          payload.coverPictureUrl = imageUrl;
+          payload.cover_picture_url = imageUrl;
           console.log('Cover picture uploaded successfully');
         } catch (error) {
           console.error('Failed to upload cover picture:', error);
@@ -99,10 +99,10 @@ export const airtableService = {
 
       // Call the backend API
       const response = await fetch(`${API_BASE_URL}/f1meme/profiles/upsert/${profileData.walletAddress}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
         body: JSON.stringify(payload)
       });
 
@@ -152,24 +152,24 @@ export const airtableService = {
       const data = await response.json();
       console.log('Profile data:', data);
 
-      if (!data || !data.walletAddress) {
+      if (!data || !data.wallet_address) {
         return null;
       }
       
       return {
         name: data.name || '',
         email: data.email || '',
-        instagramUrl: data.instagramUrl || '',
-        tiktokUrl: data.tiktokUrl || '',
-        tgUrl: data.tgUrl || '',
+        instagramUrl: data.instagram_url || '',
+        tiktokUrl: data.tiktok_url || '',
+        tgUrl: data.tg_url || '',
         profilePicture: undefined, // We don't load existing images back as Files
         coverPicture: undefined,   // We don't load existing images back as Files
-        walletAddress: data.walletAddress || '',
-        createdAt: data.createdAt || undefined,
-        updatedAt: data.updatedAt || undefined,
-        profilePictureUrl: data.profilePictureUrl || '',
-        coverPictureUrl: data.coverPictureUrl || '',
-        membershipLevel: data.membershipLevel || 0,
+        walletAddress: data.wallet_address || '',
+        createdAt: data.created_at || undefined,
+        updatedAt: data.updated_at || undefined,
+        profilePictureUrl: data.profile_picture_url || '',
+        coverPictureUrl: data.cover_picture_url || '',
+        membershipLevel: data.membership_level || 0,
       };
     } catch (error) {
       console.error('Error getting profile:', error);
@@ -193,14 +193,14 @@ export const airtableService = {
       return (data.profiles || []).map((profile: any) => {
         return {
           name: profile.name || '',
-          instagramUrl: profile.instagramUrl || '',
-          tiktokUrl: profile.tiktokUrl || '',
-          tgUrl: profile.tgUrl || '',
-          profilePictureUrl: profile.profilePictureUrl || '',
-          coverPictureUrl: profile.coverPictureUrl || '',
-          walletAddress: profile.walletAddress || '',
-          membershipLevel: profile.membershipLevel || 0,
-          // Do not include email
+          instagramUrl: profile.instagram_url || '',
+          tiktokUrl: profile.tiktok_url || '',
+          tgUrl: profile.tg_url || '',
+          profilePictureUrl: profile.profile_picture_url || '',
+          coverPictureUrl: profile.cover_picture_url || '',
+          walletAddress: profile.wallet_address || '',
+          membershipLevel: profile.membership_level || 0,
+        // Do not include email
         };
       });
     } catch (error) {
@@ -216,9 +216,9 @@ export const airtableService = {
       
       const payload = {
         url: photo.url,
-        uploadedBy: photo.uploadedBy,
-        uploadedAt: photo.uploadedAt,
-        walletAddress: photo.walletAddress,
+        uploaded_by: photo.uploadedBy,
+        uploaded_at: photo.uploadedAt,
+        wallet_address: photo.walletAddress,
         caption: photo.caption || '',
       };
 
@@ -266,9 +266,9 @@ export const airtableService = {
       return (data.photos || []).map((photo: any) => ({
         id: photo.id,
         url: photo.url || '',
-        uploadedBy: photo.uploadedBy || '',
-        uploadedAt: photo.uploadedAt || '',
-        walletAddress: photo.walletAddress || '',
+        uploadedBy: photo.uploaded_by || '',
+        uploadedAt: photo.uploaded_at || '',
+        walletAddress: photo.wallet_address || '',
         caption: photo.caption || '',
       }));
     } catch (error) {
@@ -299,9 +299,9 @@ export const airtableService = {
       return (data.photos || []).map((photo: any) => ({
         id: photo.id,
         url: photo.url || '',
-        uploadedBy: photo.uploadedBy || '',
-        uploadedAt: photo.uploadedAt || '',
-        walletAddress: photo.walletAddress || '',
+        uploadedBy: photo.uploaded_by || '',
+        uploadedAt: photo.uploaded_at || '',
+        walletAddress: photo.wallet_address || '',
         caption: photo.caption || '',
       }));
     } catch (error) {
@@ -315,13 +315,13 @@ export const airtableService = {
       console.log('Deleting gallery photo:', id);
       const response = await fetch(`${API_BASE_URL}/f1meme/gallery/${id}`, {
         method: 'DELETE',
-        headers: {
+    headers: {
           'Content-Type': 'application/json'
         }
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
+  if (!response.ok) {
+    const errorText = await response.text();
         console.error('Delete gallery photo error response:', errorText);
         throw new Error(`Delete gallery photo failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
