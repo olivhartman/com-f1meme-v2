@@ -253,6 +253,7 @@ export const airtableService = {
       return profiles.map((profile: any) => {
         return {
           name: profile.name || '',
+          email: profile.email || profile.email_address || '',
           instagramUrl: profile.instagram_url || profile.instagramUrl || '',
           tiktokUrl: profile.tiktok_url || profile.tiktokUrl || '',
           tgUrl: profile.tg_url || profile.tgUrl || '',
@@ -260,7 +261,8 @@ export const airtableService = {
           coverPictureUrl: profile.cover_picture_url || profile.coverPictureUrl || '',
           walletAddress: profile.wallet_address || profile.walletAddress || '',
           membershipLevel: profile.membership_level || profile.membershipLevel || 0,
-        // Do not include email
+          createdAt: profile.created_at || profile.createdAt || profile.updated_at || profile.updatedAt || '',
+          updatedAt: profile.updated_at || profile.updatedAt || '',
         };
       });
     } catch (error) {
