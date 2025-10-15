@@ -215,32 +215,32 @@ const Gallery: React.FC = () => {
         console.log('Raw photos from API:', allPhotos)
         
         // Filter out photos with invalid data - be more lenient with uploadedAt
-        // const validPhotos = allPhotos.filter(photo => {
-        //   const hasUrl = !!photo.url
-        //   const hasUploadedBy = !!photo.uploadedBy
-        //   const hasUploadedAt = !!photo.uploadedAt
+        const validPhotos = allPhotos.filter(photo => {
+          const hasUrl = !!photo.url
+          const hasUploadedBy = !!photo.uploadedBy
+          const hasUploadedAt = !!photo.uploadedAt
           
-        //   // If uploadedAt exists, check if it's valid, otherwise allow photos without it
-        //   const isValidDate = !photo.uploadedAt || !isNaN(new Date(photo.uploadedAt).getTime())
+          // If uploadedAt exists, check if it's valid, otherwise allow photos without it
+          const isValidDate = !photo.uploadedAt || !isNaN(new Date(photo.uploadedAt).getTime())
           
-        //   console.log('Photo validation:', {
-        //     id: photo.id,
-        //     url: photo.url,
-        //     uploadedBy: photo.uploadedBy,
-        //     uploadedAt: photo.uploadedAt,
-        //     hasUrl,
-        //     hasUploadedBy,
-        //     hasUploadedAt,
-        //     isValidDate,
-        //     valid: hasUrl && hasUploadedBy && isValidDate
-        //   })
+          console.log('Photo validation:', {
+            id: photo.id,
+            url: photo.url,
+            uploadedBy: photo.uploadedBy,
+            uploadedAt: photo.uploadedAt,
+            hasUrl,
+            hasUploadedBy,
+            hasUploadedAt,
+            isValidDate,
+            valid: hasUrl && hasUploadedBy && isValidDate
+          })
           
-        //   // Only require URL and uploadedBy, uploadedAt is optional
-        //   return hasUrl && hasUploadedBy && isValidDate
-        // })
+          // Only require URL and uploadedBy, uploadedAt is optional
+          return hasUrl && hasUploadedBy && isValidDate
+        })
         
-        // console.log('Valid photos after filtering:', validPhotos)
-        setPhotos(allPhotos)
+        console.log('Valid photos after filtering:', validPhotos)
+        setPhotos(validPhotos)
       } catch (err) {
         console.error("Failed to fetch photos:", err)
         setError("Failed to load gallery photos")

@@ -322,16 +322,41 @@ export const airtableService = {
       }
 
       const data = await response.json();
-      console.log('All gallery photos data:', data);
+      console.log('All gallery photos raw data:', data);
+      console.log('Data structure:', {
+        isArray: Array.isArray(data),
+        hasPhotos: data.photos ? 'yes' : 'no',
+        photosLength: data.photos ? data.photos.length : 'N/A',
+        dataLength: Array.isArray(data) ? data.length : 'N/A'
+      });
 
-      return (data.photos || []).map((photo: any) => ({
-        id: photo.id,
-        url: photo.url || '',
-        uploadedBy: photo.uploaded_by || photo.uploadedBy || '',
-        uploadedAt: photo.uploaded_at || photo.uploadedAt || '',
-        walletAddress: photo.wallet_address || photo.walletAddress || '',
-        caption: photo.caption || '',
-      }));
+      // Handle both array response and object with photos property
+      const photosArray = Array.isArray(data) ? data : (data.photos || []);
+      console.log('Photos array to process:', photosArray);
+
+      const mappedPhotos = photosArray.map((photo: any, index: number) => {
+        console.log(`Processing photo ${index}:`, {
+          id: photo.id,
+          url: photo.url,
+          uploadedBy: photo.uploaded_by || photo.uploadedBy,
+          uploadedAt: photo.uploaded_at || photo.uploadedAt,
+          walletAddress: photo.wallet_address || photo.walletAddress,
+          caption: photo.caption,
+          rawPhoto: photo
+        });
+
+        return {
+          id: photo.id || `photo-${index}`,
+          url: photo.url || '',
+          uploadedBy: photo.uploaded_by || photo.uploadedBy || '',
+          uploadedAt: photo.uploaded_at || photo.uploadedAt || '',
+          walletAddress: photo.wallet_address || photo.walletAddress || '',
+          caption: photo.caption || '',
+        };
+      });
+
+      console.log('Mapped photos result:', mappedPhotos);
+      return mappedPhotos;
     } catch (error) {
       console.error('Error getting all gallery photos:', error);
       throw error;
