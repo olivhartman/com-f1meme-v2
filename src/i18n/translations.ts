@@ -143,6 +143,53 @@ export interface Translations {
     noSocialLinks: string;
     level: string;
   };
+  
+  // Additional translations for missing texts
+  additional: {
+    // Community page
+    communityMember: string;
+    noMembersLevel: string;
+    noMembersLevelDesc: string;
+    copyAddress: string;
+    showQrCode: string;
+    hideQrCode: string;
+    copied: string;
+    noWallet: string;
+    f1Enthusiast: string;
+    failedToGenerateQr: string;
+    generatingQrCode: string;
+    // Schedule page
+    f1Schedule: string;
+    f1ScheduleDesc: string;
+    loadingF1Schedule: string;
+    fetchingRaceInfo: string;
+    season: string;
+    raceDay: string;
+    sessions: string;
+    fp1: string;
+    fp2: string;
+    fp3: string;
+    qualifying: string;
+    sprint: string;
+    sprintQualifying: string;
+    // Gallery page
+    f1memeGallery: string;
+    f1memeGalleryDesc: string;
+    failedToLoadGallery: string;
+    noPhotosYet: string;
+    noPhotosYetDesc: string;
+    loadingGallery: string;
+    noPhotosUpload: string;
+    viewMore: string;
+    share: string;
+    download: string;
+    // Home page
+    boxboxWeb3Membership: string;
+    boxboxWeb3MembershipDesc: string;
+    miniGallery: string;
+    loadingGalleryHome: string;
+    noPhotosYetHome: string;
+  };
 }
 
 export const translations: Record<string, Translations> = {
@@ -272,6 +319,51 @@ export const translations: Record<string, Translations> = {
       noSocialLinks: "No social links",
       level: "Level",
     },
+    additional: {
+      // Community page
+      communityMember: "Community Member",
+      noMembersLevel: "No Members in Level 1-99!",
+      noMembersLevelDesc: "There are currently no community members with membership levels between 1-99. Check back later or become the first premium member!",
+      copyAddress: "Copy full address",
+      showQrCode: "Show QR code",
+      hideQrCode: "Hide QR code",
+      copied: "Copied!",
+      noWallet: "No Wallet",
+      f1Enthusiast: "F1 Enthusiast",
+      failedToGenerateQr: "Failed to generate QR",
+      generatingQrCode: "Generating QR code...",
+      // Schedule page
+      f1Schedule: "F1 Schedule",
+      f1ScheduleDesc: "Stay updated with the latest Formula 1 race schedule and session times",
+      loadingF1Schedule: "Loading F1 Schedule...",
+      fetchingRaceInfo: "Fetching the latest race information",
+      season: "Season",
+      raceDay: "Race Day",
+      sessions: "Sessions",
+      fp1: "FP1",
+      fp2: "FP2",
+      fp3: "FP3",
+      qualifying: "Qualifying",
+      sprint: "Sprint",
+      sprintQualifying: "Sprint Qualifying",
+      // Gallery page
+      f1memeGallery: "F1Meme Gallery",
+      f1memeGalleryDesc: "Share your F1 moments and connect with the community through photos",
+      failedToLoadGallery: "Failed to Load Gallery",
+      noPhotosYet: "No Photos Yet",
+      noPhotosYetDesc: "The gallery is empty. Be the first to share your F1 photos with the community!",
+      loadingGallery: "Loading gallery...",
+      noPhotosUpload: "No photos yet. Be the first to upload!",
+      viewMore: "View More",
+      share: "Share",
+      download: "Download",
+      // Home page
+      boxboxWeb3Membership: "BoxBox Web3 Membership",
+      boxboxWeb3MembershipDesc: "Join the ultimate F1 community and unlock exclusive benefits",
+      miniGallery: "Mini Gallery",
+      loadingGalleryHome: "Loading gallery...",
+      noPhotosYetHome: "No photos yet. Be the first to upload!",
+    },
   },
   zh: {
     nav: {
@@ -398,6 +490,51 @@ export const translations: Record<string, Translations> = {
       noUsersFound: "未找到符合条件的用户",
       noSocialLinks: "无社交链接",
       level: "等级",
+    },
+    additional: {
+      // Community page
+      communityMember: "社区成员",
+      noMembersLevel: "1-99级别暂无成员！",
+      noMembersLevelDesc: "目前没有1-99级别的社区成员。稍后再来看看或成为第一个高级会员！",
+      copyAddress: "复制完整地址",
+      showQrCode: "显示二维码",
+      hideQrCode: "隐藏二维码",
+      copied: "已复制！",
+      noWallet: "无钱包",
+      f1Enthusiast: "F1爱好者",
+      failedToGenerateQr: "生成二维码失败",
+      generatingQrCode: "生成二维码中...",
+      // Schedule page
+      f1Schedule: "F1赛程",
+      f1ScheduleDesc: "获取最新F1赛程和比赛时间信息",
+      loadingF1Schedule: "加载F1赛程...",
+      fetchingRaceInfo: "获取最新比赛信息",
+      season: "赛季",
+      raceDay: "比赛日",
+      sessions: "练习赛",
+      fp1: "第一次练习",
+      fp2: "第二次练习",
+      fp3: "第三次练习",
+      qualifying: "排位赛",
+      sprint: "冲刺赛",
+      sprintQualifying: "冲刺排位",
+      // Gallery page
+      f1memeGallery: "F1Meme相册",
+      f1memeGalleryDesc: "分享您的F1时刻，通过照片与社区连接",
+      failedToLoadGallery: "加载相册失败",
+      noPhotosYet: "暂无照片",
+      noPhotosYetDesc: "相册为空。成为第一个与社区分享F1照片的人！",
+      loadingGallery: "加载相册...",
+      noPhotosUpload: "暂无照片。成为第一个上传者！",
+      viewMore: "查看更多",
+      share: "分享",
+      download: "下载",
+      // Home page
+      boxboxWeb3Membership: "BoxBox Web3会员",
+      boxboxWeb3MembershipDesc: "加入终极F1社区，解锁专属福利",
+      miniGallery: "迷你相册",
+      loadingGalleryHome: "加载相册...",
+      noPhotosYetHome: "暂无照片。成为第一个上传者！",
     },
   },
 };

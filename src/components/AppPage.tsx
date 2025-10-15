@@ -206,10 +206,10 @@ export default function Home() {
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-4">
                   <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent mb-4 py-3">
-                    {t.hero.title} Web3 Membership
+                    {t.additional.boxboxWeb3Membership}
                   </h2>
                   <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                    {t.hero.description}
+                    {t.additional.boxboxWeb3MembershipDesc}
                   </p>
                 </div>
                 <BoxBoxInterface />
@@ -224,7 +224,7 @@ export default function Home() {
             {/* Mini Gallery Title */}
             <div className="text-center mb-6">
               <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent mb-4 py-3">
-                {t.gallery.title}
+                {t.additional.miniGallery}
               </h2>
             </div>
             <div className="max-w-5xl mx-auto px-4">
@@ -302,10 +302,10 @@ function MiniGallery() {
   }, [])
 
   if (loading) {
-    return <div className="flex justify-center py-8 text-gray-400">Loading gallery...</div>
+    return <div className="flex justify-center py-8 text-gray-400">{t.additional.loadingGalleryHome}</div>
   }
   if (!photos.length) {
-    return <div className="flex justify-center py-8 text-gray-400">No photos yet. Be the first to upload!</div>
+    return <div className="flex justify-center py-8 text-gray-400">{t.additional.noPhotosYetHome}</div>
   }
   const showPhotos = photos.slice(0, 6);
   const hasMore = photos.length > 6;
@@ -322,7 +322,7 @@ function MiniGallery() {
       </div>
       {hasMore && (
         <div className="flex justify-center">
-          <Button onClick={() => navigate('/gallery')} variant="secondary" size="lg" className="px-8">View More</Button>
+          <Button onClick={() => navigate('/gallery')} variant="secondary" size="lg" className="px-8">{t.additional.viewMore}</Button>
         </div>
       )}
       </div>

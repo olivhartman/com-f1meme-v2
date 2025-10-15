@@ -133,21 +133,21 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
         {/* Member name and wallet */}
         <div className="space-y-1 w-full">
         <h3 className="text-lg font-bold text-white group-hover:text-yellow-400 transition-colors duration-300">
-          {member.name || "F1 Enthusiast"}
+          {member.name || t.additional.f1Enthusiast}
         </h3>
           <div className="flex flex-col items-center gap-1 w-full mt-1">
             <div className="flex items-center gap-2 justify-center w-full flex-wrap">
               <span className="text-xs text-slate-400 font-mono break-all select-all max-w-full">
                 {member.walletAddress
                   ? `${member.walletAddress.slice(0, 4)}...${member.walletAddress.slice(-4)}`
-                  : "No Wallet"}
+                  : t.additional.noWallet}
               </span>
               {member.walletAddress && (
                 <>
                   <button
                     onClick={handleCopy}
                     className="ml-1 p-1 rounded bg-transparent hover:bg-yellow-400/20 transition-colors focus:outline-none border-none shadow-none"
-                    title="Copy full address"
+                    title={t.additional.copyAddress}
                     type="button"
                   >
                     <Copy className="w-4 h-4 text-yellow-400" />
@@ -155,7 +155,7 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
                   <button
                     onClick={handleShowQR}
                     className="ml-1 p-1 rounded bg-transparent hover:bg-yellow-400/20 transition-colors focus:outline-none border-none shadow-none"
-                    title="Show QR code"
+                    title={t.additional.showQrCode}
                     type="button"
                   >
                     <QrCodeIcon className="w-4 h-4 text-yellow-400" />
@@ -163,11 +163,11 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
                 </>
               )}
               {copied && (
-                <span className="text-emerald-400 text-xs ml-2 animate-fade-in">Copied!</span>
+                <span className="text-emerald-400 text-xs ml-2 animate-fade-in">{t.additional.copied}</span>
               )}
             </div>
           </div>
-        <p className="text-sm text-slate-400">Community Member</p>
+        <p className="text-sm text-slate-400">{t.additional.communityMember}</p>
       </div>
 
       {/* Social links */}
@@ -364,9 +364,9 @@ const Community: React.FC = () => {
                 <Flag className="w-12 h-12 text-yellow-400 animate-bounce" />
               </div>
               <div className="text-center space-y-2">
-                <h3 className="text-2xl font-bold text-white">No Members in Level 1-99!</h3>
+                <h3 className="text-2xl font-bold text-white">{t.additional.noMembersLevel}</h3>
                 <p className="text-slate-400 max-w-md">
-                  Be the first to join our F1Meme community and reach Level 1 or higher to appear here.
+                  {t.additional.noMembersLevelDesc}
                 </p>
               </div>
               {/* <Button className="bg-gradient-to-r from-yellow-400 to-red-500 hover:from-yellow-500 hover:to-red-600 text-black font-semibold">

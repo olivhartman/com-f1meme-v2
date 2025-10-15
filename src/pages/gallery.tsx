@@ -7,6 +7,7 @@ import { Image, Share2, Download } from "lucide-react"
 import { airtableService, type GalleryPhoto } from "../api/airtable"
 import { Card, CardContent } from "../components/ui/card"
 import { Button } from "../components/ui/button"
+import { useTranslation } from "../i18n/TranslationContext"
 
 const AnimatedBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
@@ -21,6 +22,7 @@ const AnimatedBackground = () => (
 )
 
 export const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const [showMobileOverlay, setShowMobileOverlay] = useState(false)
 
@@ -202,6 +204,7 @@ const LoadingCard = () => (
 )
 
 const Gallery: React.FC = () => {
+  const { t } = useTranslation()
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -240,10 +243,10 @@ const Gallery: React.FC = () => {
           <div className="relative px-4 py-26 text-center flex flex-col items-center justify-center">
             <div className="w-full max-w-3xl">
               <div className="mb-4 mt-4">
-                <h1 className="text-4xl md:text-6xl font-black text-[#FBEB04] tracking-tight">F1Meme Gallery</h1>
+                <h1 className="text-4xl md:text-6xl font-black text-[#FBEB04] tracking-tight">{t.additional.f1memeGallery}</h1>
               </div>
               <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-                Community photos from our F1 enthusiasts
+                {t.additional.f1memeGalleryDesc}
               </p>
             </div>
           </div>
@@ -291,7 +294,7 @@ const Gallery: React.FC = () => {
                 <Image className="w-12 h-12 text-red-500" />
               </div>
               <div className="text-center space-y-2">
-                <h3 className="text-2xl font-bold text-white">Failed to Load Gallery</h3>
+                <h3 className="text-2xl font-bold text-white">{t.additional.failedToLoadGallery}</h3>
                 <p className="text-slate-400 max-w-md">
                   {error}
                 </p>
@@ -303,9 +306,9 @@ const Gallery: React.FC = () => {
                 <Image className="w-12 h-12 text-yellow-400" />
               </div>
               <div className="text-center space-y-2">
-                <h3 className="text-2xl font-bold text-white">No Photos Yet</h3>
+                <h3 className="text-2xl font-bold text-white">{t.additional.noPhotosYet}</h3>
                 <p className="text-slate-400 max-w-md">
-                  Be the first to upload a photo to our gallery! Reach Level 55+ to start sharing.
+                  {t.additional.noPhotosYetDesc}
                 </p>
               </div>
             </div>

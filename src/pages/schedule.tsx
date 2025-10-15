@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { Calendar, MapPin, Flag, Clock, Zap, Trophy, Timer } from "lucide-react"
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import { useTranslation } from "../i18n/TranslationContext";
 
 type Session = {
   date: string
@@ -37,51 +38,44 @@ export type Race = {
   SprintQualifying?: Session
 }
 
-const sessionConfig: {
-  [key: string]: {
-    label: string
-    icon: React.ReactNode
-    color: string
-    bgColor: string
-  }
-} = {
+const getSessionConfig = (t: any) => ({
   FirstPractice: {
-    label: "FP1",
+    label: t.additional.fp1,
     icon: <Timer className="w-3 h-3" />,
     color: "text-[#FBEB04]",
     bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
   SecondPractice: {
-    label: "FP2",
+    label: t.additional.fp2,
     icon: <Timer className="w-3 h-3" />,
     color: "text-[#FBEB04]",
     bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
   ThirdPractice: {
-    label: "FP3",
+    label: t.additional.fp3,
     icon: <Timer className="w-3 h-3" />,
     color: "text-[#FBEB04]",
     bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
   Qualifying: {
-    label: "Qualifying",
+    label: t.additional.qualifying,
     icon: <Zap className="w-3 h-3" />,
     color: "text-[#FBEB04]",
     bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
   Sprint: {
-    label: "Sprint",
+    label: t.additional.sprint,
     icon: <Trophy className="w-3 h-3" />,
     color: "text-[#FBEB04]",
     bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
   SprintQualifying: {
-    label: "Sprint Qualifying",
+    label: t.additional.sprintQualifying,
     icon: <Flag className="w-3 h-3" />,
     color: "text-[#FBEB04]",
     bgColor: "bg-[#FBEB04]/10 border-[#FBEB04]/30",
   },
-}
+})
 
 function formatDateTime(date: string, time: string) {
   const dt = new Date(`${date}T${time.replace("Z", "")}Z`)
@@ -109,6 +103,7 @@ function formatRaceDate(date: string, time: string) {
 }
 
 export default function Schedule() {
+  const { t } = useTranslation()
   const [races, setRaces] = useState<Race[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -161,14 +156,15 @@ export default function Schedule() {
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-xl font-semibold text-white">Loading F1 Schedule...</p>
-          <p className="text-sm text-slate-400">Fetching the latest race information</p>
+          <p className="text-xl font-semibold text-white">{t.additional.loadingF1Schedule}</p>
+          <p className="text-sm text-slate-400">{t.additional.fetchingRaceInfo}</p>
         </div>
       </div>
     )
   }
 
   const sessionOrder = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying", "SprintQualifying", "Sprint"]
+  const sessionConfig = getSessionConfig(t)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
@@ -178,10 +174,10 @@ export default function Schedule() {
         <div className="relative px-4 py-26 text-center flex flex-col items-center justify-center">
           <div className="w-full max-w-3xl">
             <div className="mb-4">
-              <h1 className="text-4xl md:text-6xl font-black text-[#FBEB04] tracking-tight">F1 Schedule</h1>
+              <h1 className="text-4xl md:text-6xl font-black text-[#FBEB04] tracking-tight">{t.additional.f1Schedule}</h1>
             </div>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-              Complete Formula 1 race weekend schedule with all sessions and timings
+              {t.additional.f1ScheduleDesc}
             </p>
           </div>
         </div>
@@ -203,7 +199,7 @@ export default function Schedule() {
                       <Badge className="bg-[#FBEB04]/20 text-[#FBEB04] border-[#FBEB04]/40 font-semibold">
                         Round {race.round}
                       </Badge>
-                      <div className="text-right text-xs text-slate-400">Season {race.season}</div>
+                      <div className="text-right text-xs text-slate-400">{t.additional.season} {race.season}</div>
                     </div>
 
                     <h2 className="text-xl font-bold text-white group-hover:text-[#FBEB04] transition-colors line-clamp-2">
@@ -237,7 +233,7 @@ export default function Schedule() {
                   <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-red-500/10 to-transparent rounded-lg border border-red-500/20">
                     <Calendar className="w-4 h-4 text-red-400" />
                     <div>
-                      <p className="text-sm font-semibold text-white">Race Day</p>
+                      <p className="text-sm font-semibold text-white">{t.additional.raceDay}</p>
                       <p className="text-xs text-slate-300">{formatRaceDate(race.date, race.time)}</p>
                     </div>
                   </div>
@@ -246,7 +242,7 @@ export default function Schedule() {
                   <div className="space-y-3">
                     <h3 className="text-sm font-semibold text-slate-300 flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      Weekend Schedule
+                      {t.additional.sessions}
                     </h3>
 
                     <div className="grid grid-cols-1 gap-2">
