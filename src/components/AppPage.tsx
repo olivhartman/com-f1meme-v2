@@ -18,6 +18,7 @@ import { type GalleryPhoto } from "../api/airtable"
 import { Button } from "./ui/button"
 import { useNavigate } from "react-router-dom"
 import { PhotoCard } from "../pages/gallery"
+import { useTranslation } from "../i18n/TranslationContext"
 
 import "@solana/wallet-adapter-react-ui/styles.css"
 
@@ -25,6 +26,7 @@ import "@solana/wallet-adapter-react-ui/styles.css"
 
 const idl_object = JSON.parse(JSON.stringify(idl))
 export default function Home() {
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(true)
   const { publicKey } = useWallet()
   const wallet = useAnchorWallet()
@@ -204,10 +206,10 @@ export default function Home() {
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-4">
                   <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent mb-4 py-3">
-                    BoxBox Web3 Membership
+                    {t.hero.title} Web3 Membership
                   </h2>
                   <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                    Lock your BOXBOX tokens to participate in the F1 community and earn rewards.
+                    {t.hero.description}
                   </p>
                 </div>
                 <BoxBoxInterface />
@@ -222,7 +224,7 @@ export default function Home() {
             {/* Mini Gallery Title */}
             <div className="text-center mb-6">
               <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-yellow-500 bg-clip-text text-transparent mb-4 py-3">
-                Mini Gallery
+                {t.gallery.title}
               </h2>
             </div>
             <div className="max-w-5xl mx-auto px-4">

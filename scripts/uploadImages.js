@@ -7,8 +7,8 @@ import FormData from 'form-data';
 // Load environment variables from .env file if it exists
 dotenv.config();
 
-const CLOUDINARY_CLOUD_NAME = process.env.VITE_CLOUDINARY_CLOUD_NAME;
-const CLOUDINARY_UPLOAD_PRESET = process.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+const CLOUDINARY_CLOUD_NAME = "f1meme";
+const CLOUDINARY_UPLOAD_PRESET = "f1meme";
 
 class CloudinaryUploader {
   constructor() {

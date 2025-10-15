@@ -7,6 +7,7 @@ import { Card, CardContent } from "../components/ui/card"
 import { Button } from "../components/ui/button"
 import QRCode from "qrcode"
 import { motion } from "framer-motion"
+import { useTranslation } from "../i18n/TranslationContext"
 
 const AnimatedBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
@@ -280,6 +281,7 @@ const LoadingCard = () => (
 )
 
 const Community: React.FC = () => {
+  const { t } = useTranslation()
   const [members, setMembers] = useState<ProfileData[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
@@ -338,10 +340,10 @@ const Community: React.FC = () => {
         <div className="relative px-4 py-26 text-center flex flex-col items-center justify-center">
           <div className="w-full max-w-3xl">
             <div className="mb-4 mt-4">
-              <h1 className="text-4xl md:text-6xl font-black text-[#FBEB04] tracking-tight">F1Meme Community</h1>
+              <h1 className="text-4xl md:text-6xl font-black text-[#FBEB04] tracking-tight">{t.community.title}</h1>
             </div>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-              Meet the passionate F1 fans who make our community legendary
+              {t.community.subtitle}
             </p>
           </div>
         </div>

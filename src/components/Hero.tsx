@@ -6,6 +6,7 @@ import { Clock } from "lucide-react"
 import { Card, CardContent } from "./ui/card"
 import { Button } from "./ui/button"
 import DriversStandings from "./DriversStandings"
+import { useTranslation } from "../i18n/TranslationContext"
 // IMPORTANT: Always type API data and function parameters. Enable 'noImplicitAny' in tsconfig.json for strict type safety.
 // If you add new API calls, define and use types for all data.
 // See: https://www.typescriptlang.org/tsconfig#noImplicitAny
@@ -37,6 +38,7 @@ function isRace(obj: unknown): obj is Race {
 }
 
 export default function Hero() {
+  const { t } = useTranslation()
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -534,7 +536,7 @@ export default function Hero() {
                     </Card>
 
                     <p className="text-sm sm:text-base font-light tracking-wider text-gray-400 text-center">
-                      Race Begins{" "}
+                      {t.schedule.raceDay} {" "}
                       <span className="text-yellow-500 font-medium block mt-1">
                         {nextRace ? new Date(`${nextRace.date}T${nextRace.time}`).toLocaleString("en-US", {
                           weekday: "long",
@@ -544,7 +546,7 @@ export default function Hero() {
                           hour: "2-digit",
                           minute: "2-digit",
                           timeZoneName: "short",
-                        }) : "Loading..."}
+                        }) : t.common.loading}
                       </span>
                     </p>
                   </div>

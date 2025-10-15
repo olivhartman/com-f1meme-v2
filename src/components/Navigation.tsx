@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, User, Users, Calendar, Image } from "lucide-react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { Link } from "react-router-dom"
+import { useTranslation } from "../i18n/TranslationContext"
+import { LanguageToggle } from "./LanguageToggle"
 
 interface NavigationProps {}
 
@@ -13,6 +15,7 @@ export default function Navigation({}: NavigationProps) {
   const [showConnectModal, setShowConnectModal] = useState(false)
   const wallet = useWallet()
   const { publicKey } = wallet
+  const { t } = useTranslation()
 
   // Debug logging
   useEffect(() => {
@@ -48,14 +51,14 @@ export default function Navigation({}: NavigationProps) {
             <div className="mb-4">
               <User className="h-10 w-10 text-[#272AE9] mx-auto" strokeWidth={2} />
             </div>
-            <h2 className="text-lg font-bold text-[#272AE9] mb-2 text-center">Connect Your Wallet</h2>
-            <p className="text-gray-700 text-center mb-6">Please connect your wallet first to access your profile.</p>
-            <button
-              onClick={() => setShowConnectModal(false)}
-              className="mt-2 px-6 py-2 rounded-lg bg-[#FBEB04] text-[#272AE9] font-semibold shadow hover:bg-yellow-300 transition"
-            >
-              Close
-            </button>
+            <h2 className="text-lg font-bold text-[#272AE9] mb-2 text-center">{t.wallet.connect}</h2>
+            <p className="text-gray-700 text-center mb-6">{t.wallet.connectToContinue}</p>
+              <button
+                onClick={() => setShowConnectModal(false)}
+                className="mt-2 px-6 py-2 rounded-lg bg-[#FBEB04] text-[#272AE9] font-semibold shadow hover:bg-yellow-300 transition"
+              >
+                {t.common.close}
+              </button>
           </div>
         </div>
       )}
@@ -84,6 +87,7 @@ export default function Navigation({}: NavigationProps) {
 
             {/* Right: Profile and Community buttons always visible, side by side (desktop only) */}
             <div className="hidden sm:flex flex-row items-center gap-3 h-16">
+              <LanguageToggle />
               <Link
                 to="/community"
                 className="flex items-center justify-center w-11 h-11 rounded-lg bg-white border-2 border-[#FBEB04] shadow-lg hover:bg-[#FBEB04]/10 hover:border-[#FBEB04] transition-all font-bold text-[#272AE9] text-base focus:outline-none focus:ring-2 focus:ring-[#FBEB04]"
@@ -117,7 +121,8 @@ export default function Navigation({}: NavigationProps) {
             </div>
 
             {/* Hamburger menu for mobile */}
-            <div className="flex sm:hidden items-center h-16">
+            <div className="flex sm:hidden items-center gap-2 h-16">
+              <LanguageToggle />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="flex items-center justify-center w-11 h-11 rounded-lg bg-[#FBEB04] border-2 border-[#FBEB04] shadow-lg hover:bg-[#FBEB04]/80 hover:border-[#FBEB04] transition-all focus:outline-none focus:ring-2 focus:ring-[#FBEB04]"
@@ -147,7 +152,7 @@ export default function Navigation({}: NavigationProps) {
                 className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
                 <h5>
-                Home
+                {t.nav.home}
                 </h5>
               </Link>
               <Link
@@ -156,7 +161,7 @@ export default function Navigation({}: NavigationProps) {
                 className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
                 <h5>
-                Community
+                {t.nav.community}
                 </h5>
               </Link>
               <Link
@@ -165,7 +170,7 @@ export default function Navigation({}: NavigationProps) {
                 className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
                 <h5>
-                Schedule
+                {t.nav.schedule}
                 </h5>
               </Link>
               <Link
@@ -174,7 +179,7 @@ export default function Navigation({}: NavigationProps) {
                 className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
               >
                 <h5>
-                Gallery
+                {t.nav.gallery}
                 </h5>
               </Link>
 
@@ -190,7 +195,7 @@ export default function Navigation({}: NavigationProps) {
                   className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-[#FBEB04]"
                 >
                   <h5>
-                  Profile
+                  {t.nav.profile}
                   </h5>
                 </Link>
             </nav>

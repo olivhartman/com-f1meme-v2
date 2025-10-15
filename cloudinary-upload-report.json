@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-10-15T11:30:21.735Z",
+  "totalFiles": 7,
+  "successful": 7,
+  "failed": 0,
+  "results": [
+    {
+      "filename": "f1king-cover.jpeg",
+      "cloudinaryUrl": "https://res.cloudinary.com/f1meme/image/upload/v1760527788/eyk1ah24m9vkwznp0zcm.jpg",
+      "success": true
+    },
+    {
+      "filename": "f1king.jpeg",
+      "cloudinaryUrl": "https://res.cloudinary.com/f1meme/image/upload/v1760527795/bj5fahzjgan7pwwzxilp.jpg",
+      "success": true
+    },
+    {
+      "filename": "mohd.png",
+      "cloudinaryUrl": "https://res.cloudinary.com/f1meme/image/upload/v1760527801/ulokiivmalllpe1hogsv.png",
+      "success": true
+    },
+    {
+      "filename": "vic-cover.jpeg",
+      "cloudinaryUrl": "https://res.cloudinary.com/f1meme/image/upload/v1760527805/wshpjuvxi5sniop6plqw.jpg",
+      "success": true
+    },
+    {
+      "filename": "victoria.jpeg",
+      "cloudinaryUrl": "https://res.cloudinary.com/f1meme/image/upload/v1760527808/jvo7dxzc08cwjgkdx3np.jpg",
+      "success": true
+    },
+    {
+      "filename": "web3og-cover.webp",
+      "cloudinaryUrl": "https://res.cloudinary.com/f1meme/image/upload/v1760527812/bnoj0yxmzvow7o5nzhzh.webp",
+      "success": true
+    },
+    {
+      "filename": "web3og.png",
+      "cloudinaryUrl": "https://res.cloudinary.com/f1meme/image/upload/v1760527820/ve8cewwm6c7qal2irk84.png",
+      "success": true
+    }
+  ]
+}
