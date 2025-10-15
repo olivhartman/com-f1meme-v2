@@ -205,18 +205,27 @@ export const airtableService = {
   // Get all profiles (for community page)
   async getAllProfiles(): Promise<ProfileData[]> {
     try {
+      console.log('Getting all profiles from:', `${API_BASE_URL}/f1meme/profiles/all`);
       const response = await fetch(`${API_BASE_URL}/f1meme/profiles/all`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
         }
       });
+      
+      console.log('getAllProfiles response status:', response.status);
+      console.log('getAllProfiles response headers:', Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch all profiles');
+        const errorText = await response.text();
+        console.error('getAllProfiles error response:', errorText);
+        throw new Error(`Failed to fetch all profiles: ${response.status} ${response.statusText} - ${errorText}`);
       }
       
       // Handle empty responses
       const responseText = await response.text();
+      console.log('getAllProfiles raw response text:', responseText);
+      
       if (!responseText || responseText.trim() === '') {
         console.log('Empty response received for getAllProfiles, returning empty array');
         return [];
@@ -225,11 +234,16 @@ export const airtableService = {
       let data;
       try {
         data = JSON.parse(responseText);
+        console.log('getAllProfiles parsed data:', data);
       } catch (parseError) {
         console.error('Failed to parse JSON response for getAllProfiles:', responseText);
         throw new Error(`Invalid JSON response: ${parseError}`);
       }
-      return (data.profiles || []).map((profile: any) => {
+      
+      const profiles = data.profiles || data || [];
+      console.log('getAllProfiles profiles array:', profiles);
+      
+      return profiles.map((profile: any) => {
         return {
           name: profile.name || '',
           instagramUrl: profile.instagram_url || profile.instagramUrl || '',
