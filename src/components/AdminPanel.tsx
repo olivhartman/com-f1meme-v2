@@ -4,7 +4,7 @@ import { airtableService, type ProfileData } from '../api/airtable';
 import { useTranslation } from '../i18n/TranslationContext';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
-import { Search, Filter, Download, Users, Crown, Shield } from 'lucide-react';
+import { Search, Filter, Download, Users, Crown, Shield, Copy, Check } from 'lucide-react';
 
 const ADMIN_WALLET_ADDRESS = "G14s2hZVZQqcUfLYSEdTThNqgZCi4pqM2P2RmRiu2ddz";
 
@@ -22,9 +22,24 @@ export const AdminPanel: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showNonZeroOnly, setShowNonZeroOnly] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
   // Check if current user is admin
   const isAdmin = publicKey?.toBase58() === ADMIN_WALLET_ADDRESS;
+
+  // Copy wallet address to clipboard
+  const copyToClipboard = async (address: string) => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopiedAddress(address);
+      // Reset the copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedAddress(null);
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy address:', error);
+    }
+  };
 
   // Wait for wallet to be connected before checking admin status
   useEffect(() => {
@@ -313,8 +328,21 @@ export const AdminPanel: React.FC = () => {
                     {filteredUsers.map((user, index) => (
                       <tr key={user.walletAddress} className={`border-t border-slate-700/50 ${index % 2 === 0 ? 'bg-slate-800/20' : 'bg-slate-800/10'}`}>
                         <td className="px-6 py-4">
-                          <div className="font-mono text-sm text-slate-300">
-                            {user.walletAddress.slice(0, 8)}...{user.walletAddress.slice(-8)}
+                          <div className="flex items-center gap-2">
+                            <div className="font-mono text-sm text-slate-300">
+                              {user.walletAddress.slice(0, 8)}...{user.walletAddress.slice(-8)}
+                            </div>
+                            <button
+                              onClick={() => copyToClipboard(user.walletAddress)}
+                              className="p-1 hover:bg-slate-700 rounded transition-colors duration-200 group"
+                              title="Copy wallet address"
+                            >
+                              {copiedAddress === user.walletAddress ? (
+                                <Check className="w-4 h-4 text-green-400" />
+                              ) : (
+                                <Copy className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors duration-200" />
+                              )}
+                            </button>
                           </div>
                         </td>
                         <td className="px-6 py-4">
