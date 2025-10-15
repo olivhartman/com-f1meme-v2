@@ -36,21 +36,6 @@ export const AdminPanel: React.FC = () => {
       try {
         setLoading(true);
         const allProfiles = await airtableService.getAllProfiles();
-        console.log('=== ADMIN PANEL: All Profiles Data ===');
-        console.log('Total profiles returned:', allProfiles.length);
-        console.log('Full profiles array:', allProfiles);
-        
-        // Log each user's data individually
-        allProfiles.forEach((profile, index) => {
-          console.log(`--- User ${index + 1} Data ---`);
-          console.log('Profile object:', profile);
-          console.log('Available fields:', Object.keys(profile));
-          console.log('Field values:');
-          Object.entries(profile).forEach(([key, value]) => {
-            console.log(`  ${key}:`, value, `(type: ${typeof value})`);
-          });
-          console.log('--- End User Data ---');
-        });
         
         setUsers(allProfiles);
         setFilteredUsers(allProfiles);
@@ -309,7 +294,7 @@ export const AdminPanel: React.FC = () => {
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-slate-300">
-                            {(user as any).email || (user as any).email_address || 'N/A'}
+                            {(user as any).email || (user as any).email_address || (user as any).user_email || (user as any).e_mail || (user as any).mail || (user as any).contact_email || 'N/A'}
                           </div>
                         </td>
                         <td className="px-6 py-4">

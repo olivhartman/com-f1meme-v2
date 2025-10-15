@@ -248,12 +248,11 @@ export const airtableService = {
       }
       
       const profiles = data.profiles || data || [];
-      console.log('getAllProfiles profiles array:', profiles);
       
       return profiles.map((profile: any) => {
         return {
           name: profile.name || '',
-          email: profile.email || profile.email_address || '',
+          email: profile.email || profile.email_address || profile.user_email || profile.e_mail || profile.mail || profile.contact_email || '',
           instagramUrl: profile.instagram_url || profile.instagramUrl || '',
           tiktokUrl: profile.tiktok_url || profile.tiktokUrl || '',
           tgUrl: profile.tg_url || profile.tgUrl || '',
