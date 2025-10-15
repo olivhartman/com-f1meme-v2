@@ -73,7 +73,8 @@ export const AdminPanel: React.FC = () => {
     if (searchTerm) {
       filtered = filtered.filter(user => 
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ((user as any).email && (user as any).email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        ((user as any).email_address && (user as any).email_address.toLowerCase().includes(searchTerm.toLowerCase())) ||
         user.walletAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.instagramUrl.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.tiktokUrl.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -107,13 +108,13 @@ export const AdminPanel: React.FC = () => {
       ...filteredUsers.map(user => [
         user.walletAddress,
         `"${user.name || ''}"`,
-        `"${user.email || ''}"`,
+        `"${(user as any).email || (user as any).email_address || ''}"`,
         `"${user.instagramUrl || ''}"`,
         `"${user.tiktokUrl || ''}"`,
         `"${user.tgUrl || ''}"`,
         user.membershipLevel || 0,
-        `"${user.createdAt || ''}"`,
-        `"${user.updatedAt || ''}"`
+        `"${(user as any).createdAt || (user as any).created_at || (user as any).updatedAt || (user as any).updated_at || ''}"`,
+        `"${(user as any).updatedAt || (user as any).updated_at || ''}"`
       ].join(','))
     ].join('\n');
 
@@ -308,7 +309,7 @@ export const AdminPanel: React.FC = () => {
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-slate-300">
-                            {user.email || 'N/A'}
+                            {(user as any).email || (user as any).email_address || 'N/A'}
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -352,7 +353,12 @@ export const AdminPanel: React.FC = () => {
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-slate-400 text-sm">
-                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                            {(user as any).createdAt ? new Date((user as any).createdAt).toLocaleDateString() : 
+                             (user as any).created_at ? new Date((user as any).created_at).toLocaleDateString() :
+                             (user as any).createdAt ? new Date((user as any).createdAt).toLocaleDateString() :
+                             (user as any).updatedAt ? new Date((user as any).updatedAt).toLocaleDateString() :
+                             (user as any).updated_at ? new Date((user as any).updated_at).toLocaleDateString() :
+                             'N/A'}
                           </div>
                         </td>
                       </tr>
