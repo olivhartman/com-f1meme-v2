@@ -36,8 +36,22 @@ export const AdminPanel: React.FC = () => {
       try {
         setLoading(true);
         const allProfiles = await airtableService.getAllProfiles();
-        console.log('Raw profiles from API:', allProfiles);
-        console.log('First profile sample:', allProfiles[0]);
+        console.log('=== ADMIN PANEL: All Profiles Data ===');
+        console.log('Total profiles returned:', allProfiles.length);
+        console.log('Full profiles array:', allProfiles);
+        
+        // Log each user's data individually
+        allProfiles.forEach((profile, index) => {
+          console.log(`--- User ${index + 1} Data ---`);
+          console.log('Profile object:', profile);
+          console.log('Available fields:', Object.keys(profile));
+          console.log('Field values:');
+          Object.entries(profile).forEach(([key, value]) => {
+            console.log(`  ${key}:`, value, `(type: ${typeof value})`);
+          });
+          console.log('--- End User Data ---');
+        });
+        
         setUsers(allProfiles);
         setFilteredUsers(allProfiles);
       } catch (error) {
@@ -291,12 +305,6 @@ export const AdminPanel: React.FC = () => {
                           <div className="text-white font-medium">
                             {user.name || 'N/A'}
                           </div>
-                          {/* Debug: Show all available fields */}
-                          {index === 0 && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              Debug: {JSON.stringify(Object.keys(user))}
-                            </div>
-                          )}
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-slate-300">
@@ -346,12 +354,6 @@ export const AdminPanel: React.FC = () => {
                           <div className="text-slate-400 text-sm">
                             {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                           </div>
-                          {/* Debug: Show created date fields */}
-                          {index === 0 && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              Created: {user.createdAt || 'undefined'}
-                            </div>
-                          )}
                         </td>
                       </tr>
                     ))}
