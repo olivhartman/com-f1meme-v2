@@ -24,155 +24,155 @@ import "@solana/wallet-adapter-react-ui/styles.css"
 
 
 
-const idl_object = JSON.parse(JSON.stringify(idl))
+// const idl_object = JSON.parse(JSON.stringify(idl))
 export default function Home() {
   const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(true)
-  const { publicKey } = useWallet()
-  const wallet = useAnchorWallet()
-  const { connection } = useConnection()
+  // const { publicKey } = useWallet()
+  // const wallet = useAnchorWallet()
+  // const { connection } = useConnection()
   
 
-  const getProvider = () => {
-    if (!wallet) {
-      // setMessageWithType("Wallet not connected.", "error")
-      return null
-    }
-    const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions())
-    setProvider(provider)
-    return provider
-  }
+  // const getProvider = () => {
+  //   if (!wallet) {
+  //     // setMessageWithType("Wallet not connected.", "error")
+  //     return null
+  //   }
+  //   const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions())
+  //   setProvider(provider)
+  //   return provider
+  // }
 
   // Get program instance
-  const getProgram = () => {
-    if (!publicKey) return null
-    const provider = getProvider()
-    return provider ? new Program<F1boxbox>(idl_object, provider) : null
-  }
+  // const getProgram = () => {
+  //   if (!publicKey) return null
+  //   const provider = getProvider()
+  //   return provider ? new Program<F1boxbox>(idl_object, provider) : null
+  // }
 
   // Sync membership level to Airtable when user visits homepage
-  useEffect(() => {
-    const syncMembershipLevel = async () => {
-      if (!publicKey) return
+  // useEffect(() => {
+  //   const syncMembershipLevel = async () => {
+  //     if (!publicKey) return
       
-      try {
-        const program = getProgram()
-        if (!program) return
+  //     try {
+  //       const program = getProgram()
+  //       if (!program) return
 
-        // Add a small delay to ensure blockchain data is loaded
-        await new Promise(resolve => setTimeout(resolve, 1000))
+  //       // Add a small delay to ensure blockchain data is loaded
+  //       await new Promise(resolve => setTimeout(resolve, 1000))
 
-        // Get user's membership account
-        const [membershipAccountPda] = await PublicKey.findProgramAddress(
-          [Buffer.from("membership_account"), publicKey.toBuffer()],
-          program.programId,
-        )
+  //       // Get user's membership account
+  //       const [membershipAccountPda] = await PublicKey.findProgramAddress(
+  //         [Buffer.from("membership_account"), publicKey.toBuffer()],
+  //         program.programId,
+  //       )
 
-        // Check if membership account exists first
-        const membershipAccountInfo = await connection.getAccountInfo(membershipAccountPda)
-        if (!membershipAccountInfo) {
-          // console.log('Membership account does not exist, setting level to 0')
-          // Only set to 0 if account truly doesn't exist
-          try {
-            const existingProfile = await airtableService.getProfile(publicKey.toBase58())
-            await airtableService.upsertProfile({ 
-              walletAddress: publicKey.toBase58(), 
-              membershipLevel: 0,
-              name: existingProfile?.name || "",
-              email: existingProfile?.email || "",
-              instagramUrl: existingProfile?.instagramUrl || "",
-              tiktokUrl: existingProfile?.tiktokUrl || "",
-              tgUrl: existingProfile?.tgUrl || "",
-              profilePictureUrl: existingProfile?.profilePictureUrl || "",
-              coverPictureUrl: existingProfile?.coverPictureUrl || "",
-            })
-            console.info('Membership account not found, set level to 0 in Airtable')
-          } catch (profileError) {
-            console.error('Failed to get existing profile:', profileError)
-            // If we can't get the profile, just update the level without other fields
-            await airtableService.upsertProfile({ 
-              walletAddress: publicKey.toBase58(), 
-              membershipLevel: 0,
-              name: "",
-              email: "",
-              instagramUrl: "",
-              tiktokUrl: "",
-              tgUrl: "",
-            })
-          }
-          return
-        }
+  //       // Check if membership account exists first
+  //       const membershipAccountInfo = await connection.getAccountInfo(membershipAccountPda)
+  //       if (!membershipAccountInfo) {
+  //         // console.log('Membership account does not exist, setting level to 0')
+  //         // Only set to 0 if account truly doesn't exist
+  //         try {
+  //           const existingProfile = await airtableService.getProfile(publicKey.toBase58())
+  //           await airtableService.upsertProfile({ 
+  //             walletAddress: publicKey.toBase58(), 
+  //             membershipLevel: 0,
+  //             name: existingProfile?.name || "",
+  //             email: existingProfile?.email || "",
+  //             instagramUrl: existingProfile?.instagramUrl || "",
+  //             tiktokUrl: existingProfile?.tiktokUrl || "",
+  //             tgUrl: existingProfile?.tgUrl || "",
+  //             profilePictureUrl: existingProfile?.profilePictureUrl || "",
+  //             coverPictureUrl: existingProfile?.coverPictureUrl || "",
+  //           })
+  //           console.info('Membership account not found, set level to 0 in Airtable')
+  //         } catch (profileError) {
+  //           console.error('Failed to get existing profile:', profileError)
+  //           // If we can't get the profile, just update the level without other fields
+  //           await airtableService.upsertProfile({ 
+  //             walletAddress: publicKey.toBase58(), 
+  //             membershipLevel: 0,
+  //             name: "",
+  //             email: "",
+  //             instagramUrl: "",
+  //             tiktokUrl: "",
+  //             tgUrl: "",
+  //           })
+  //         }
+  //         return
+  //       }
 
-        // Fetch account info to get current level
-        const accountInfo = await program.account.membershipAccount.fetch(membershipAccountPda)
-        const currentLevel = accountInfo.level
+  //       // Fetch account info to get current level
+  //       const accountInfo = await program.account.membershipAccount.fetch(membershipAccountPda)
+  //       const currentLevel = accountInfo.level
 
-        // console.log('Current blockchain level:', currentLevel)
+  //       // console.log('Current blockchain level:', currentLevel)
 
-        // Get existing profile data from Airtable
-        const existingProfile = await airtableService.getProfile(publicKey.toBase58())
+  //       // Get existing profile data from Airtable
+  //       const existingProfile = await airtableService.getProfile(publicKey.toBase58())
         
-        // Update Airtable with current level and existing profile data
-        await airtableService.upsertProfile({ 
-          walletAddress: publicKey.toBase58(), 
-          membershipLevel: currentLevel,
-          name: existingProfile?.name || "",
-          email: existingProfile?.email || "",
-          instagramUrl: existingProfile?.instagramUrl || "",
-          tiktokUrl: existingProfile?.tiktokUrl || "",
-          tgUrl: existingProfile?.tgUrl || "",
-          profilePictureUrl: existingProfile?.profilePictureUrl || "",
-          coverPictureUrl: existingProfile?.coverPictureUrl || "",
-        })
+  //       // Update Airtable with current level and existing profile data
+  //       await airtableService.upsertProfile({ 
+  //         walletAddress: publicKey.toBase58(), 
+  //         membershipLevel: currentLevel,
+  //         name: existingProfile?.name || "",
+  //         email: existingProfile?.email || "",
+  //         instagramUrl: existingProfile?.instagramUrl || "",
+  //         tiktokUrl: existingProfile?.tiktokUrl || "",
+  //         tgUrl: existingProfile?.tgUrl || "",
+  //         profilePictureUrl: existingProfile?.profilePictureUrl || "",
+  //         coverPictureUrl: existingProfile?.coverPictureUrl || "",
+  //       })
         
-        // console.log('Membership level synced to Airtable:', currentLevel)
-      } catch (error: any) {
-        const errorMsg = String(error)
-        if (errorMsg.includes('Account does not exist') || errorMsg.includes('has no data')) {
-          // Handle gracefully: set level to 0
-          try {
-            const existingProfile = await airtableService.getProfile(publicKey.toBase58())
-            await airtableService.upsertProfile({ 
-              walletAddress: publicKey.toBase58(), 
-              membershipLevel: 0,
-              name: existingProfile?.name || "",
-              email: existingProfile?.email || "",
-              instagramUrl: existingProfile?.instagramUrl || "",
-              tiktokUrl: existingProfile?.tiktokUrl || "",
-              tgUrl: existingProfile?.tgUrl || "",
-              profilePictureUrl: existingProfile?.profilePictureUrl || "",
-              coverPictureUrl: existingProfile?.coverPictureUrl || "",
-            })
-            console.info('Membership account not found, set level to 0 in Airtable')
-          } catch (profileError) {
-            console.error('Failed to get existing profile:', profileError)
-            // If we can't get the profile, just update the level without other fields
-            await airtableService.upsertProfile({ 
-              walletAddress: publicKey.toBase58(), 
-              membershipLevel: 0,
-              name: "",
-              email: "",
-              instagramUrl: "",
-              tiktokUrl: "",
-              tgUrl: "",
-            })
-          }
-        } else {
-          console.error('Failed to sync membership level:', error)
-          // Don't set to 0 for other errors - just log them
-        }
-      }
-    }
+  //       // console.log('Membership level synced to Airtable:', currentLevel)
+  //     } catch (error: any) {
+  //       const errorMsg = String(error)
+  //       if (errorMsg.includes('Account does not exist') || errorMsg.includes('has no data')) {
+  //         // Handle gracefully: set level to 0
+  //         try {
+  //           const existingProfile = await airtableService.getProfile(publicKey.toBase58())
+  //           await airtableService.upsertProfile({ 
+  //             walletAddress: publicKey.toBase58(), 
+  //             membershipLevel: 0,
+  //             name: existingProfile?.name || "",
+  //             email: existingProfile?.email || "",
+  //             instagramUrl: existingProfile?.instagramUrl || "",
+  //             tiktokUrl: existingProfile?.tiktokUrl || "",
+  //             tgUrl: existingProfile?.tgUrl || "",
+  //             profilePictureUrl: existingProfile?.profilePictureUrl || "",
+  //             coverPictureUrl: existingProfile?.coverPictureUrl || "",
+  //           })
+  //           console.info('Membership account not found, set level to 0 in Airtable')
+  //         } catch (profileError) {
+  //           console.error('Failed to get existing profile:', profileError)
+  //           // If we can't get the profile, just update the level without other fields
+  //           await airtableService.upsertProfile({ 
+  //             walletAddress: publicKey.toBase58(), 
+  //             membershipLevel: 0,
+  //             name: "",
+  //             email: "",
+  //             instagramUrl: "",
+  //             tiktokUrl: "",
+  //             tgUrl: "",
+  //           })
+  //         }
+  //       } else {
+  //         console.error('Failed to sync membership level:', error)
+  //         // Don't set to 0 for other errors - just log them
+  //       }
+  //     }
+  //   }
 
-    if (publicKey) {
-      // Add a delay to ensure wallet is fully connected
-      const timer = setTimeout(() => {
-        syncMembershipLevel()
-      }, 2000) // Wait 2 seconds for wallet to fully connect
+  //   if (publicKey) {
+  //     // Add a delay to ensure wallet is fully connected
+  //     const timer = setTimeout(() => {
+  //       syncMembershipLevel()
+  //     }, 2000) // Wait 2 seconds for wallet to fully connect
 
-      return () => clearTimeout(timer)
-    }
-  }, [publicKey, connection])
+  //     return () => clearTimeout(timer)
+  //   }
+  // }, [publicKey, connection])
 
   useEffect(() => {
     const timer = setTimeout(() => {
