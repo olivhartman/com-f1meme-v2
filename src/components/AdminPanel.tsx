@@ -139,7 +139,8 @@ export const AdminPanel: React.FC = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  if (!isAdmin) {
+  // Only show access denied if wallet loading is complete and user is not admin
+  if (!walletLoading && !isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <Card className="bg-slate-900/80 border-red-500/20 max-w-md w-full mx-4">
