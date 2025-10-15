@@ -11,6 +11,7 @@ import { TranslationProvider } from './i18n/TranslationContext';
 import Community from './pages/community'
 import SchedulePage from './pages/schedule'
 import Gallery from './pages/gallery'
+import { AdminPanel } from './components/AdminPanel'
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             <Route path="/community" element={<Community />} />
             <Route path="/schedule" element={<SchedulePage />} />
             <Route path="/gallery" element={<Gallery />} />
+            <Route path="/admin" element={<AdminPanel />} />
           </Routes>
         </Router>
       </WalletContextWrapper>

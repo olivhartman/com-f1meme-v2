@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, User, Users, Calendar, Image } from "lucide-react"
+import { Menu, X, User, Users, Calendar, Image, Shield } from "lucide-react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { Link } from "react-router-dom"
 import { useTranslation } from "../i18n/TranslationContext"
@@ -16,6 +16,10 @@ export default function Navigation({}: NavigationProps) {
   const wallet = useWallet()
   const { publicKey } = wallet
   const { t } = useTranslation()
+  
+  // Check if current user is admin
+  const ADMIN_WALLET_ADDRESS = "G14s2hZVZQqcUfLYSEdTThNqgZCi4pqM2P2RmRiu2ddz";
+  const isAdmin = publicKey?.toBase58() === ADMIN_WALLET_ADDRESS;
 
   // Debug logging
   useEffect(() => {
@@ -106,6 +110,15 @@ export default function Navigation({}: NavigationProps) {
               >
                 <Image className="h-6 w-6 text-[#272AE9]" strokeWidth={2} />
               </Link>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="flex items-center justify-center w-11 h-11 rounded-lg bg-red-500 border-2 border-red-500 shadow-lg hover:bg-red-600 hover:border-red-600 transition-all font-bold text-white text-base focus:outline-none focus:ring-2 focus:ring-red-500"
+                  title="Admin Panel"
+                >
+                  <Shield className="h-6 w-6 text-white" strokeWidth={2} />
+                </Link>
+              )}
               <Link
                 to={publicKey ? "/profile" : "#"}
                 onClick={e => {
@@ -182,6 +195,16 @@ export default function Navigation({}: NavigationProps) {
                 {t.nav.gallery}
                 </h5>
               </Link>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 text-xl font-medium py-4 border-b border-gray-800 text-red-400"
+                >
+                  <Shield className="w-5 h-5" />
+                  <h5>Admin Panel</h5>
+                </Link>
+              )}
 
                 <Link
                 to={publicKey ? "/profile" : "#"}

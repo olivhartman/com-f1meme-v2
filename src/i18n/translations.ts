@@ -116,6 +116,33 @@ export interface Translations {
     social: string;
     copyright: string;
   };
+  
+  // Admin Panel
+  admin: {
+    title: string;
+    subtitle: string;
+    accessDenied: string;
+    noPermission: string;
+    goBack: string;
+    loadingUsers: string;
+    error: string;
+    retry: string;
+    totalUsers: string;
+    premiumMembers: string;
+    filteredResults: string;
+    searchPlaceholder: string;
+    premiumOnly: string;
+    exportCSV: string;
+    walletAddress: string;
+    name: string;
+    email: string;
+    socialLinks: string;
+    membership: string;
+    created: string;
+    noUsersFound: string;
+    noSocialLinks: string;
+    level: string;
+  };
 }
 
 export const translations: Record<string, Translations> = {
@@ -220,6 +247,31 @@ export const translations: Record<string, Translations> = {
       social: "Social",
       copyright: "© 2024 F1Meme. All rights reserved.",
     },
+    admin: {
+      title: "Admin Panel",
+      subtitle: "Manage and monitor F1Meme community members",
+      accessDenied: "Access Denied",
+      noPermission: "You don't have permission to access the admin panel. Admin privileges required.",
+      goBack: "Go Back",
+      loadingUsers: "Loading user data...",
+      error: "Error",
+      retry: "Retry",
+      totalUsers: "Total Users",
+      premiumMembers: "Premium Members",
+      filteredResults: "Filtered Results",
+      searchPlaceholder: "Search users by name, email, wallet, or social...",
+      premiumOnly: "Premium Members Only",
+      exportCSV: "Export CSV",
+      walletAddress: "Wallet Address",
+      name: "Name",
+      email: "Email",
+      socialLinks: "Social Links",
+      membership: "Membership",
+      created: "Created",
+      noUsersFound: "No users found matching your criteria",
+      noSocialLinks: "No social links",
+      level: "Level",
+    },
   },
   zh: {
     nav: {
@@ -321,6 +373,31 @@ export const translations: Record<string, Translations> = {
       links: "链接",
       social: "社交",
       copyright: "© 2024 F1Meme。保留所有权利。",
+    },
+    admin: {
+      title: "管理面板",
+      subtitle: "管理和监控F1Meme社区成员",
+      accessDenied: "访问被拒绝",
+      noPermission: "您没有权限访问管理面板。需要管理员权限。",
+      goBack: "返回",
+      loadingUsers: "加载用户数据...",
+      error: "错误",
+      retry: "重试",
+      totalUsers: "总用户数",
+      premiumMembers: "高级会员",
+      filteredResults: "筛选结果",
+      searchPlaceholder: "按姓名、邮箱、钱包或社交账号搜索用户...",
+      premiumOnly: "仅高级会员",
+      exportCSV: "导出CSV",
+      walletAddress: "钱包地址",
+      name: "姓名",
+      email: "邮箱",
+      socialLinks: "社交链接",
+      membership: "会员等级",
+      created: "创建时间",
+      noUsersFound: "未找到符合条件的用户",
+      noSocialLinks: "无社交链接",
+      level: "等级",
     },
   },
 };
