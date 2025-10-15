@@ -572,7 +572,7 @@ const ProfilePage: React.FC = () => {
               <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between mb-8 gap-2 sm:gap-3">
                 <h2 className="text-2xl font-bold text-slate-100">{t.additional.galleryUpload}</h2>
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
-                  Gallery Access
+                  {t.additional.galleryAccess}
                 </span>
               </div>
 
@@ -628,12 +628,12 @@ const ProfilePage: React.FC = () => {
                 {/* Caption Field */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200">
-                    Caption (Optional)
+                    {t.additional.captionOptional}
                   </label>
                   <textarea
                     value={galleryCaption}
                     onChange={(e) => setGalleryCaption(e.target.value)}
-                    placeholder="Add a caption for your photo..."
+                    placeholder={t.additional.addCaptionPlaceholder}
                     className={`w-full px-4 py-3 border-2 border-[#232c43] focus:border-yellow-500 focus:ring-yellow-200 rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm resize-none ${
                       profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? 'opacity-60 pointer-events-none' : ''
                     }`}
@@ -657,7 +657,7 @@ const ProfilePage: React.FC = () => {
                     ) : (
                       <>
                         <Upload className="h-5 w-5" />
-                        <span>Upload to Gallery</span>
+                        <span>{t.additional.uploadToGallery}</span>
                       </>
                     )}
                   </button>
@@ -668,7 +668,7 @@ const ProfilePage: React.FC = () => {
                   <div className="mt-4 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-center">
                     <div className="flex items-center justify-center gap-2">
                       <AlertCircle className="h-4 w-4" />
-                      <span className="font-medium">Upgrade to Level 55+ to upload photos to the gallery!</span>
+                      <span className="font-medium">{t.additional.upgradeToLevel55}</span>
                     </div>
                   </div>
                 )}

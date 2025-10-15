@@ -278,11 +278,32 @@ export interface Translations {
     // FAQs
     faq: string;
     faqDesc: string;
+    faq1Question: string;
+    faq1Answer: string;
+    faq2Question: string;
+    faq2Answer: string;
+    faq3Question: string;
+    faq3Answer: string;
+    faq4Question: string;
+    faq4Answer: string;
+    faq5Question: string;
+    faq5Answer: string;
     stillHaveQuestions: string;
     joinCommunity: string;
     twitter: string;
     telegram: string;
     youtube: string;
+      // News items for marquee
+      news1: string;
+      news2: string;
+      news3: string;
+      news4: string;
+      // Profile page additional texts
+      galleryAccess: string;
+      captionOptional: string;
+      addCaptionPlaceholder: string;
+      uploadToGallery: string;
+      upgradeToLevel55: string;
     // Footer
     poweredBy: string;
     allRightsReserved: string;
@@ -549,11 +570,32 @@ export const translations: Record<string, Translations> = {
       // FAQs
       faq: "FAQ",
       faqDesc: "Frequently Asked Questions",
+      faq1Question: "What is a Solana Token Program?",
+      faq1Answer: "A Solana Token Program is a smart contract that manages the creation and behavior of tokens on the Solana blockchain. It handles essential functions such as minting new tokens, burning existing ones, and facilitating transfers between accounts. This program ensures the integrity and functionality of tokens within the Solana ecosystem.",
+      faq2Question: "What is a Membership Account?",
+      faq2Answer: "A Membership Account is a specialized account within our ecosystem that tracks your participation and privileges. It stores information about your activity, token holdings, and access levels. This account may grant you special benefits, voting rights, or access to exclusive features based on your level of engagement and token ownership.",
+      faq3Question: "What is a Vault?",
+      faq3Answer: "A Vault is a secure smart contract designed to hold and manage tokens or other digital assets. Vaults serve various purposes, such as facilitating staking mechanisms, providing liquidity to decentralized exchanges, or managing treasury funds. They often incorporate advanced security measures to protect the assets they hold.",
+      faq4Question: "How are tokens locked and unlocked?",
+      faq4Answer: "Token locking and unlocking are controlled by smart contract mechanisms. These processes can be used for various purposes, such as implementing vesting schedules for team tokens, enforcing staking periods, or managing liquidity. The smart contract defines conditions that must be met before tokens can be transferred or accessed, ensuring adherence to predefined rules.",
+      faq5Question: "What are the levels?",
+      faq5Answer: "Levels in our ecosystem range from 0 to 99, where 0 is the lowest and 99 is the highest. To advance to the next level, a user must lock 10 million tokens. Users at at least level 55 have the opportunity to add pictures to the F1meme gallery section. Upgrading levels provides access to additional benefits and features, with higher levels unlocking more exclusive perks and opportunities.",
       stillHaveQuestions: "Still have questions?",
       joinCommunity: "Join our community channels to get more information and stay updated on the latest developments.",
       twitter: "Twitter",
       telegram: "Telegram",
       youtube: "Youtube",
+      // News items for marquee
+      news1: "Yuki Tsunoda Racing in Red Bull in front Japanese Crowd 🏎️",
+      news2: "Maclaren Big Lead in both Championship, is it a bad sign?🔥",
+      news3: "Kimi winning his first Grand Prix soon 🔧",
+      news4: "Over 220,000 attendance in Chinese Grand Prix 🏁",
+      // Profile page additional texts
+      galleryAccess: "Gallery Access",
+      captionOptional: "Caption (Optional)",
+      addCaptionPlaceholder: "Add a caption for your photo...",
+      uploadToGallery: "Upload to Gallery",
+      upgradeToLevel55: "Upgrade to Level 55+ to upload photos to the gallery!",
       // Footer
       poweredBy: "Powered by",
       allRightsReserved: "All rights reserved",
@@ -818,11 +860,32 @@ export const translations: Record<string, Translations> = {
       // FAQs
       faq: "常见问题",
       faqDesc: "常见问题解答",
+      faq1Question: "什么是Solana代币程序？",
+      faq1Answer: "Solana代币程序是一个智能合约，用于管理Solana区块链上代币的创建和行为。它处理基本功能，如铸造新代币、销毁现有代币以及促进账户之间的转账。该程序确保Solana生态系统内代币的完整性和功能性。",
+      faq2Question: "什么是会员账户？",
+      faq2Answer: "会员账户是我们生态系统中的专用账户，用于跟踪您的参与和特权。它存储有关您的活动、代币持有量和访问级别的信息。根据您的参与度和代币所有权，该账户可能授予您特殊福利、投票权或独家功能访问权限。",
+      faq3Question: "什么是保险库？",
+      faq3Answer: "保险库是一个安全的智能合约，用于持有和管理代币或其他数字资产。保险库有多种用途，如促进质押机制、为去中心化交易所提供流动性或管理国库资金。它们通常采用先进的安全措施来保护所持有的资产。",
+      faq4Question: "代币如何锁定和解锁？",
+      faq4Answer: "代币锁定和解锁由智能合约机制控制。这些过程可用于各种目的，如实施团队代币的归属时间表、执行质押期限或管理流动性。智能合约定义在代币可以转移或访问之前必须满足的条件，确保遵守预定义的规则。",
+      faq5Question: "等级是什么？",
+      faq5Answer: "我们生态系统中的等级范围从0到99，其中0是最低等级，99是最高等级。要升级到下一等级，用户必须锁定1000万代币。等级至少55的用户有机会向F1meme画廊部分添加图片。升级等级可提供额外的福利和功能访问权限，更高的等级解锁更多独家特权和机会。",
       stillHaveQuestions: "还有问题吗？",
       joinCommunity: "加入我们的社区频道，获取更多信息并了解最新发展动态。",
       twitter: "推特",
       telegram: "电报",
       youtube: "YouTube",
+      // News items for marquee
+      news1: "角田裕毅在日本观众面前驾驶红牛赛车 🏎️",
+      news2: "迈凯伦在两个锦标赛中都大幅领先，这是坏兆头吗？🔥",
+      news3: "基米即将赢得他的第一个大奖赛 🔧",
+      news4: "中国大奖赛观众超过220,000人 🏁",
+      // Profile page additional texts
+      galleryAccess: "画廊访问",
+      captionOptional: "说明文字（可选）",
+      addCaptionPlaceholder: "为您的照片添加说明文字...",
+      uploadToGallery: "上传到画廊",
+      upgradeToLevel55: "升级到55级或以上才能上传照片到画廊！",
       // Footer
       poweredBy: "技术支持",
       allRightsReserved: "版权所有",

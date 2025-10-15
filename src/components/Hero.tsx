@@ -46,10 +46,10 @@ export default function Hero() {
     seconds: 0,
   })
   const [newsItems, setNewsItems] = useState<string[]>([
-    "Yuki Tsunoda Racing in Red Bull in front Japanese Crowd 🏎️",
-    "Maclaren Big Lead in both Championship, is it a bad sign?🔥",
-    "Kimi winning his first Grand Prix soon 🔧",
-    "Over 220,000 attendance in Chinese Grand Prix 🏁",
+    t.additional.news1,
+    t.additional.news2,
+    t.additional.news3,
+    t.additional.news4,
   ])
   const [nextRace, setNextRace] = useState<NextRaceInfo | null>(null)
   const [latestRace, setLatestRace] = useState<LatestRaceInfo>({})
@@ -247,6 +247,16 @@ export default function Hero() {
     const latestRaceInterval = setInterval(fetchLatestRace, 30000)
     return () => clearInterval(latestRaceInterval)
   }, []);
+
+  // Update news items when language changes
+  useEffect(() => {
+    setNewsItems([
+      t.additional.news1,
+      t.additional.news2,
+      t.additional.news3,
+      t.additional.news4,
+    ]);
+  }, [t]);
 
   useEffect(() => {
     const fetchNews = async () => {

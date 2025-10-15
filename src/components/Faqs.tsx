@@ -12,29 +12,24 @@ export default function Faqs() {
 
   const faqs = [
     {
-      question: "What is a Solana Token Program?",
-      answer:
-        "A Solana Token Program is a smart contract that manages the creation and behavior of tokens on the Solana blockchain. It handles essential functions such as minting new tokens, burning existing ones, and facilitating transfers between accounts. This program ensures the integrity and functionality of tokens within the Solana ecosystem.",
+      question: t.additional.faq1Question,
+      answer: t.additional.faq1Answer,
     },
     {
-      question: "What is a Membership Account?",
-      answer:
-        "A Membership Account is a specialized account within our ecosystem that tracks your participation and privileges. It stores information about your activity, token holdings, and access levels. This account may grant you special benefits, voting rights, or access to exclusive features based on your level of engagement and token ownership.",
+      question: t.additional.faq2Question,
+      answer: t.additional.faq2Answer,
     },
     {
-      question: "What is a Vault?",
-      answer:
-        "A Vault is a secure smart contract designed to hold and manage tokens or other digital assets. Vaults serve various purposes, such as facilitating staking mechanisms, providing liquidity to decentralized exchanges, or managing treasury funds. They often incorporate advanced security measures to protect the assets they hold.",
+      question: t.additional.faq3Question,
+      answer: t.additional.faq3Answer,
     },
     {
-      question: "How are tokens locked and unlocked?",
-      answer:
-        "Token locking and unlocking are controlled by smart contract mechanisms. These processes can be used for various purposes, such as implementing vesting schedules for team tokens, enforcing staking periods, or managing liquidity. The smart contract defines conditions that must be met before tokens can be transferred or accessed, ensuring adherence to predefined rules.",
+      question: t.additional.faq4Question,
+      answer: t.additional.faq4Answer,
     },
     {
-      question: "What are the levels?",
-      answer:
-        "Levels in our ecosystem range from 0 to 99, where 0 is the lowest and 99 is the highest. To advance to the next level, a user must lock 10 million tokens. Users at at least level 55 have the opportunity to add pictures to the F1meme gallery section. Upgrading levels provides access to additional benefits and features, with higher levels unlocking more exclusive perks and opportunities.",
+      question: t.additional.faq5Question,
+      answer: t.additional.faq5Answer,
     },
   ]
 
