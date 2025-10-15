@@ -47,6 +47,7 @@ const SocialIcon = ({
 
 
 const MemberCard = ({ member }: { member: ProfileData }) => {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   const [showQR, setShowQR] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)

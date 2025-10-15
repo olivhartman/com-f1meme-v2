@@ -22,7 +22,6 @@ const AnimatedBackground = () => (
 )
 
 export const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
-  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const [showMobileOverlay, setShowMobileOverlay] = useState(false)
 

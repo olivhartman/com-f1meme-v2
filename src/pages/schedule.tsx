@@ -1,6 +1,5 @@
 "use client"
 
-import type React from "react"
 import { useEffect, useState } from "react"
 import { Calendar, MapPin, Flag, Clock, Zap, Trophy, Timer } from "lucide-react"
 import { Card, CardContent } from "../components/ui/card";
@@ -248,7 +247,7 @@ export default function Schedule() {
                     <div className="grid grid-cols-1 gap-2">
                       {sessionOrder.map((sessionKey) => {
                         const session = race[sessionKey as keyof Race] as Session | undefined
-                        const config = sessionConfig[sessionKey]
+                        const config = sessionConfig[sessionKey as keyof typeof sessionConfig]
 
                         if (!session) return null
 

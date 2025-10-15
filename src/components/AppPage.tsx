@@ -286,6 +286,7 @@ export default function Home() {
 }
 
 function MiniGallery() {
+  const { t } = useTranslation()
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
