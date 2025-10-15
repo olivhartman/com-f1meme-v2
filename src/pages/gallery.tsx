@@ -215,24 +215,29 @@ const Gallery: React.FC = () => {
         const allPhotos = await airtableService.getAllGalleryPhotos()
         console.log('Raw photos from API:', allPhotos)
         
-        // Filter out photos with invalid data
+        // Filter out photos with invalid data - be more lenient with uploadedAt
         const validPhotos = allPhotos.filter(photo => {
           const hasUrl = !!photo.url
           const hasUploadedBy = !!photo.uploadedBy
           const hasUploadedAt = !!photo.uploadedAt
-          const isValidDate = photo.uploadedAt && !isNaN(new Date(photo.uploadedAt).getTime())
+          
+          // If uploadedAt exists, check if it's valid, otherwise allow photos without it
+          const isValidDate = !photo.uploadedAt || !isNaN(new Date(photo.uploadedAt).getTime())
           
           console.log('Photo validation:', {
             id: photo.id,
+            url: photo.url,
+            uploadedBy: photo.uploadedBy,
+            uploadedAt: photo.uploadedAt,
             hasUrl,
             hasUploadedBy,
             hasUploadedAt,
-            uploadedAt: photo.uploadedAt,
             isValidDate,
-            valid: hasUrl && hasUploadedBy && hasUploadedAt && isValidDate
+            valid: hasUrl && hasUploadedBy && isValidDate
           })
           
-          return hasUrl && hasUploadedBy && hasUploadedAt && isValidDate
+          // Only require URL and uploadedBy, uploadedAt is optional
+          return hasUrl && hasUploadedBy && isValidDate
         })
         
         console.log('Valid photos after filtering:', validPhotos)
@@ -292,10 +297,10 @@ const Gallery: React.FC = () => {
         <div className="relative px-4 py-26 text-center flex flex-col items-center justify-center">
           <div className="w-full max-w-3xl">
             <div className="mb-4 mt-4">
-              <h1 className="text-4xl md:text-6xl font-black text-[#FBEB04] tracking-tight">F1Meme Gallery</h1>
+                <h1 className="text-4xl md:text-6xl font-black text-[#FBEB04] tracking-tight">{t.additional.f1memeGallery}</h1>
             </div>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-              Community photos from our F1 enthusiasts
+              {t.additional.f1memeGalleryDesc}
             </p>
           </div>
         </div>
