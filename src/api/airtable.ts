@@ -121,7 +121,7 @@ export const airtableService = {
         try {
           const data = JSON.parse(responseText);
           console.log('Upsert response data:', JSON.stringify(data, null, 2));
-        } catch (parseError) {
+            } catch (parseError) {
           console.log('Upsert response is not JSON, treating as success');
         }
       }
