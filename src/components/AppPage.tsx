@@ -259,7 +259,7 @@ export default function Home() {
                     <a href="https://x.com/F1memeBoxbox" className="text-gray-400 hover:text-yellow-500 transition-colors">
                       <Twitter size={20} />
                     </a>
-                    <a href="https://t.me/+jnS50P8w0WY1ZTcx" className="text-gray-400 hover:text-yellow-500 transition-colors">
+                    <a href="https://t.me/+jnS50P8w0WY1ZTcx" className="text-blue-400 hover:text-yellow-500 transition-colors">
                       <Send size={20} />
                     </a>
                     <a href="https://solscan.io/token/A5D4sQ3gWgM7QHFRyo3ZavKa9jMjkfHSNR6rX5TNJB8y" className="text-gray-400 hover:text-yellow-500 transition-colors">
