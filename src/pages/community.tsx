@@ -318,8 +318,10 @@ const Community: React.FC = () => {
     fetchMembers()
   }, [])
 
-  // Pagination logic
-  const filteredMembers = members.filter(m => m.membershipLevel && m.membershipLevel >= 1 && m.membershipLevel <= 99)
+  // Pagination logic - sort by highest level first
+  const filteredMembers = members
+    .filter(m => m.membershipLevel && m.membershipLevel >= 1 && m.membershipLevel <= 99)
+    .sort((a, b) => (b.membershipLevel || 0) - (a.membershipLevel || 0)) // Sort by highest level first
   const totalPages = Math.ceil(filteredMembers.length / perPage)
   const pagedMembers = filteredMembers.slice((page - 1) * perPage, page * perPage)
 
