@@ -122,7 +122,7 @@ export default function Faqs() {
                 <span>{t.additional.twitter}</span>
               </a>
               <a
-                href="#"
+                href="https://t.me/+jnS50P8w0WY1ZTcx"
                 className="px-6 py-3 bg-black/40 hover:bg-black/60 text-white rounded-full transition-colors duration-300 flex items-center gap-2"
               >
                 <span>{t.additional.telegram}</span>
