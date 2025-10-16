@@ -587,7 +587,7 @@ export default function Hero() {
                   </div>
                   
                   <div className="relative space-y-2 flex flex-col justify-center items-center h-full">
-                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white text-center">Get Started with Phantom</h3>
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white text-center">{t.additional.getStartedWithPhantom}</h3>
                   </div>
                   
                   <div className="relative flex flex-col sm:flex-row gap-3 sm:gap-4">
