@@ -62,6 +62,17 @@ const TransactionLink = ({ signature }: { signature: string }) => (
 
 const QUICKNODE_WS_URL = 'wss://winter-silent-lake.solana-mainnet.quiknode.pro/3e452fad7a2a3061d83b097d144b06b2e5230b2f/';
 
+// Phantom provider detection
+const getPhantomProvider = () => {
+  if ('phantom' in window) {
+    const provider = (window as any).phantom?.solana;
+    if (provider?.isPhantom) {
+      return provider;
+    }
+  }
+  return null;
+};
+
 const BoxBoxInterface: React.FC = () => {
   const { t } = useTranslation()
   const { connection } = useConnection()
@@ -397,7 +408,15 @@ useEffect(() => {
           })
           .transaction()
 
-        await sendTransaction(tx, connection)
+        // Use Phantom's signAndSendTransaction method
+        const phantomProvider = getPhantomProvider();
+        if (phantomProvider) {
+          const { signature } = await phantomProvider.signAndSendTransaction(tx);
+          await connection.getSignatureStatus(signature);
+        } else {
+          // Fallback to wallet adapter
+          await sendTransaction(tx, connection);
+        }
 
         // setMessageWithType(<>Membership account has been set up.</>, "success"), transactionSignature
         setMembershipAccount(membershipAccountPda)
