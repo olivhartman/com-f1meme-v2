@@ -123,7 +123,7 @@ export const AdminPanel: React.FC = () => {
       'Name',
       'Email',
       'Instagram URL',
-      'TikTok URL',
+      'X (formerly Twitter) URL',
       'Telegram URL',
       'Membership Level',
       'Created At',
@@ -366,7 +366,7 @@ export const AdminPanel: React.FC = () => {
                             {user.tiktokUrl && (
                               <a href={user.tiktokUrl} target="_blank" rel="noopener noreferrer" 
                                  className="text-pink-400 hover:text-pink-300 text-sm">
-                                TikTok
+                                X (formerly Twitter)
                               </a>
                             )}
                             {user.tgUrl && (

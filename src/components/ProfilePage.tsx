@@ -147,7 +147,7 @@ const ProfilePage: React.FC = () => {
         try {
           const url = new URL(value)
           if (field === "instagramUrl" && !url.hostname.includes("instagram.com")) return t.additional.validInstagramUrl
-          if (field === "tiktokUrl" && !url.hostname.includes("tiktok.com")) return t.additional.validTiktokUrl
+          if (field === "tiktokUrl" && !url.hostname.includes("tiktok.com") && !url.hostname.includes("x.com")) return t.additional.validTiktokUrl
           if (field === "tgUrl" && !url.hostname.includes("t.me")) return t.additional.validTelegramUrl
         } catch {
           return t.additional.validUrl
@@ -511,7 +511,7 @@ const ProfilePage: React.FC = () => {
                   )}
               </div>
 
-              {/* TikTok Field */}
+              {/* X (formerly Twitter) Field */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200 flex items-center gap-2">
                     <Music className="h-4 w-4 text-slate-100" />

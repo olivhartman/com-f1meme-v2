@@ -187,7 +187,7 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
               url={member.tiktokUrl}
               icon={<Music className="w-4 h-4" />}
               hoverColor="hover:text-white hover:bg-slate-700/50"
-              platform="TikTok"
+              platform="X (formerly Twitter)"
             />
           )}
           {member.tgUrl && (
