@@ -1,7 +1,7 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { airtableService, type ProfileData } from "../api/airtable"
-import { Instagram, Music, Globe, Flag, Users, Sparkles, Copy, QrCode as QrCodeIcon, AlertCircle } from "lucide-react"
+import { Instagram, X, Send, Flag, Users, Sparkles, Copy, QrCode as QrCodeIcon, AlertCircle } from "lucide-react"
 import { Card, CardContent } from "../components/ui/card"
 // import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
@@ -185,7 +185,7 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
           {member.tiktokUrl && (
             <SocialIcon
               url={member.tiktokUrl}
-              icon={<Music className="w-4 h-4" />}
+              icon={<X className="w-4 h-4" />}
               hoverColor="hover:text-white hover:bg-slate-700/50"
               platform="X (formerly Twitter)"
             />
@@ -193,7 +193,7 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
           {member.tgUrl && (
             <SocialIcon
               url={member.tgUrl}
-              icon={<Globe className="w-4 h-4" />}
+              icon={<Send className="w-4 h-4" />}
               hoverColor="hover:text-blue-400 hover:bg-blue-400/10"
               platform="Telegram"
             />

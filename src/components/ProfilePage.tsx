@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { User, Instagram, Music, Send, Upload, Save, Camera, Check, AlertCircle, X, Plus } from "lucide-react"
+import { User, Instagram, Send, Upload, Save, Camera, Check, AlertCircle, X, Plus } from "lucide-react"
 import { airtableService, type ProfileData as AirtableProfileData, type GalleryPhoto } from "../api/airtable"
 import Loader from "./Loader";
 import { useTranslation } from "../i18n/TranslationContext";
@@ -65,6 +65,48 @@ const ProfilePage: React.FC = () => {
     setProfileData((prev) => ({ ...prev, [field]: value }))
   }
 
+  // Convert username to full URL for backend
+  const convertUsernameToUrl = (username: string, platform: 'instagram' | 'tiktok' | 'telegram'): string => {
+    if (!username || username.trim() === '') return ''
+    
+    const cleanUsername = username.trim().replace(/^@/, '').replace(/^https?:\/\//, '').replace(/^www\./, '')
+    
+    switch (platform) {
+      case 'instagram':
+        return `https://instagram.com/${cleanUsername}`
+      case 'tiktok':
+        return `https://tiktok.com/@${cleanUsername}`
+      case 'telegram':
+        return `https://t.me/${cleanUsername}`
+      default:
+        return cleanUsername
+    }
+  }
+
+  // Extract username from URL for display
+  const extractUsernameFromUrl = (url: string, platform: 'instagram' | 'tiktok' | 'telegram'): string => {
+    if (!url || url.trim() === '') return ''
+    
+    try {
+      const urlObj = new URL(url)
+      const pathname = urlObj.pathname
+      
+      switch (platform) {
+        case 'instagram':
+          return pathname.replace('/', '')
+        case 'tiktok':
+          return pathname.replace('/@', '').replace('/', '')
+        case 'telegram':
+          return pathname.replace('/', '')
+        default:
+          return url
+      }
+    } catch {
+      // If it's not a valid URL, assume it's already a username
+      return url.replace(/^@/, '').replace(/^https?:\/\//, '').replace(/^www\./, '')
+    }
+  }
+
   const handleFileChange = (field: "profilePicture" | "coverPicture", file: File | null) => {
     setProfileData((prev) => ({ ...prev, [field]: file }))
   }
@@ -93,9 +135,9 @@ const ProfilePage: React.FC = () => {
             setProfileData({
               name: existingProfile.name,
               email: existingProfile.email || "",
-              instagramUrl: existingProfile.instagramUrl,
-              tiktokUrl: existingProfile.tiktokUrl,
-              tgUrl: existingProfile.tgUrl,
+              instagramUrl: extractUsernameFromUrl(existingProfile.instagramUrl || "", 'instagram'),
+              tiktokUrl: extractUsernameFromUrl(existingProfile.tiktokUrl || "", 'tiktok'),
+              tgUrl: extractUsernameFromUrl(existingProfile.tgUrl || "", 'telegram'),
               profilePicture: null,
               coverPicture: null,
               profilePictureUrl: existingProfile.profilePictureUrl,
@@ -144,13 +186,16 @@ const ProfilePage: React.FC = () => {
     }
     if (["instagramUrl", "tiktokUrl", "tgUrl"].includes(field)) {
       if (value && typeof value === "string" && value.trim() !== "") {
-        try {
-          const url = new URL(value)
-          if (field === "instagramUrl" && !url.hostname.includes("instagram.com")) return t.additional.validInstagramUrl
-          if (field === "tiktokUrl" && !url.hostname.includes("tiktok.com") && !url.hostname.includes("x.com")) return t.additional.validTiktokUrl
-          if (field === "tgUrl" && !url.hostname.includes("t.me")) return t.additional.validTelegramUrl
-        } catch {
-          return t.additional.validUrl
+        // For social media fields, we now accept just usernames
+        // Remove any leading @ or https:// if user enters them
+        const cleanValue = value.trim().replace(/^@/, '').replace(/^https?:\/\//, '').replace(/^www\./, '')
+        
+        // Basic validation for username format (alphanumeric, underscores, dots, hyphens)
+        const usernameRegex = /^[a-zA-Z0-9._-]+$/
+        if (!usernameRegex.test(cleanValue)) {
+          if (field === "instagramUrl") return t.additional.validInstagramUrl
+          if (field === "tiktokUrl") return t.additional.validTiktokUrl
+          if (field === "tgUrl") return t.additional.validTelegramUrl
         }
       }
     }
@@ -196,9 +241,9 @@ const ProfilePage: React.FC = () => {
       const airtableData: AirtableProfileData = {
         name: profileData.name,
         email: profileData.email,
-        instagramUrl: profileData.instagramUrl,
-        tiktokUrl: profileData.tiktokUrl,
-        tgUrl: profileData.tgUrl,
+        instagramUrl: convertUsernameToUrl(profileData.instagramUrl, 'instagram'),
+        tiktokUrl: convertUsernameToUrl(profileData.tiktokUrl, 'tiktok'),
+        tgUrl: convertUsernameToUrl(profileData.tgUrl, 'telegram'),
         profilePicture: profileData.profilePicture || undefined,
         coverPicture: profileData.coverPicture || undefined,
         walletAddress: publicKey.toBase58(),
@@ -388,7 +433,7 @@ const ProfilePage: React.FC = () => {
                     )}
                     {profileData.tiktokUrl && (
                       <div className="w-10 h-10 bg-gradient-to-br from-black to-[#232c43] rounded-full flex items-center justify-center">
-                        <Music className="h-5 w-5 text-slate-200" />
+                        <X className="h-5 w-5 text-slate-200" />
                       </div>
                     )}
                     {profileData.tgUrl && (
@@ -501,7 +546,7 @@ const ProfilePage: React.FC = () => {
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-pink-500 focus:ring-pink-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                  placeholder={t.additional.instagramUrl}
+                  placeholder="username"
                 />
                   {formErrors.instagramUrl && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
@@ -514,7 +559,7 @@ const ProfilePage: React.FC = () => {
               {/* X (formerly Twitter) Field */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-200 flex items-center gap-2">
-                    <Music className="h-4 w-4 text-slate-100" />
+                  <X className="h-4 w-4 text-pink-500" />
                     {t.additional.tiktokUrl}
                   </label>
                 <input
@@ -527,7 +572,7 @@ const ProfilePage: React.FC = () => {
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-yellow-500 focus:ring-yellow-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                  placeholder={t.additional.tiktokUrl}
+                  placeholder="username"
                 />
                   {formErrors.tiktokUrl && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
@@ -553,7 +598,7 @@ const ProfilePage: React.FC = () => {
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-[#232c43] focus:border-blue-500 focus:ring-blue-200"
                     } rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm`}
-                  placeholder={t.additional.telegramUrl}
+                  placeholder="username"
                 />
                   {formErrors.tgUrl && (
                     <div className="flex items-center gap-2 text-red-400 text-sm">
