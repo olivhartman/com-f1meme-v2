@@ -537,7 +537,7 @@ const ProfilePage: React.FC = () => {
                     {t.additional.instagramUrl}
                   </label>
                 <input
-                  type="url"
+                  type="text"
                   value={profileData.instagramUrl}
                   onChange={(e) => handleInputChange("instagramUrl", e.target.value)}
                   onBlur={() => handleBlur("instagramUrl")}
@@ -563,7 +563,7 @@ const ProfilePage: React.FC = () => {
                     {t.additional.tiktokUrl}
                   </label>
                 <input
-                  type="url"
+                  type="text"
                   value={profileData.tiktokUrl}
                   onChange={(e) => handleInputChange("tiktokUrl", e.target.value)}
                   onBlur={() => handleBlur("tiktokUrl")}
@@ -589,7 +589,7 @@ const ProfilePage: React.FC = () => {
                     {t.additional.telegramUrl}
                   </label>
                 <input
-                  type="url"
+                  type="text"
                   value={profileData.tgUrl}
                   onChange={(e) => handleInputChange("tgUrl", e.target.value)}
                   onBlur={() => handleBlur("tgUrl")}
