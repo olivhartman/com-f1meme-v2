@@ -77,6 +77,16 @@ const BoxBoxInterface: React.FC = () => {
   const [tokenBalance, setTokenBalance] = useState<number>(0)
   const [amountToLock, setAmountToLock] = useState<string>("")
   const [userLevel, setUserLevel] = useState<number>(0) // Add state for user level
+  
+  // Debug userLevel changes
+  useEffect(() => {
+    console.log('userLevel state changed to:', userLevel)
+  }, [userLevel])
+  
+  // Debug membershipAccount changes
+  useEffect(() => {
+    console.log('membershipAccount state changed to:', membershipAccount?.toBase58() || 'null')
+  }, [membershipAccount])
   const [isEscrowInitialized, setIsEscrowInitialized] = useState<boolean>(false) // Added escrow initialization state
   const [isMembershipInitialized, setIsMembershipInitialized] = useState<boolean>(false) // Added membership initialization state
   const [showTooltip, setShowTooltip] = useState(false);
@@ -317,6 +327,7 @@ useEffect(() => {
 
 useEffect(() => {
     if (publicKey) {
+      console.log('useEffect[publicKey]: Starting initialization for wallet:', publicKey.toBase58())
       checkMembershipAccount()
       initializeMembershipAccount()
       if (!isEscrowInitialized) {
@@ -324,6 +335,7 @@ useEffect(() => {
       }
       fetchTokenBalance()
       const fetchData = async () => {
+        console.log('useEffect[publicKey]: Running periodic fetchData')
         checkMembershipAccount()
         await fetchTokenBalance()
       }
@@ -338,14 +350,29 @@ useEffect(() => {
   checkMembershipAccount = async () => {
     const program = getProgram()
 
-    if (!program || !wallet?.publicKey) return
+    if (!program || !wallet?.publicKey) {
+      console.log('checkMembershipAccount: Missing program or wallet publicKey')
+      return
+    }
 
     try {
         ;[membershipAccountPda] = PublicKey.findProgramAddressSync(
           [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
           program.programId,
         )
-      // setMembershipAccount(membershipAccountPda)
+      console.log('checkMembershipAccount: Generated membershipAccountPda:', membershipAccountPda.toBase58())
+      
+      // Check if membership account exists
+      const membershipAccountInfo = await connection.getAccountInfo(membershipAccountPda)
+      console.log('checkMembershipAccount: Membership account exists:', !!membershipAccountInfo)
+      
+      if (membershipAccountInfo) {
+        console.log('checkMembershipAccount: Setting membership account')
+        setMembershipAccount(membershipAccountPda)
+      } else {
+        console.log('checkMembershipAccount: Membership account does not exist yet')
+        setMembershipAccount(null)
+      }
 
       escrowTokenAccountPda = await utils.token.associatedAddress({
         mint: tokenMint,
@@ -353,7 +380,7 @@ useEffect(() => {
       })
 
       const escrowAccountInfo = await connection.getAccountInfo(escrowTokenAccountPda)
-      // console.log('escrow 2: ', escrowTokenAccountPda);
+      console.log('checkMembershipAccount: Escrow account exists:', !!escrowAccountInfo)
       if (!escrowAccountInfo) {
         setIsEscrowInitialized(false)
       }
@@ -361,10 +388,9 @@ useEffect(() => {
         setIsEscrowInitialized(true)
       }
 
-
-
       updateAccountInfo()
     } catch (error) {
+      console.error('checkMembershipAccount: Error:', error)
       if (!error?.toString().includes("failed to get info about account")) {
         setMessageWithType(`Error checking membership account: ${error}`, "error")
       }
@@ -482,10 +508,20 @@ useEffect(() => {
 
   const updateAccountInfo = async () => {
     const program = getProgram()
-    if (!program || !membershipAccount) return
+    if (!program || !membershipAccount) {
+      console.log('updateAccountInfo: Missing program or membershipAccount', { 
+        hasProgram: !!program, 
+        hasMembershipAccount: !!membershipAccount,
+        membershipAccountAddress: membershipAccount?.toBase58()
+      })
+      return
+    }
 
     try {
+      console.log('updateAccountInfo: Fetching account info for:', membershipAccount.toBase58())
       const accountInfo = await program.account.membershipAccount.fetch(membershipAccount)
+      console.log('updateAccountInfo: Raw account info:', accountInfo)
+      console.log('updateAccountInfo: Account level:', accountInfo.level)
 
       const currentTime = new Date()
       setLocks(
@@ -497,9 +533,11 @@ useEffect(() => {
           canUnlock: lock.isLocked && currentTime >= new Date(lock.releaseDate.toNumber() * 1000),
         })),
       )
+      console.log('updateAccountInfo: Setting user level to:', accountInfo.level)
       setUserLevel(accountInfo.level) // Update user level
-    } catch {
-      // setMessageWithType(`Error fetching account info: ${error}`, "error")
+    } catch (error) {
+      console.error('updateAccountInfo: Error fetching account info:', error)
+      setMessageWithType(`Error fetching account info: ${error}`, "error")
     }
   }
 
@@ -758,12 +796,15 @@ useEffect(() => {
   }, []) // Removed unnecessary 'message' dependency
 
   //Dummy LevelDisplay Component
-  const LevelDisplay = ({ level }: { level: number }) => (
-    <div className="flex justify-center items-center mb-4 gap-4">
-      <span className="text-gray-400 font-bold">{t.additional.membershipLevel}</span>
-      <h6 className="text-xl font-semibold">{level}</h6>
-    </div>
-  )
+  const LevelDisplay = ({ level }: { level: number }) => {
+    console.log('LevelDisplay: Received level:', level, 'Type:', typeof level)
+    return (
+      <div className="flex justify-center items-center mb-4 gap-4">
+        <span className="text-gray-400 font-bold">{t.additional.membershipLevel}</span>
+        <h6 className="text-xl font-semibold">{level}</h6>
+      </div>
+    )
+  }
 
   // Add a new function to update total locked tokens
   const updateTotalLockedTokens = async () => {
