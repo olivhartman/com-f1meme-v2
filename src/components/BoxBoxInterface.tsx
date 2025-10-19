@@ -87,6 +87,11 @@ const BoxBoxInterface: React.FC = () => {
   useEffect(() => {
     console.log('membershipAccount state changed to:', membershipAccount?.toBase58() || 'null')
   }, [membershipAccount])
+  
+  // Debug isMembershipInitialized changes
+  useEffect(() => {
+    console.log('isMembershipInitialized state changed to:', isMembershipInitialized)
+  }, [isMembershipInitialized])
   const [isEscrowInitialized, setIsEscrowInitialized] = useState<boolean>(false) // Added escrow initialization state
   const [isMembershipInitialized, setIsMembershipInitialized] = useState<boolean>(false) // Added membership initialization state
   const [showTooltip, setShowTooltip] = useState(false);
@@ -369,9 +374,13 @@ useEffect(() => {
       if (membershipAccountInfo) {
         console.log('checkMembershipAccount: Setting membership account')
         setMembershipAccount(membershipAccountPda)
+        setIsMembershipInitialized(true)
+        console.log('checkMembershipAccount: Set isMembershipInitialized to true')
       } else {
         console.log('checkMembershipAccount: Membership account does not exist yet')
         setMembershipAccount(null)
+        setIsMembershipInitialized(false)
+        console.log('checkMembershipAccount: Set isMembershipInitialized to false')
       }
 
       escrowTokenAccountPda = await utils.token.associatedAddress({
