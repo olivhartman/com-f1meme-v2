@@ -383,7 +383,7 @@ useEffect(() => {
 
     try {
 
-        ;[membershipAccountPda] = await PublicKey.findProgramAddress(
+        ;[membershipAccountPda] = await PublicKey.findProgramAddressSync(
           [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
           program.programId,
         )
