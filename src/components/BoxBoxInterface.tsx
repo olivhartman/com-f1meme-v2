@@ -387,6 +387,7 @@ useEffect(() => {
           [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
           program.programId,
         )
+        console.log('membershipAccountPdaMembershipAccount: ', membershipAccountPda);
 
       const membershipAccountInfo = await connection.getAccountInfo(membershipAccountPda)
       if (!membershipAccountInfo) {
@@ -430,6 +431,7 @@ useEffect(() => {
           [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
           program.programId,
         )
+        console.log('membershipAccountPdaEscrowAccount: ', membershipAccountPda);
         setMembershipAccount(membershipAccountPda)
 
         escrowTokenAccountPda = await utils.token.associatedAddress({
