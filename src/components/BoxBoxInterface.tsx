@@ -341,10 +341,10 @@ useEffect(() => {
     if (!program || !wallet?.publicKey) return
 
     try {
-      ;[membershipAccountPda] = await PublicKey.findProgramAddress(
-        [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
-        program.programId,
-      )
+        ;[membershipAccountPda] = PublicKey.findProgramAddressSync(
+          [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
+          program.programId,
+        )
       // setMembershipAccount(membershipAccountPda)
 
       escrowTokenAccountPda = await utils.token.associatedAddress({
