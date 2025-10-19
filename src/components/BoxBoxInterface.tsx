@@ -383,10 +383,11 @@ useEffect(() => {
 
     try {
 
-        ;[membershipAccountPda] = PublicKey.findProgramAddressSync(
+        ;[membershipAccountPda] = await PublicKey.findProgramAddressSync(
           [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
           program.programId,
         )
+        console.log('membershipAccountPdaMembershipAccount: ', membershipAccountPda);
 
       const membershipAccountInfo = await connection.getAccountInfo(membershipAccountPda)
       if (!membershipAccountInfo) {
@@ -426,10 +427,11 @@ useEffect(() => {
     if (balance < 0.00016) return setMessageWithType("You need 0.00016 SOL to create a vault. If you've added the SOL, disconnect and reconnect your wallet to proceed.", "info")
 
     try {
-        ;[membershipAccountPda] = PublicKey.findProgramAddressSync(
+        ;[membershipAccountPda] = await PublicKey.findProgramAddressSync(
           [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
           program.programId,
         )
+        console.log('membershipAccountPdaEscrowAccount: ', membershipAccountPda);
         setMembershipAccount(membershipAccountPda)
 
         escrowTokenAccountPda = await utils.token.associatedAddress({
@@ -497,7 +499,7 @@ useEffect(() => {
       )
       setUserLevel(accountInfo.level) // Update user level
     } catch {
-      // setMessageWithType(`Error fetching account info: ${error}`, "error")
+      setMessageWithType(`Error fetching account info: ${error}`, "error")
     }
   }
 
