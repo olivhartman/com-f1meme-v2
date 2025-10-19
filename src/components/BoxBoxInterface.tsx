@@ -88,12 +88,13 @@ const BoxBoxInterface: React.FC = () => {
     console.log('membershipAccount state changed to:', membershipAccount?.toBase58() || 'null')
   }, [membershipAccount])
   
+  const [isEscrowInitialized, setIsEscrowInitialized] = useState<boolean>(false) // Added escrow initialization state
+  const [isMembershipInitialized, setIsMembershipInitialized] = useState<boolean>(false) // Added membership initialization state
+  
   // Debug isMembershipInitialized changes
   useEffect(() => {
     console.log('isMembershipInitialized state changed to:', isMembershipInitialized)
   }, [isMembershipInitialized])
-  const [isEscrowInitialized, setIsEscrowInitialized] = useState<boolean>(false) // Added escrow initialization state
-  const [isMembershipInitialized, setIsMembershipInitialized] = useState<boolean>(false) // Added membership initialization state
   const [showTooltip, setShowTooltip] = useState(false);
 
   const [messages, setMessages] = useState<Array<{ text: React.ReactNode; type: "success" | "error" | "info" }>>([])
