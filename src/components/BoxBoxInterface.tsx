@@ -499,7 +499,7 @@ useEffect(() => {
       )
       setUserLevel(accountInfo.level) // Update user level
     } catch {
-      setMessageWithType(`Error fetching account info: ${error}`, "error")
+      // setMessageWithType(`Error fetching account info: ${error}`, "error")
     }
   }
 
