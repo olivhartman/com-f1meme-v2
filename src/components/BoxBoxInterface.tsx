@@ -402,7 +402,7 @@ useEffect(() => {
     } catch (error) {
       console.error('checkMembershipAccount: Error:', error)
       if (!error?.toString().includes("failed to get info about account")) {
-        setMessageWithType(`Error checking membership account: ${error}`, "error")
+        setMessageWithType(`${t.messages.errorCheckingMembershipAccount} ${error}`, "error")
       }
     }
   }
@@ -415,7 +415,7 @@ useEffect(() => {
     balance = await connection.getBalance(wallet.publicKey)
       // console.log(`Balance: ${balance / LAMPORTS_PER_SOL} SOL`);
 
-    if (balance < 0.00016) return setMessageWithType("You need 0.00016 SOL to create an account. If you've added the SOL, disconnect and reconnect your wallet to proceed.", "info")
+    if (balance < 0.00016) return setMessageWithType(t.messages.needSolForAccount, "info")
 
     try {
 
@@ -436,7 +436,7 @@ useEffect(() => {
 
         await sendTransaction(tx, connection)
 
-        // setMessageWithType(<>Membership account has been set up.</>, "success"), transactionSignature
+        // setMessageWithType(t.messages.membershipAccountCreated, "success"), transactionSignature
         setMembershipAccount(membershipAccountPda)
         setIsMembershipInitialized(true)
       } else {
@@ -445,10 +445,10 @@ useEffect(() => {
       }
     } catch (error) {
       if (error?.toString().includes("User rejected the request")) {
-        setMessageWithType(`You rejected the request to create your membership account`, "error")
+        setMessageWithType(t.messages.rejectedCreateAccount, "error")
       }
       else if (!error?.toString().includes("failed to get info about account")) {
-        setMessageWithType(`Error creating account: ${error}`, "error")
+        setMessageWithType(`${t.messages.errorCreatingAccount} ${error}`, "error")
       }
     }
     // updateAccountInfo()
@@ -460,7 +460,7 @@ useEffect(() => {
     if (!program || !wallet?.publicKey) return
 
     balance = await connection.getBalance(wallet.publicKey)
-    if (balance < 0.00016) return setMessageWithType("You need 0.00016 SOL to create a vault. If you've added the SOL, disconnect and reconnect your wallet to proceed.", "info")
+    if (balance < 0.00016) return setMessageWithType(t.messages.needSolForVault, "info")
 
     try {
         ;[membershipAccountPda] = await PublicKey.findProgramAddressSync(
@@ -500,18 +500,18 @@ useEffect(() => {
 
             setEscrowAccount(escrowTokenAccountPda)
             setIsEscrowInitialized(true)
-            // setMessageWithType("Vault created successfully!", "success", signature)
+            // setMessageWithType(t.messages.vaultCreated, "success", signature)
         } else {
             setEscrowAccount(escrowTokenAccountPda)
             setIsEscrowInitialized(true)
         }
     } catch (error) {
         if (error?.toString().includes("User rejected the request")) {
-            setMessageWithType(`You rejected the request to create your vault`, "error")
+            setMessageWithType(t.messages.rejectedCreateVault, "error")
         } else if (error?.toString().includes("blockhash not found")) {
-            setMessageWithType(`Transaction expired. Please try again.`, "error")
+            setMessageWithType(t.messages.transactionExpired, "error")
         } else if (!error?.toString().includes("failed to get info about account")) {
-            setMessageWithType(`Error creating vault: ${error}`, "error")
+            setMessageWithType(`${t.messages.errorCreatingVault} ${error}`, "error")
         }
     }
   }
@@ -547,7 +547,7 @@ useEffect(() => {
       setUserLevel(accountInfo.level) // Update user level
     } catch (error) {
       console.error('updateAccountInfo: Error fetching account info:', error)
-      setMessageWithType(`Error fetching account info: ${error}`, "error")
+      setMessageWithType(`${t.messages.errorFetchingAccountInfo} ${error}`, "error")
     }
   }
 
@@ -575,24 +575,19 @@ useEffect(() => {
 
     if (!escrowAccount) return initializeEscrowAccount()
 
-    if (balance < 0.00016) return setMessageWithType("You need some SOL for to create an account, a vault and for transactions. If you've added the SOL, disconnect and reconnect your wallet to proceed.", "info")
+    if (balance < 0.00016) return setMessageWithType(t.messages.needSolForTransactions, "info")
 
 
     try {
       // Check if membership account and escrow account have been created
       if (!isMembershipInitialized) {
-        let errorMessage = "Before locking tokens, you need to:"
-        if (!isMembershipInitialized) errorMessage += " create a membership account"
-        if (!isMembershipInitialized && !isEscrowInitialized) errorMessage += " and"
-        if (!isEscrowInitialized) errorMessage += " create a vault"
-        errorMessage += "."
-        setMessageWithType(errorMessage, "error")
+        setMessageWithType(t.messages.needCreateAccountAndVault, "error")
         return
       }
 
       NUMBER_OF_TX = locks.length
       if (NUMBER_OF_TX == MAX_ACTIVE_VAULTS) {
-        setMessageWithType("You cannot have more than 99 transactions.", "error")
+        setMessageWithType(t.messages.cannotHaveMoreThan99Transactions, "error")
         return
       }
 
@@ -656,11 +651,11 @@ useEffect(() => {
       // })
 
       if (Number(amountToLock) > tokenBalance && tokenBalance !== 0) {
-        setMessageWithType("Insufficient Balance.", "error")
+        setMessageWithType(t.messages.insufficientBalance, "error")
         return
       }
       if (tokenBalance === 0) {
-        setMessageWithType("You don't have any BOXBOX tokens. Purchase some at boxbox.wtf", "info")
+        setMessageWithType(t.messages.noBoxboxTokens, "info")
         return
       }
 
@@ -683,7 +678,7 @@ useEffect(() => {
       // Wait for transaction confirmation
       await connection.confirmTransaction(transactionSignature)
       
-      setMessageWithType("", "success", transactionSignature)
+      setMessageWithType(t.messages.tokensLockedSuccessfully, "success", transactionSignature)
       
       // Update totals after successful lock
       await updateTotalLockedTokens()
@@ -694,10 +689,10 @@ useEffect(() => {
       
     } catch (error) {
       if (error?.toString().includes("User rejected the request")) {
-        setMessageWithType(`You rejected the request to lock tokens`, "error")
+        setMessageWithType(t.messages.rejectedLockTokens, "error")
       }
       else if (!error?.toString().includes("failed to get info about account")) {
-        setMessageWithType(`Error locking tokens: ${error}`, "error")
+        setMessageWithType(`${t.messages.errorLockingTokens} ${error}`, "error")
       }
     }
   }
@@ -710,16 +705,16 @@ useEffect(() => {
     // console.log('vault details: ', lock);
     
     if (!lock || !lock.isLocked) {
-      setMessageWithType("This lock is not active.", "error")
+      setMessageWithType(t.messages.lockNotActive, "error")
       return
     }
     if (!lock.isLocked) {
-      setMessageWithType("The tokens have already been unlocked.", "info")
+      setMessageWithType(t.messages.tokensAlreadyUnlocked, "info")
       return
     }
 
     if (!lock.canUnlock) {
-      setMessageWithType(`Tokens are still locked. Come back on/after ${lock.releaseDate.toLocaleString()}`, "info")
+      setMessageWithType(`${t.messages.tokensStillLocked} ${lock.releaseDate.toLocaleString()}`, "info")
       return
     }
 
@@ -744,7 +739,7 @@ useEffect(() => {
       // Wait for transaction confirmation
       await connection.confirmTransaction(transactionSignature)
       
-      setMessageWithType("", "success", transactionSignature)
+      setMessageWithType(t.messages.tokensUnlockedSuccessfully, "success", transactionSignature)
       
       // Update totals after successful unlock
       await updateTotalLockedTokens()
@@ -761,10 +756,10 @@ useEffect(() => {
       await fetchTokenBalance()
     } catch (error) {
       if (error?.toString().includes("User rejected the request.")) {
-        setMessageWithType(`You rejected the request to unlock tokens`, "error")
+        setMessageWithType(t.messages.rejectedUnlockTokens, "error")
       }
       else if (!error?.toString().includes("failed to get info about account")) {
-        setMessageWithType(`Error unlocking tokens: ${error}`, "error")
+        setMessageWithType(`${t.messages.errorUnlockingTokens} ${error}`, "error")
       }
     }
   }

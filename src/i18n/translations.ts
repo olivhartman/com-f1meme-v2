@@ -144,6 +144,38 @@ export interface Translations {
     level: string;
   };
   
+  // Messages for BoxBox Interface
+  messages: {
+    // Error messages
+    walletNotConnected: string;
+    errorCheckingMembershipAccount: string;
+    needSolForAccount: string;
+    rejectedCreateAccount: string;
+    errorCreatingAccount: string;
+    needSolForVault: string;
+    rejectedCreateVault: string;
+    transactionExpired: string;
+    errorCreatingVault: string;
+    errorFetchingAccountInfo: string;
+    needSolForTransactions: string;
+    needCreateAccountAndVault: string;
+    cannotHaveMoreThan99Transactions: string;
+    insufficientBalance: string;
+    noBoxboxTokens: string;
+    rejectedLockTokens: string;
+    errorLockingTokens: string;
+    lockNotActive: string;
+    tokensAlreadyUnlocked: string;
+    tokensStillLocked: string;
+    rejectedUnlockTokens: string;
+    errorUnlockingTokens: string;
+    // Success messages
+    membershipAccountCreated: string;
+    vaultCreated: string;
+    tokensLockedSuccessfully: string;
+    tokensUnlockedSuccessfully: string;
+  };
+  
   // Additional translations for missing texts
   additional: {
     // Community page
@@ -442,6 +474,36 @@ export const translations: Record<string, Translations> = {
       noSocialLinks: "No social links",
       level: "Level",
     },
+    messages: {
+      // Error messages
+      walletNotConnected: "Wallet not connected.",
+      errorCheckingMembershipAccount: "Error checking membership account:",
+      needSolForAccount: "You need 0.00016 SOL to create an account. If you've added the SOL, disconnect and reconnect your wallet to proceed.",
+      rejectedCreateAccount: "You rejected the request to create your membership account",
+      errorCreatingAccount: "Error creating account:",
+      needSolForVault: "You need 0.00016 SOL to create a vault. If you've added the SOL, disconnect and reconnect your wallet to proceed.",
+      rejectedCreateVault: "You rejected the request to create your vault",
+      transactionExpired: "Transaction expired. Please try again.",
+      errorCreatingVault: "Error creating vault:",
+      errorFetchingAccountInfo: "Error fetching account info:",
+      needSolForTransactions: "You need some SOL for to create an account, a vault and for transactions. If you've added the SOL, disconnect and reconnect your wallet to proceed.",
+      needCreateAccountAndVault: "Before locking tokens, you need to create a membership account and create a vault.",
+      cannotHaveMoreThan99Transactions: "You cannot have more than 99 transactions.",
+      insufficientBalance: "Insufficient Balance.",
+      noBoxboxTokens: "You don't have any BOXBOX tokens. Purchase some at boxbox.wtf",
+      rejectedLockTokens: "You rejected the request to lock tokens",
+      errorLockingTokens: "Error locking tokens:",
+      lockNotActive: "This lock is not active.",
+      tokensAlreadyUnlocked: "The tokens have already been unlocked.",
+      tokensStillLocked: "Tokens are still locked. Come back on/after",
+      rejectedUnlockTokens: "You rejected the request to unlock tokens",
+      errorUnlockingTokens: "Error unlocking tokens:",
+      // Success messages
+      membershipAccountCreated: "Membership account has been set up.",
+      vaultCreated: "Vault created successfully!",
+      tokensLockedSuccessfully: "Tokens locked successfully!",
+      tokensUnlockedSuccessfully: "Tokens unlocked successfully!",
+    },
     additional: {
       // Community page
       communityMember: "Community Member",
@@ -736,6 +798,36 @@ export const translations: Record<string, Translations> = {
       noUsersFound: "未找到符合条件的用户",
       noSocialLinks: "无社交链接",
       level: "等级",
+    },
+    messages: {
+      // Error messages
+      walletNotConnected: "钱包未连接。",
+      errorCheckingMembershipAccount: "检查会员账户时出错：",
+      needSolForAccount: "您需要0.00016 SOL来创建账户。如果您已添加SOL，请断开并重新连接钱包以继续。",
+      rejectedCreateAccount: "您拒绝了创建会员账户的请求",
+      errorCreatingAccount: "创建账户时出错：",
+      needSolForVault: "您需要0.00016 SOL来创建保险库。如果您已添加SOL，请断开并重新连接钱包以继续。",
+      rejectedCreateVault: "您拒绝了创建保险库的请求",
+      transactionExpired: "交易已过期。请重试。",
+      errorCreatingVault: "创建保险库时出错：",
+      errorFetchingAccountInfo: "获取账户信息时出错：",
+      needSolForTransactions: "您需要一些SOL来创建账户、保险库和进行交易。如果您已添加SOL，请断开并重新连接钱包以继续。",
+      needCreateAccountAndVault: "在锁定代币之前，您需要创建会员账户和创建保险库。",
+      cannotHaveMoreThan99Transactions: "您不能有超过99笔交易。",
+      insufficientBalance: "余额不足。",
+      noBoxboxTokens: "您没有任何BOXBOX代币。请在boxbox.wtf购买一些",
+      rejectedLockTokens: "您拒绝了锁定代币的请求",
+      errorLockingTokens: "锁定代币时出错：",
+      lockNotActive: "此锁定不活跃。",
+      tokensAlreadyUnlocked: "代币已被解锁。",
+      tokensStillLocked: "代币仍被锁定。请在以下时间后回来：",
+      rejectedUnlockTokens: "您拒绝了解锁代币的请求",
+      errorUnlockingTokens: "解锁代币时出错：",
+      // Success messages
+      membershipAccountCreated: "会员账户已设置。",
+      vaultCreated: "保险库创建成功！",
+      tokensLockedSuccessfully: "代币锁定成功！",
+      tokensUnlockedSuccessfully: "代币解锁成功！",
     },
     additional: {
       // Community page
