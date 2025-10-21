@@ -275,6 +275,8 @@ export interface Translations {
     tokenBalance: string;
     vault: string;
     vaultTooltip: string;
+    createAccount: string;
+    createVault: string;
     amountToLock: string;
     lockTokens: string;
     processing: string;
@@ -602,6 +604,8 @@ export const translations: Record<string, Translations> = {
       tokenBalance: "Token Balance",
       vault: "Vault",
       vaultTooltip: "Vault and membership level reset at the end of each season",
+      createAccount: "Create Account",
+      createVault: "Create Vault",
       amountToLock: "Amount to Lock (BOXBOX)",
       lockTokens: "Lock Tokens",
       processing: "Processing...",
@@ -619,7 +623,7 @@ export const translations: Record<string, Translations> = {
       unlockedDate: "Unlocked Date",
       connectWalletToLock: "Connect your wallet to lock your BOXBOX tokens.",
       openWithPhantom: "Open f1meme.com with Phantom Wallet browser.",
-      firstConnectionInfo: "On your first wallet connection, your membership account and vault are automatically created. This requires approval for two transactions to cover the costs, so keep at least 0.001 SOL in your wallet.",
+      firstConnectionInfo: "Connect your wallet and create your membership account and vault to start locking BOXBOX tokens. Keep at least 0.001 SOL in your wallet for transaction fees.",
       // Tokenomics
       tokenomics: "Tokenomics",
       tokenomicsDesc: "Discover the economic model behind BOXBOX, the F1 Meme token powering our ecosystem",
@@ -927,6 +931,8 @@ export const translations: Record<string, Translations> = {
       tokenBalance: "代币余额",
       vault: "保险库",
       vaultTooltip: "保险库和会员等级在每个赛季结束时重置",
+      createAccount: "创建账户",
+      createVault: "创建保险库",
       amountToLock: "锁定数量 (BOXBOX)",
       lockTokens: "锁定代币",
       processing: "处理中...",
@@ -944,7 +950,7 @@ export const translations: Record<string, Translations> = {
       unlockedDate: "解锁日期",
       connectWalletToLock: "连接钱包以锁定您的BOXBOX代币。",
       openWithPhantom: "使用Phantom钱包浏览器打开f1meme.com。",
-      firstConnectionInfo: "首次连接钱包时，您的会员账户和保险库会自动创建。这需要批准两笔交易来支付费用，因此请在钱包中保留至少0.001 SOL。",
+      firstConnectionInfo: "连接钱包并创建您的会员账户和保险库以开始锁定BOXBOX代币。请在钱包中保留至少0.001 SOL作为交易手续费。",
       // Tokenomics
       tokenomics: "代币经济学",
       tokenomicsDesc: "探索BOXBOX背后的经济模型，这是推动我们生态系统的F1 Meme代币",

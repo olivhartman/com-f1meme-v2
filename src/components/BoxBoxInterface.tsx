@@ -331,14 +331,10 @@ useEffect(() => {
     }
 }, [wallet]); // Re-run when wallet changes
 
-useEffect(() => {
+  useEffect(() => {
     if (publicKey) {
       console.log('useEffect[publicKey]: Starting initialization for wallet:', publicKey.toBase58())
       checkMembershipAccount()
-      initializeMembershipAccount()
-      if (!isEscrowInitialized) {
-        initializeEscrowAccount()
-      }
       fetchTokenBalance()
       const fetchData = async () => {
         console.log('useEffect[publicKey]: Running periodic fetchData')
@@ -571,12 +567,7 @@ useEffect(() => {
     const program = getProgram()
     if (!program || !wallet?.publicKey || !membershipAccount || !escrowAccount) return
 
-    if (!membershipAccount) return initializeMembershipAccount()
-
-    if (!escrowAccount) return initializeEscrowAccount()
-
     if (balance < 0.00016) return setMessageWithType(t.messages.needSolForTransactions, "info")
-
 
     try {
       // Check if membership account and escrow account have been created
@@ -1004,6 +995,15 @@ useEffect(() => {
                     <h6 className="text-base font-semibold block mt-1">
                       {isMembershipInitialized ? t.additional.created : t.additional.yetToBeCreated}
                     </h6>
+                    {!isMembershipInitialized && (
+                      <button
+                        onClick={initializeMembershipAccount}
+                        disabled={isProcessing}
+                        className="mt-2 w-full py-2 px-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-md text-sm font-medium transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+                      >
+                        {isProcessing ? t.additional.processing : t.additional.createAccount}
+                      </button>
+                    )}
                   </div>
                   <div className="backdrop-blur-sm bg-black/20 p-4 rounded-lg relative">
                     <span className="text-gray-400 font-bold text-sm">
@@ -1018,6 +1018,15 @@ useEffect(() => {
                     <h6 className="text-base font-semibold block mt-1">
                       {isEscrowInitialized ? t.additional.created : t.additional.yetToBeCreated}
                     </h6>
+                    {!isEscrowInitialized && isMembershipInitialized && (
+                      <button
+                        onClick={initializeEscrowAccount}
+                        disabled={isProcessing}
+                        className="mt-2 w-full py-2 px-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-md text-sm font-medium transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+                      >
+                        {isProcessing ? t.additional.processing : t.additional.createVault}
+                      </button>
+                    )}
                     {showTooltip && (
                       <span className="absolute left-0 -top-16 w-64 bg-gray-800 text-white text-xs px-4 py-2 rounded-lg shadow-lg z-10">
                         {t.additional.vaultTooltip}
