@@ -565,14 +565,20 @@ useEffect(() => {
 
   const lockTokens = async () => {
     const program = getProgram()
-    if (!program || !wallet?.publicKey || !membershipAccount || !escrowAccount) return
+    if (!program || !wallet?.publicKey) return
 
     if (balance < 0.00016) return setMessageWithType(t.messages.needSolForTransactions, "info")
 
     try {
-      // Check if membership account and escrow account have been created
+      // Check if membership account has been created
       if (!isMembershipInitialized) {
-        setMessageWithType(t.messages.needCreateAccountAndVault, "error")
+        setMessageWithType(t.messages.needCreateMembershipAccount, "error")
+        return
+      }
+
+      // Check if escrow account has been created
+      if (!isEscrowInitialized) {
+        setMessageWithType(t.messages.needCreateEscrowAccount, "error")
         return
       }
 

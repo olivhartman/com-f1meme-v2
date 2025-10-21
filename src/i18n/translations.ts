@@ -159,6 +159,8 @@ export interface Translations {
     errorFetchingAccountInfo: string;
     needSolForTransactions: string;
     needCreateAccountAndVault: string;
+    needCreateMembershipAccount: string;
+    needCreateEscrowAccount: string;
     cannotHaveMoreThan99Transactions: string;
     insufficientBalance: string;
     noBoxboxTokens: string;
@@ -490,6 +492,8 @@ export const translations: Record<string, Translations> = {
       errorFetchingAccountInfo: "Error fetching account info:",
       needSolForTransactions: "You need some SOL for to create an account, a vault and for transactions. If you've added the SOL, disconnect and reconnect your wallet to proceed.",
       needCreateAccountAndVault: "Before locking tokens, you need to create a membership account and create a vault.",
+      needCreateMembershipAccount: "Please create your membership account first before locking tokens.",
+      needCreateEscrowAccount: "Please create your vault first before locking tokens.",
       cannotHaveMoreThan99Transactions: "You cannot have more than 99 transactions.",
       insufficientBalance: "Insufficient Balance.",
       noBoxboxTokens: "You don't have any BOXBOX tokens. Purchase some at boxbox.wtf",
@@ -817,6 +821,8 @@ export const translations: Record<string, Translations> = {
       errorFetchingAccountInfo: "获取账户信息时出错：",
       needSolForTransactions: "您需要一些SOL来创建账户、保险库和进行交易。如果您已添加SOL，请断开并重新连接钱包以继续。",
       needCreateAccountAndVault: "在锁定代币之前，您需要创建会员账户和创建保险库。",
+      needCreateMembershipAccount: "请在锁定代币之前先创建您的会员账户。",
+      needCreateEscrowAccount: "请在锁定代币之前先创建您的保险库。",
       cannotHaveMoreThan99Transactions: "您不能有超过99笔交易。",
       insufficientBalance: "余额不足。",
       noBoxboxTokens: "您没有任何BOXBOX代币。请在boxbox.wtf购买一些",
