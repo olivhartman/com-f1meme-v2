@@ -290,6 +290,9 @@ function MiniGallery() {
   // Check if current user is admin
   const isAdmin = isCurrentUserAdmin(publicKey)
   
+  // Get current user's wallet address
+  const currentUserWallet = publicKey?.toBase58() || null
+  
   const handleDeletePhoto = (photoId: string) => {
     // For the mini gallery, we don't need to update state since it's just a preview
     // The main gallery will handle the actual deletion
@@ -323,6 +326,7 @@ function MiniGallery() {
             key={photo.id} 
             photo={photo} 
             isAdmin={isAdmin}
+            currentUserWallet={currentUserWallet}
             onDelete={handleDeletePhoto}
           />
         ))}

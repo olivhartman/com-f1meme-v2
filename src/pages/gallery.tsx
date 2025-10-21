@@ -25,16 +25,21 @@ const AnimatedBackground = () => (
 
 export const PhotoCard = ({ 
   photo, 
-  isAdmin, 
+  isAdmin,
+  currentUserWallet, 
   onDelete 
 }: { 
   photo: GalleryPhoto
   isAdmin: boolean
+  currentUserWallet: string | null
   onDelete: (photoId: string) => void
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [showMobileOverlay, setShowMobileOverlay] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  
+  // Check if current user can delete this photo (either admin or owner)
+  const canDelete = isAdmin || (currentUserWallet && photo.walletAddress === currentUserWallet)
 
   const handleDownload = async () => {
     setIsLoading(true)
@@ -86,7 +91,7 @@ export const PhotoCard = ({
   }
 
   const handleDelete = async () => {
-    if (!isAdmin || !photo.id) return
+    if (!canDelete || !photo.id) return
     
     const confirmed = window.confirm('Are you sure you want to delete this photo? This action cannot be undone.')
     if (!confirmed) return
@@ -165,7 +170,7 @@ export const PhotoCard = ({
                   <Download className="h-4 w-4 text-white" />
                 )}
               </Button>
-              {isAdmin && (
+              {canDelete && (
                 <Button
                   size="sm"
                   variant="secondary"
@@ -227,7 +232,7 @@ export const PhotoCard = ({
                   <Download className="h-5 w-5 text-white" />
                 )}
               </Button>
-              {isAdmin && (
+              {canDelete && (
                 <Button
                   size="lg"
                   variant="secondary"
@@ -286,6 +291,9 @@ const Gallery: React.FC = () => {
   
   // Check if current user is admin
   const isAdmin = isCurrentUserAdmin(publicKey)
+  
+  // Get current user's wallet address
+  const currentUserWallet = publicKey?.toBase58() || null
   
   const handleDeletePhoto = (photoId: string) => {
     setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== photoId))
@@ -422,6 +430,7 @@ const Gallery: React.FC = () => {
                   key={photo.id} 
                   photo={photo} 
                   isAdmin={isAdmin}
+                  currentUserWallet={currentUserWallet}
                   onDelete={handleDeletePhoto}
                 />
               ))}
