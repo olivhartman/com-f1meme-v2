@@ -8,6 +8,7 @@ import { User, Instagram, Send, Upload, Save, Camera, Check, AlertCircle, X, Plu
 import { airtableService, type ProfileData as AirtableProfileData, type GalleryPhoto } from "../api/airtable"
 import Loader from "./Loader";
 import { useTranslation } from "../i18n/TranslationContext";
+import { isCurrentUserAdmin } from "../lib/admin";
 
 interface ProfileData {
   name: string;
@@ -27,6 +28,10 @@ interface ProfileData {
 const ProfilePage: React.FC = () => {
   const { t } = useTranslation()
   const { publicKey } = useWallet()
+  
+  // Check if current user is admin
+  const isAdmin = isCurrentUserAdmin(publicKey)
+  
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
     email: "",
@@ -628,16 +633,16 @@ const ProfilePage: React.FC = () => {
                     {t.additional.uploadPhoto} <span className="text-red-500">*</span>
                   </label>
                   <div
-                    className={`relative w-full h-48 bg-[#1a2336] rounded-xl border-2 border-dashed border-[#232c43] group cursor-pointer ${profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? 'opacity-60 pointer-events-none' : 'hover:border-yellow-500/50 transition-all duration-300'}`}
-                    onDragOver={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? undefined : (e) => e.preventDefault()}
-                    onDrop={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? undefined : (e) => {
+                    className={`relative w-full h-48 bg-[#1a2336] rounded-xl border-2 border-dashed border-[#232c43] group cursor-pointer ${!isAdmin && profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? 'opacity-60 pointer-events-none' : 'hover:border-yellow-500/50 transition-all duration-300'}`}
+                    onDragOver={!isAdmin && profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? undefined : (e) => e.preventDefault()}
+                    onDrop={!isAdmin && profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? undefined : (e) => {
                       e.preventDefault()
                       const file = e.dataTransfer.files[0]
                       if (file && file.type.startsWith("image/")) {
                         setGalleryPhoto(file)
                       }
                     }}
-                    onClick={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? undefined : () => galleryPhotoRef.current?.click()}
+                    onClick={!isAdmin && profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? undefined : () => galleryPhotoRef.current?.click()}
                   >
                     {galleryPhoto ? (
                       <img
@@ -666,7 +671,7 @@ const ProfilePage: React.FC = () => {
                     accept="image/*"
                     onChange={handleGalleryPhotoChange}
                     className="hidden"
-                    disabled={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55}
+                    disabled={!isAdmin && profileData.membershipLevel !== undefined && profileData.membershipLevel < 55}
                   />
                 </div>
 
@@ -680,10 +685,10 @@ const ProfilePage: React.FC = () => {
                     onChange={(e) => setGalleryCaption(e.target.value)}
                     placeholder={t.additional.addCaptionPlaceholder}
                     className={`w-full px-4 py-3 border-2 border-[#232c43] focus:border-yellow-500 focus:ring-yellow-200 rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 transition-all duration-300 text-base bg-[#232c43]/70 backdrop-blur-sm resize-none ${
-                      profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? 'opacity-60 pointer-events-none' : ''
+                      !isAdmin && profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 ? 'opacity-60 pointer-events-none' : ''
                     }`}
                     rows={3}
-                    disabled={profileData.membershipLevel !== undefined && profileData.membershipLevel < 55}
+                    disabled={!isAdmin && profileData.membershipLevel !== undefined && profileData.membershipLevel < 55}
                   />
                 </div>
 
@@ -691,7 +696,7 @@ const ProfilePage: React.FC = () => {
                 <div className="space-y-4">
                   <button
                     onClick={handleGalleryUpload}
-                    disabled={profileData.membershipLevel === undefined || profileData.membershipLevel < 55 || !galleryPhoto || isUploadingGallery}
+                    disabled={!isAdmin && (profileData.membershipLevel === undefined || profileData.membershipLevel < 55) || !galleryPhoto || isUploadingGallery}
                     className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-yellow-500 to-yellow-700 hover:from-yellow-600 hover:to-yellow-800 text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-yellow-900/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
                   >
                     {isUploadingGallery ? (
@@ -709,7 +714,7 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 {/* Upgrade message for users below level 55 */}
-                {profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 && (
+                {!isAdmin && profileData.membershipLevel !== undefined && profileData.membershipLevel < 55 && (
                   <div className="mt-4 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-center">
                     <div className="flex items-center justify-center gap-2">
                       <AlertCircle className="h-4 w-4" />

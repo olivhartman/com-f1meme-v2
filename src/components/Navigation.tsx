@@ -7,6 +7,7 @@ import { useWallet } from "@solana/wallet-adapter-react"
 import { Link } from "react-router-dom"
 import { useTranslation } from "../i18n/TranslationContext"
 import { LanguageToggle } from "./LanguageToggle"
+import { isCurrentUserAdmin } from "../lib/admin"
 
 interface NavigationProps {}
 
@@ -18,8 +19,7 @@ export default function Navigation({}: NavigationProps) {
   const { t } = useTranslation()
   
   // Check if current user is admin
-  const ADMIN_WALLET_ADDRESS = "G14s2hZVZQqcUfLYSEdTThNqgZCi4pqM2P2RmRiu2ddz";
-  const isAdmin = publicKey?.toBase58() === ADMIN_WALLET_ADDRESS;
+  const isAdmin = isCurrentUserAdmin(publicKey);
 
   // Debug logging
   useEffect(() => {

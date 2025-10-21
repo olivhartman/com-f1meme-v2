@@ -5,8 +5,9 @@ import Faqs from "./Faqs"
 import { Twitter, Send } from "lucide-react"
 import BoxBoxInterface from "./BoxBoxInterface"
 import { useEffect, useState } from "react"
-// import { useWallet } from "@solana/wallet-adapter-react"
+import { useWallet } from "@solana/wallet-adapter-react"
 import { airtableService } from "../api/airtable"
+import { isCurrentUserAdmin } from "../lib/admin"
 // import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react"
 // import { Program, AnchorProvider, setProvider } from "@coral-xyz/anchor"
 // import { PublicKey } from "@solana/web3.js"
@@ -28,10 +29,6 @@ import "@solana/wallet-adapter-react-ui/styles.css"
 export default function Home() {
   const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(true)
-  // const { publicKey } = useWallet()
-  // const wallet = useAnchorWallet()
-  // const { connection } = useConnection()
-  
 
   // const getProvider = () => {
   //   if (!wallet) {
@@ -285,9 +282,19 @@ export default function Home() {
 
 function MiniGallery() {
   const { t } = useTranslation()
+  const { publicKey } = useWallet()
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
+  
+  // Check if current user is admin
+  const isAdmin = isCurrentUserAdmin(publicKey)
+  
+  const handleDeletePhoto = (photoId: string) => {
+    // For the mini gallery, we don't need to update state since it's just a preview
+    // The main gallery will handle the actual deletion
+    console.log('Photo deleted:', photoId)
+  }
 
   useEffect(() => {
     let mounted = true
@@ -312,7 +319,12 @@ function MiniGallery() {
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-12 mb-12">
         {showPhotos.map((photo) => (
-          <PhotoCard key={photo.id} photo={photo} />
+          <PhotoCard 
+            key={photo.id} 
+            photo={photo} 
+            isAdmin={isAdmin}
+            onDelete={handleDeletePhoto}
+          />
         ))}
         {/* Add placeholders to fill the last row if needed */}
         {Array.from({ length: (2 - (showPhotos.length % 2)) % 2 }).map((_, idx) => (

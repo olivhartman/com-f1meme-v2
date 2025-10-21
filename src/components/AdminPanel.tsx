@@ -5,8 +5,7 @@ import { useTranslation } from '../i18n/TranslationContext';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Search, Filter, Download, Users, Crown, Shield, Copy, Check } from 'lucide-react';
-
-const ADMIN_WALLET_ADDRESS = "G14s2hZVZQqcUfLYSEdTThNqgZCi4pqM2P2RmRiu2ddz";
+import { isCurrentUserAdmin } from '../lib/admin';
 
 interface AdminUserData extends ProfileData {
   id?: string;
@@ -25,7 +24,7 @@ export const AdminPanel: React.FC = () => {
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
   // Check if current user is admin
-  const isAdmin = publicKey?.toBase58() === ADMIN_WALLET_ADDRESS;
+  const isAdmin = isCurrentUserAdmin(publicKey);
 
   // Copy wallet address to clipboard
   const copyToClipboard = async (address: string) => {

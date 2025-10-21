@@ -3,11 +3,13 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Image, Share2, Download } from "lucide-react"
+import { Image, Share2, Download, Trash2, User } from "lucide-react"
 import { airtableService, type GalleryPhoto } from "../api/airtable"
 import { Card, CardContent } from "../components/ui/card"
 import { Button } from "../components/ui/button"
 import { useTranslation } from "../i18n/TranslationContext"
+import { useWallet } from "@solana/wallet-adapter-react"
+import { isCurrentUserAdmin } from "../lib/admin"
 
 const AnimatedBackground = () => (
   <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
@@ -21,9 +23,18 @@ const AnimatedBackground = () => (
   </div>
 )
 
-export const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
+export const PhotoCard = ({ 
+  photo, 
+  isAdmin, 
+  onDelete 
+}: { 
+  photo: GalleryPhoto
+  isAdmin: boolean
+  onDelete: (photoId: string) => void
+}) => {
   const [isLoading, setIsLoading] = useState(false)
   const [showMobileOverlay, setShowMobileOverlay] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDownload = async () => {
     setIsLoading(true)
@@ -74,6 +85,24 @@ export const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
     }
   }
 
+  const handleDelete = async () => {
+    if (!isAdmin || !photo.id) return
+    
+    const confirmed = window.confirm('Are you sure you want to delete this photo? This action cannot be undone.')
+    if (!confirmed) return
+    
+    setIsDeleting(true)
+    try {
+      await airtableService.deleteGalleryPhoto(photo.id)
+      onDelete(photo.id)
+    } catch (error) {
+      console.error('Delete failed:', error)
+      alert('Failed to delete photo. Please try again.')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
 
 
   return (
@@ -96,6 +125,14 @@ export const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
           
           {/* Desktop Overlay with actions and caption (hover only) */}
           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 hidden md:flex">
+            {/* Uploader Info */}
+            <div className="text-center mb-3">
+              <div className="flex items-center justify-center gap-2 text-white text-sm">
+                <User className="h-4 w-4" />
+                <span className="font-medium">by {photo.uploadedBy}</span>
+              </div>
+            </div>
+            
             {/* Caption */}
             {photo.caption && (
               <div className="text-center mb-4">
@@ -128,6 +165,21 @@ export const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
                   <Download className="h-4 w-4 text-white" />
                 )}
               </Button>
+              {isAdmin && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="bg-red-500/20 backdrop-blur-sm hover:bg-red-500/30 border-red-500/30"
+                >
+                  {isDeleting ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  ) : (
+                    <Trash2 className="h-4 w-4 text-white" />
+                  )}
+                </Button>
+              )}
             </div>
           </div>
 
@@ -135,6 +187,14 @@ export const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
           <div className={`absolute inset-0 bg-black/80 transition-opacity duration-300 flex flex-col items-center justify-center p-4 md:hidden ${
             showMobileOverlay ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}>
+            {/* Uploader Info */}
+            <div className="text-center mb-4">
+              <div className="flex items-center justify-center gap-2 text-white text-base">
+                <User className="h-5 w-5" />
+                <span className="font-medium">by {photo.uploadedBy}</span>
+              </div>
+            </div>
+            
             {/* Caption */}
             {photo.caption && (
               <div className="text-center mb-6">
@@ -167,6 +227,21 @@ export const PhotoCard = ({ photo }: { photo: GalleryPhoto }) => {
                   <Download className="h-5 w-5 text-white" />
                 )}
               </Button>
+              {isAdmin && (
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="bg-red-500/20 backdrop-blur-sm hover:bg-red-500/30 border-red-500/30"
+                >
+                  {isDeleting ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                  ) : (
+                    <Trash2 className="h-5 w-5 text-white" />
+                  )}
+                </Button>
+              )}
             </div>
 
             {/* Close button for mobile */}
@@ -204,9 +279,17 @@ const LoadingCard = () => (
 
 const Gallery: React.FC = () => {
   const { t } = useTranslation()
+  const { publicKey } = useWallet()
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  
+  // Check if current user is admin
+  const isAdmin = isCurrentUserAdmin(publicKey)
+  
+  const handleDeletePhoto = (photoId: string) => {
+    setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== photoId))
+  }
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -335,7 +418,12 @@ const Gallery: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {photos.map((photo) => (
-                <PhotoCard key={photo.id} photo={photo} />
+                <PhotoCard 
+                  key={photo.id} 
+                  photo={photo} 
+                  isAdmin={isAdmin}
+                  onDelete={handleDeletePhoto}
+                />
               ))}
             </div>
           )}
