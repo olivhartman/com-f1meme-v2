@@ -1018,10 +1018,10 @@ useEffect(() => {
                     <h6 className="text-base font-semibold block mt-1">
                       {isEscrowInitialized ? t.additional.created : t.additional.yetToBeCreated}
                     </h6>
-                    {!isEscrowInitialized && isMembershipInitialized && (
+                    {!isEscrowInitialized && (
                       <button
                         onClick={initializeEscrowAccount}
-                        disabled={isProcessing}
+                        disabled={isProcessing || !isMembershipInitialized}
                         className="mt-2 w-full py-2 px-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-md text-sm font-medium transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
                       >
                         {isProcessing ? t.additional.processing : t.additional.createVault}
