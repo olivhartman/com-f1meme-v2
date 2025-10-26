@@ -746,24 +746,24 @@ const ProfilePage: React.FC = () => {
 
       {/* Toast Notification */}
       {message && (
-        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 duration-500">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 min-w-[320px] max-w-sm animate-in slide-in-from-top-4 duration-500">
           <div
-            className={`flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl border ${
+            className={`flex items-center gap-4 px-6 py-5 rounded-2xl shadow-2xl backdrop-blur-xl border-2 ${
               message.includes("successfully")
-                ? "bg-emerald-50/90 border-emerald-200 text-emerald-800 shadow-emerald-500/20"
-                : "bg-red-50/90 border-red-200 text-red-800 shadow-red-500/20"
+                ? "bg-gradient-to-r from-emerald-500/20 via-emerald-600/15 to-emerald-500/20 border-emerald-400/40 text-emerald-100 shadow-emerald-500/30"
+                : "bg-gradient-to-r from-red-500/20 via-red-600/15 to-red-500/20 border-red-400/40 text-red-100 shadow-red-500/30"
             }`}
           >
             {message.includes("successfully") ? (
-              <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
-                <Check className="h-4 w-4 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                <Check className="h-5 w-5 text-white" strokeWidth={3} />
               </div>
             ) : (
-              <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-                <X className="h-4 w-4 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg shadow-red-500/30">
+                <X className="h-5 w-5 text-white" strokeWidth={3} />
               </div>
             )}
-            <span className="font-semibold">{message}</span>
+            <span className="font-semibold text-base leading-tight">{message}</span>
           </div>
         </div>
       )}
