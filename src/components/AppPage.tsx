@@ -21,6 +21,7 @@ import { PhotoCard } from "../pages/gallery"
 import { useTranslation } from "../i18n/TranslationContext"
 
 import "@solana/wallet-adapter-react-ui/styles.css"
+import { log } from "console"
 
 
 
@@ -52,13 +53,14 @@ export default function Home() {
   // Sync membership levels for ALL users when user visits homepage
   useEffect(() => {
     const syncAllUsersMembershipLevels = async () => {
+      console.log('YO');
       try {
         const program = getProgram()
         if (!program) return
 
         // Add a delay to ensure blockchain data is loaded
         await new Promise(resolve => setTimeout(resolve, 1000))
-
+        console.log('Started');
         // Fetch ALL membership accounts from the blockchain
         const allAccounts = await program.account.membershipAccount.all()
         console.log(`Found ${allAccounts.length} membership accounts on blockchain`)
