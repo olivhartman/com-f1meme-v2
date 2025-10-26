@@ -21,7 +21,6 @@ import { PhotoCard } from "../pages/gallery"
 import { useTranslation } from "../i18n/TranslationContext"
 
 import "@solana/wallet-adapter-react-ui/styles.css"
-import { log } from "console"
 
 
 
