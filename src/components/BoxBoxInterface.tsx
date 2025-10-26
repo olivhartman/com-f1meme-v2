@@ -447,9 +447,6 @@ useEffect(() => {
         if (verifyInfo) {
           setMembershipAccount(membershipAccountPda)
           setIsMembershipInitialized(true)
-          
-          // Update account info and sync membership level to DB
-          await updateAccountInfo()
         }
       } else {
         setMembershipAccount(membershipAccountPda)

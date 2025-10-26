@@ -8,12 +8,11 @@ import { useEffect, useState } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { airtableService } from "../api/airtable"
 import { isCurrentUserAdmin } from "../lib/admin"
-// Removed unused imports - membership level sync is now handled in BoxBoxInterface
-// import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react"
-// import { Program, AnchorProvider, setProvider } from "@coral-xyz/anchor"
-// import { PublicKey } from "@solana/web3.js"
-// import idl from "../idl/boxbox.json"
-// import type { F1boxbox } from "../types/boxbox"
+import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react"
+import { Program, AnchorProvider, setProvider } from "@coral-xyz/anchor"
+import { PublicKey } from "@solana/web3.js"
+import idl from "../idl/boxbox.json"
+import type { F1boxbox } from "../types/boxbox"
 import Loader from "./Loader"
 // MiniGallery component
 import { type GalleryPhoto } from "../api/airtable"
@@ -26,12 +25,15 @@ import "@solana/wallet-adapter-react-ui/styles.css"
 
 
 
-// const idl_object = JSON.parse(JSON.stringify(idl))
+const idl_object = JSON.parse(JSON.stringify(idl))
 export default function Home() {
   const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(true)
+  const { connection } = useConnection()
+  const wallet = useAnchorWallet()
+  const { publicKey } = useWallet()
 
-  /* const getProvider = () => {
+  const getProvider = () => {
     if (!wallet) {
       // setMessageWithType("Wallet not connected.", "error")
       return null
@@ -46,11 +48,10 @@ export default function Home() {
     if (!publicKey) return null
     const provider = getProvider()
     return provider ? new Program<F1boxbox>(idl_object, provider) : null
-  } */
+  }
 
   // Sync membership level to Airtable when user visits homepage
-  // This functionality is now handled in BoxBoxInterface component
-  /* useEffect(() => {
+  useEffect(() => {
     const syncMembershipLevel = async () => {
       if (!publicKey) return
       
@@ -171,7 +172,7 @@ export default function Home() {
 
       return () => clearTimeout(timer)
     }
-  }, [publicKey, connection]) */
+  }, [publicKey, connection])
 
   useEffect(() => {
     const timer = setTimeout(() => {
