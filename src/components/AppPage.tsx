@@ -8,8 +8,8 @@ import { useEffect, useState } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { airtableService } from "../api/airtable"
 import { isCurrentUserAdmin } from "../lib/admin"
-import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react"
-import { Program, AnchorProvider, setProvider } from "@coral-xyz/anchor"
+import { useConnection } from "@solana/wallet-adapter-react"
+import { Program, AnchorProvider } from "@coral-xyz/anchor"
 import idl from "../idl/boxbox.json"
 import type { F1boxbox } from "../types/boxbox"
 import Loader from "./Loader"
@@ -29,24 +29,13 @@ export default function Home() {
   const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(true)
   const { connection } = useConnection()
-  const wallet = useAnchorWallet()
-  const { publicKey } = useWallet()
 
-  const getProvider = () => {
-    if (!wallet) {
-      // setMessageWithType("Wallet not connected.", "error")
-      return null
-    }
-    const provider = new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions())
-    setProvider(provider)
-    return provider
-  }
-
-  // Get program instance
+  // Get program instance - now works without wallet connection
   const getProgram = () => {
-    if (!publicKey) return null
-    const provider = getProvider()
-    return provider ? new Program<F1boxbox>(idl_object, provider) : null
+    if (!connection) return null
+    // Create a read-only connection provider (no wallet needed)
+    const provider = new AnchorProvider(connection, {} as any, AnchorProvider.defaultOptions())
+    return new Program<F1boxbox>(idl_object, provider)
   }
 
   // Sync membership levels for ALL users when user visits homepage
@@ -54,12 +43,15 @@ export default function Home() {
     const syncAllUsersMembershipLevels = async () => {
       console.log('YO');
       try {
-        const program = getProgram()
-        if (!program) return
-
         // Add a delay to ensure blockchain data is loaded
         await new Promise(resolve => setTimeout(resolve, 1000))
         console.log('Started');
+        
+        const program = getProgram()
+        if (!program) {
+          console.log('No program available')
+          return
+        }
         // Fetch ALL membership accounts from the blockchain
         const allAccounts = await program.account.membershipAccount.all()
         console.log(`Found ${allAccounts.length} membership accounts on blockchain`)
