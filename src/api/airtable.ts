@@ -32,7 +32,6 @@ export const airtableService = {
   // Create or update profile
   async upsertProfile(profileData: ProfileData): Promise<void> {
     try {
-      console.log('Starting upsertProfile with wallet:', profileData.walletAddress);
       
       // Prepare payload
       const payload: any = {
@@ -55,8 +54,6 @@ export const airtableService = {
       // Handle membership level with validation
       if (typeof profileData.membershipLevel === 'number') {
         const levelValue = Math.max(0, Math.min(profileData.membershipLevel, 999)); // Ensure it's a valid positive number
-        console.log('Original membership level:', profileData.membershipLevel);
-        console.log('Validated membership level:', levelValue);
         payload.membershipLevel = levelValue;
       }
 
@@ -71,11 +68,9 @@ export const airtableService = {
 
       // Handle profile picture attachment
       if (profileData.profilePicture) {
-        console.log('Processing profile picture:', profileData.profilePicture.name);
         try {
           const imageUrl = await cloudinaryService.uploadImage(profileData.profilePicture);
           payload.profilePictureUrl = imageUrl;
-          console.log('Profile picture uploaded successfully, URL:', imageUrl);
         } catch (error) {
           console.error('Failed to upload profile picture:', error);
           // Continue without the image if upload fails
@@ -84,18 +79,15 @@ export const airtableService = {
 
       // Handle cover picture attachment
       if (profileData.coverPicture) {
-        console.log('Processing cover picture:', profileData.coverPicture.name);
         try {
           const imageUrl = await cloudinaryService.uploadImage(profileData.coverPicture);
           payload.coverPictureUrl = imageUrl;
-          console.log('Cover picture uploaded successfully, URL:', imageUrl);
         } catch (error) {
           console.error('Failed to upload cover picture:', error);
           // Continue without the image if upload fails
         }
       }
 
-      console.log('Final payload being sent to API:', JSON.stringify(payload, null, 2));
 
       // Call the backend API
       const response = await fetch(`${API_BASE_URL}/f1meme/profiles/upsert/${profileData.walletAddress}`, {
@@ -114,8 +106,6 @@ export const airtableService = {
 
       // Handle empty responses (like 204 No Content)
       const responseText = await response.text();
-      console.log('Upsert response status:', response.status);
-      console.log('Upsert response text:', responseText);
       
       if (responseText && responseText.trim() !== '') {
         try {
@@ -126,7 +116,6 @@ export const airtableService = {
         }
       }
 
-      console.log('Profile upserted successfully');
     } catch (error) {
       console.error('Error upserting profile:', error);
       if (typeof error === 'object' && error !== null) {
@@ -149,7 +138,6 @@ export const airtableService = {
   // Get profile by wallet address
   async getProfile(walletAddress: string): Promise<ProfileData | null> {
     try {
-      console.log('Getting profile for wallet:', walletAddress);
       const response = await fetch(`${API_BASE_URL}/f1meme/profiles/wallet/${walletAddress}`, {
         method: 'GET',
         headers: {
@@ -166,7 +154,6 @@ export const airtableService = {
       // Handle empty responses (like 204 No Content)
       const responseText = await response.text();
       if (!responseText || responseText.trim() === '') {
-        console.log('Empty response received, returning null');
         return null;
       }
 
@@ -178,10 +165,8 @@ export const airtableService = {
         throw new Error(`Invalid JSON response: ${parseError}`);
       }
       
-      console.log('Raw profile data from API:', JSON.stringify(data, null, 2));
 
       if (!data || (!data.wallet_address && !data.walletAddress)) {
-        console.log('No profile data found or missing wallet address');
         return null;
       }
       
@@ -201,7 +186,6 @@ export const airtableService = {
         membershipLevel: data.membership_level || data.membershipLevel || 0,
       };
       
-      console.log('Processed profile data:', JSON.stringify(profile, null, 2));
       return profile;
     } catch (error) {
       console.error('Error getting profile:', error);
@@ -212,7 +196,6 @@ export const airtableService = {
   // Get all profiles (for community page)
   async getAllProfiles(): Promise<ProfileData[]> {
     try {
-      console.log('Getting all profiles from:', `${API_BASE_URL}/f1meme/profiles/all`);
       const response = await fetch(`${API_BASE_URL}/f1meme/profiles/all`, {
         method: 'GET',
         headers: {
@@ -220,8 +203,6 @@ export const airtableService = {
         }
       });
       
-      console.log('getAllProfiles response status:', response.status);
-      console.log('getAllProfiles response headers:', Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -231,17 +212,14 @@ export const airtableService = {
       
       // Handle empty responses
       const responseText = await response.text();
-      console.log('getAllProfiles raw response text:', responseText);
       
       if (!responseText || responseText.trim() === '') {
-        console.log('Empty response received for getAllProfiles, returning empty array');
         return [];
       }
 
       let data;
       try {
         data = JSON.parse(responseText);
-        console.log('getAllProfiles parsed data:', data);
       } catch (parseError) {
         console.error('Failed to parse JSON response for getAllProfiles:', responseText);
         throw new Error(`Invalid JSON response: ${parseError}`);
@@ -273,7 +251,6 @@ export const airtableService = {
   // Gallery methods
   async uploadGalleryPhoto(photo: GalleryPhoto): Promise<void> {
     try {
-      console.log('Uploading gallery photo:', photo);
       
       const payload = {
         url: photo.url,
@@ -297,8 +274,6 @@ export const airtableService = {
         throw new Error(`Upload gallery photo failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
-      const data = await response.json();
-      console.log('Gallery photo uploaded successfully:', data);
     } catch (error) {
       console.error('Error uploading gallery photo:', error);
       throw error;
@@ -307,7 +282,6 @@ export const airtableService = {
 
   async getAllGalleryPhotos(): Promise<GalleryPhoto[]> {
     try {
-      console.log('Getting all gallery photos...');
       const response = await fetch(`${API_BASE_URL}/f1meme/gallery/all`, {
         method: 'GET',
         headers: {
@@ -322,28 +296,11 @@ export const airtableService = {
       }
 
       const data = await response.json();
-      console.log('All gallery photos raw data:', data);
-      console.log('Data structure:', {
-        isArray: Array.isArray(data),
-        hasPhotos: data.photos ? 'yes' : 'no',
-        photosLength: data.photos ? data.photos.length : 'N/A',
-        dataLength: Array.isArray(data) ? data.length : 'N/A'
-      });
 
       // Handle both array response and object with photos property
       const photosArray = Array.isArray(data) ? data : (data.photos || []);
-      console.log('Photos array to process:', photosArray);
 
       const mappedPhotos = photosArray.map((photo: any, index: number) => {
-        console.log(`Processing photo ${index}:`, {
-          id: photo.id,
-          url: photo.url,
-          uploadedBy: photo.uploaded_by || photo.uploadedBy,
-          uploadedAt: photo.uploaded_at || photo.uploadedAt,
-          walletAddress: photo.wallet_address || photo.walletAddress,
-          caption: photo.caption,
-          rawPhoto: photo
-        });
 
         return {
           id: photo.id || `photo-${index}`,
@@ -355,7 +312,6 @@ export const airtableService = {
         };
       });
 
-      console.log('Mapped photos result:', mappedPhotos);
       return mappedPhotos;
     } catch (error) {
       console.error('Error getting all gallery photos:', error);
@@ -365,7 +321,6 @@ export const airtableService = {
 
   async getGalleryPhotosByWallet(walletAddress: string): Promise<GalleryPhoto[]> {
     try {
-      console.log('Getting gallery photos for wallet:', walletAddress);
       const response = await fetch(`${API_BASE_URL}/f1meme/gallery/wallet/${walletAddress}`, {
         method: 'GET',
         headers: {
@@ -380,7 +335,6 @@ export const airtableService = {
       }
 
       const data = await response.json();
-      console.log('Gallery photos by wallet data:', data);
 
       return (data.photos || []).map((photo: any) => ({
         id: photo.id,
@@ -398,7 +352,6 @@ export const airtableService = {
 
   async deleteGalleryPhoto(id: string): Promise<void> {
     try {
-      console.log('Deleting gallery photo:', id);
       const response = await fetch(`${API_BASE_URL}/f1meme/gallery/${id}`, {
         method: 'DELETE',
     headers: {
@@ -412,7 +365,6 @@ export const airtableService = {
         throw new Error(`Delete gallery photo failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
-      console.log('Gallery photo deleted successfully');
     } catch (error) {
       console.error('Error deleting gallery photo:', error);
       throw error;
