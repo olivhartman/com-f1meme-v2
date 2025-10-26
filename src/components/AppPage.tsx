@@ -10,7 +10,6 @@ import { airtableService } from "../api/airtable"
 import { isCurrentUserAdmin } from "../lib/admin"
 import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react"
 import { Program, AnchorProvider, setProvider } from "@coral-xyz/anchor"
-import { PublicKey } from "@solana/web3.js"
 import idl from "../idl/boxbox.json"
 import type { F1boxbox } from "../types/boxbox"
 import Loader from "./Loader"
@@ -50,34 +49,33 @@ export default function Home() {
     return provider ? new Program<F1boxbox>(idl_object, provider) : null
   }
 
-  // Sync membership level to Airtable when user visits homepage
+  // Sync membership levels for ALL users when user visits homepage
   useEffect(() => {
-    const syncMembershipLevel = async () => {
-      if (!publicKey) return
-      
+    const syncAllUsersMembershipLevels = async () => {
       try {
         const program = getProgram()
         if (!program) return
 
-        // Add a small delay to ensure blockchain data is loaded
+        // Add a delay to ensure blockchain data is loaded
         await new Promise(resolve => setTimeout(resolve, 1000))
 
-        // Get user's membership account
-        const [membershipAccountPda] = await PublicKey.findProgramAddress(
-          [Buffer.from("membership_account"), publicKey.toBuffer()],
-          program.programId,
-        )
+        // Fetch ALL membership accounts from the blockchain
+        const allAccounts = await program.account.membershipAccount.all()
+        console.log(`Found ${allAccounts.length} membership accounts on blockchain`)
 
-        // Check if membership account exists first
-        const membershipAccountInfo = await connection.getAccountInfo(membershipAccountPda)
-        if (!membershipAccountInfo) {
-          // console.log('Membership account does not exist, setting level to 0')
-          // Only set to 0 if account truly doesn't exist
+        // Sync each account's level to Airtable
+        for (const accountData of allAccounts) {
           try {
-            const existingProfile = await airtableService.getProfile(publicKey.toBase58())
+            const walletAddress = accountData.account.owner.toBase58()
+            const membershipLevel = accountData.account.level
+
+            // Get existing profile data from Airtable
+            const existingProfile = await airtableService.getProfile(walletAddress)
+            
+            // Update Airtable with current level and existing profile data
             await airtableService.upsertProfile({ 
-              walletAddress: publicKey.toBase58(), 
-              membershipLevel: 0,
+              walletAddress: walletAddress, 
+              membershipLevel: membershipLevel,
               name: existingProfile?.name || "",
               email: existingProfile?.email || "",
               instagramUrl: existingProfile?.instagramUrl || "",
@@ -86,93 +84,26 @@ export default function Home() {
               profilePictureUrl: existingProfile?.profilePictureUrl || "",
               coverPictureUrl: existingProfile?.coverPictureUrl || "",
             })
-            console.info('Membership account not found, set level to 0 in Airtable')
-          } catch (profileError) {
-            console.error('Failed to get existing profile:', profileError)
-            // If we can't get the profile, just update the level without other fields
-            await airtableService.upsertProfile({ 
-              walletAddress: publicKey.toBase58(), 
-              membershipLevel: 0,
-              name: "",
-              email: "",
-              instagramUrl: "",
-              tiktokUrl: "",
-              tgUrl: "",
-            })
+            
+            console.log(`Synced level ${membershipLevel} for wallet: ${walletAddress}`)
+          } catch (userError) {
+            console.error('Failed to sync user:', userError)
           }
-          return
         }
 
-        // Fetch account info to get current level
-        const accountInfo = await program.account.membershipAccount.fetch(membershipAccountPda)
-        const currentLevel = accountInfo.level
-
-        // console.log('Current blockchain level:', currentLevel)
-
-        // Get existing profile data from Airtable
-        const existingProfile = await airtableService.getProfile(publicKey.toBase58())
-        
-        // Update Airtable with current level and existing profile data
-        await airtableService.upsertProfile({ 
-          walletAddress: publicKey.toBase58(), 
-          membershipLevel: currentLevel,
-          name: existingProfile?.name || "",
-          email: existingProfile?.email || "",
-          instagramUrl: existingProfile?.instagramUrl || "",
-          tiktokUrl: existingProfile?.tiktokUrl || "",
-          tgUrl: existingProfile?.tgUrl || "",
-          profilePictureUrl: existingProfile?.profilePictureUrl || "",
-          coverPictureUrl: existingProfile?.coverPictureUrl || "",
-        })
-        
-        // console.log('Membership level synced to Airtable:', currentLevel)
+        console.log('All users synced successfully!')
       } catch (error: any) {
-        const errorMsg = String(error)
-        if (errorMsg.includes('Account does not exist') || errorMsg.includes('has no data')) {
-          // Handle gracefully: set level to 0
-          try {
-            const existingProfile = await airtableService.getProfile(publicKey.toBase58())
-            await airtableService.upsertProfile({ 
-              walletAddress: publicKey.toBase58(), 
-              membershipLevel: 0,
-              name: existingProfile?.name || "",
-              email: existingProfile?.email || "",
-              instagramUrl: existingProfile?.instagramUrl || "",
-              tiktokUrl: existingProfile?.tiktokUrl || "",
-              tgUrl: existingProfile?.tgUrl || "",
-              profilePictureUrl: existingProfile?.profilePictureUrl || "",
-              coverPictureUrl: existingProfile?.coverPictureUrl || "",
-            })
-            console.info('Membership account not found, set level to 0 in Airtable')
-          } catch (profileError) {
-            console.error('Failed to get existing profile:', profileError)
-            // If we can't get the profile, just update the level without other fields
-            await airtableService.upsertProfile({ 
-              walletAddress: publicKey.toBase58(), 
-              membershipLevel: 0,
-              name: "",
-              email: "",
-              instagramUrl: "",
-              tiktokUrl: "",
-              tgUrl: "",
-            })
-          }
-        } else {
-          console.error('Failed to sync membership level:', error)
-          // Don't set to 0 for other errors - just log them
-        }
+        console.error('Failed to sync all users:', error)
       }
     }
 
-    if (publicKey) {
-      // Add a delay to ensure wallet is fully connected
-      const timer = setTimeout(() => {
-        syncMembershipLevel()
-      }, 2000) // Wait 2 seconds for wallet to fully connect
+    // Run sync when page loads (not dependent on publicKey)
+    const timer = setTimeout(() => {
+      syncAllUsersMembershipLevels()
+    }, 2000) // Wait 2 seconds for wallet to fully connect
 
-      return () => clearTimeout(timer)
-    }
-  }, [publicKey, connection])
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     const timer = setTimeout(() => {
