@@ -439,16 +439,16 @@ useEffect(() => {
 
         await sendTransaction(tx, connection)
 
-        // Wait 5 seconds before showing success
-        await new Promise(resolve => setTimeout(resolve, 5000))
-
-        // setMessageWithType(t.messages.membershipAccountCreated, "success"), transactionSignature
-        setMembershipAccount(membershipAccountPda)
-        setIsMembershipInitialized(true)
-      } else {
-        // Wait 5 seconds before showing success
+        // Wait 5 seconds to ensure the account is fully created on the blockchain
         await new Promise(resolve => setTimeout(resolve, 5000))
         
+        // Verify the account exists before marking as initialized
+        const verifyInfo = await connection.getAccountInfo(membershipAccountPda)
+        if (verifyInfo) {
+          setMembershipAccount(membershipAccountPda)
+          setIsMembershipInitialized(true)
+        }
+      } else {
         setMembershipAccount(membershipAccountPda)
         setIsMembershipInitialized(true)
       }
@@ -515,16 +515,17 @@ useEffect(() => {
                 throw new Error('Transaction failed to confirm')
             }
 
-            // Wait 5 seconds before showing success
-            await new Promise(resolve => setTimeout(resolve, 5000))
-
-            setEscrowAccount(escrowTokenAccountPda)
-            setIsEscrowInitialized(true)
-            // setMessageWithType(t.messages.vaultCreated, "success", signature)
-        } else {
-            // Wait 5 seconds before showing success
+            // Wait 5 seconds to ensure the vault is fully created on the blockchain
             await new Promise(resolve => setTimeout(resolve, 5000))
             
+            // Verify the vault exists before marking as initialized
+            const verifyVaultInfo = await connection.getAccountInfo(escrowTokenAccountPda)
+            if (verifyVaultInfo) {
+              setEscrowAccount(escrowTokenAccountPda)
+              setIsEscrowInitialized(true)
+            }
+            // setMessageWithType(t.messages.vaultCreated, "success", signature)
+        } else {
             setEscrowAccount(escrowTokenAccountPda)
             setIsEscrowInitialized(true)
         }
