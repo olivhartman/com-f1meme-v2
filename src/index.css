@@ -50,6 +50,30 @@ body {
   font-size: 1.1rem;         /* slightly larger for readability */
   line-height: 1.7;          /* more line spacing for readability */
   letter-spacing: 0.01em;    /* subtle letter spacing */
+  width: 100%;
+  position: relative;
+}
+
+/* Prevent horizontal scroll and zoom on input focus */
+html {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* Prevent font size adjustment on iOS */
+input, textarea, select {
+  font-size: 16px !important;
+}
+
+/* Additional mobile-specific fixes */
+@media screen and (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {
