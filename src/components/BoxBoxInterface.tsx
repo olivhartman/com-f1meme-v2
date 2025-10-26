@@ -99,6 +99,8 @@ const BoxBoxInterface: React.FC = () => {
 
   const [messages, setMessages] = useState<Array<{ text: React.ReactNode; type: "success" | "error" | "info" }>>([])
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isCreatingMembership, setIsCreatingMembership] = useState(false);
+  const [isCreatingVault, setIsCreatingVault] = useState(false);
 
   const [unlockingLockId, setUnlockingLockId] = useState<number | null>(null);
   const [totalLockedTokens, setTotalLockedTokens] = useAtom(totalLockedTokensAtom);
@@ -406,14 +408,19 @@ useEffect(() => {
   const initializeMembershipAccount = async () => {
     const program = getProgram()
 
-    if (!program || !wallet?.publicKey) return
+    if (!program || !wallet?.publicKey || isCreatingMembership) return
 
-    balance = await connection.getBalance(wallet.publicKey)
-      // console.log(`Balance: ${balance / LAMPORTS_PER_SOL} SOL`);
-
-    if (balance < 0.00016) return setMessageWithType(t.messages.needSolForAccount, "info")
+    setIsCreatingMembership(true)
 
     try {
+      balance = await connection.getBalance(wallet.publicKey)
+      // console.log(`Balance: ${balance / LAMPORTS_PER_SOL} SOL`);
+
+      if (balance < 0.00016) {
+        setMessageWithType(t.messages.needSolForAccount, "info")
+        setIsCreatingMembership(false)
+        return
+      }
 
         ;[membershipAccountPda] = await PublicKey.findProgramAddressSync(
           [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
@@ -446,6 +453,8 @@ useEffect(() => {
       else if (!error?.toString().includes("failed to get info about account")) {
         setMessageWithType(`${t.messages.errorCreatingAccount} ${error}`, "error")
       }
+    } finally {
+      setIsCreatingMembership(false)
     }
     // updateAccountInfo()
   }
@@ -453,12 +462,18 @@ useEffect(() => {
   const initializeEscrowAccount = async () => {
     const program = getProgram()
 
-    if (!program || !wallet?.publicKey) return
+    if (!program || !wallet?.publicKey || isCreatingVault) return
 
-    balance = await connection.getBalance(wallet.publicKey)
-    if (balance < 0.00016) return setMessageWithType(t.messages.needSolForVault, "info")
+    setIsCreatingVault(true)
 
     try {
+      balance = await connection.getBalance(wallet.publicKey)
+      if (balance < 0.00016) {
+        setMessageWithType(t.messages.needSolForVault, "info")
+        setIsCreatingVault(false)
+        return
+      }
+
         ;[membershipAccountPda] = await PublicKey.findProgramAddressSync(
           [Buffer.from("membership_account"), wallet.publicKey.toBuffer()],
           program.programId,
@@ -509,6 +524,8 @@ useEffect(() => {
         } else if (!error?.toString().includes("failed to get info about account")) {
             setMessageWithType(`${t.messages.errorCreatingVault} ${error}`, "error")
         }
+    } finally {
+      setIsCreatingVault(false)
     }
   }
 
@@ -1004,10 +1021,17 @@ useEffect(() => {
                     {!isMembershipInitialized && (
                       <button
                         onClick={initializeMembershipAccount}
-                        disabled={isProcessing}
-                        className="mt-2 w-full py-2 px-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-md text-sm font-medium transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+                        disabled={isCreatingMembership || isProcessing}
+                        className="mt-2 w-full py-2 px-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-md text-sm font-medium transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
-                        {isProcessing ? t.additional.processing : t.additional.createAccount}
+                        {isCreatingMembership ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-700 border-t-transparent"></div>
+                            <span>Creating...</span>
+                          </>
+                        ) : (
+                          t.additional.createAccount
+                        )}
                       </button>
                     )}
                   </div>
@@ -1027,10 +1051,17 @@ useEffect(() => {
                     {!isEscrowInitialized && (
                       <button
                         onClick={initializeEscrowAccount}
-                        disabled={isProcessing || !isMembershipInitialized}
-                        className="mt-2 w-full py-2 px-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-md text-sm font-medium transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+                        disabled={isCreatingVault || isProcessing || !isMembershipInitialized}
+                        className="mt-2 w-full py-2 px-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-md text-sm font-medium transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
-                        {isProcessing ? t.additional.processing : t.additional.createVault}
+                        {isCreatingVault ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-700 border-t-transparent"></div>
+                            <span>Creating...</span>
+                          </>
+                        ) : (
+                          t.additional.createVault
+                        )}
                       </button>
                     )}
                     {showTooltip && (
