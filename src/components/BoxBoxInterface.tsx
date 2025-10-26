@@ -439,10 +439,16 @@ useEffect(() => {
 
         await sendTransaction(tx, connection)
 
+        // Wait 5 seconds before showing success
+        await new Promise(resolve => setTimeout(resolve, 5000))
+
         // setMessageWithType(t.messages.membershipAccountCreated, "success"), transactionSignature
         setMembershipAccount(membershipAccountPda)
         setIsMembershipInitialized(true)
       } else {
+        // Wait 5 seconds before showing success
+        await new Promise(resolve => setTimeout(resolve, 5000))
+        
         setMembershipAccount(membershipAccountPda)
         setIsMembershipInitialized(true)
       }
@@ -509,10 +515,16 @@ useEffect(() => {
                 throw new Error('Transaction failed to confirm')
             }
 
+            // Wait 5 seconds before showing success
+            await new Promise(resolve => setTimeout(resolve, 5000))
+
             setEscrowAccount(escrowTokenAccountPda)
             setIsEscrowInitialized(true)
             // setMessageWithType(t.messages.vaultCreated, "success", signature)
         } else {
+            // Wait 5 seconds before showing success
+            await new Promise(resolve => setTimeout(resolve, 5000))
+            
             setEscrowAccount(escrowTokenAccountPda)
             setIsEscrowInitialized(true)
         }
