@@ -52,6 +52,8 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
   const [showQR, setShowQR] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
   const [qrError, setQrError] = useState<string | null>(null)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
   
   const handleCopy = () => {
     if (member.walletAddress) {
@@ -111,12 +113,25 @@ const MemberCard = ({ member }: { member: ProfileData }) => {
       <div className="relative">
         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-red-500 p-1 group-hover:scale-105 transition-transform duration-300">
           <div className="w-full h-full rounded-full overflow-hidden bg-slate-800 flex items-center justify-center">
-            {member.profilePictureUrl ? (
-              <img
-                src={member.profilePictureUrl || "/placeholder.svg"}
-                alt={`${member.name || "Member"} profile`}
-                className="w-full h-full object-cover"
-              />
+            {member.profilePictureUrl && !imageError ? (
+              <>
+                {!imageLoaded && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-yellow-400/20 to-red-500/20">
+                    <Users className="w-8 h-8 text-yellow-400" />
+                  </div>
+                )}
+                <img
+                  src={member.profilePictureUrl}
+                  alt={`${member.name || "Member"} profile`}
+                  className={`w-full h-full object-cover ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  onLoad={() => setImageLoaded(true)}
+                  onError={() => {
+                    setImageError(true)
+                    setImageLoaded(false)
+                  }}
+                  key={member.walletAddress}
+                />
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-yellow-400/20 to-red-500/20">
                 <Users className="w-8 h-8 text-yellow-400" />
