@@ -301,15 +301,15 @@ const Community: React.FC = () => {
   const [members, setMembers] = useState<ProfileData[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState(8)
+  const [perPage, setPerPage] = useState(20)
 
   // Responsive perPage
   useEffect(() => {
     function handleResize() {
       if (window.innerWidth < 640) {
-        setPerPage(5)
+        setPerPage(10)
       } else {
-        setPerPage(8)
+        setPerPage(20)
       }
     }
     handleResize()
