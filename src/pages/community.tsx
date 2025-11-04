@@ -307,9 +307,9 @@ const Community: React.FC = () => {
   useEffect(() => {
     function handleResize() {
       if (window.innerWidth < 640) {
-        setPerPage(10)
+        setPerPage(200)
       } else {
-        setPerPage(20)
+        setPerPage(200)
       }
     }
     handleResize()
