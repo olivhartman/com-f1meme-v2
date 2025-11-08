@@ -31,12 +31,13 @@ import { useTranslation } from "../i18n/TranslationContext"
 // const programID = new PublicKey("AdMkR6N759U4gDR16XmGfScZJJoQAHsYmeo8RvXJJDch")
 const tokenMint = new PublicKey("A5D4sQ3gWgM7QHFRyo3ZavKa9jMjkfHSNR6rX5TNJB8y")
 const MAX_ACTIVE_VAULTS = 99
-const MIN_REQUIRED_SOL = 0.02 * LAMPORTS_PER_SOL
+const MIN_SOL_FOR_NEW_SETUP = LAMPORTS_PER_SOL / 25 // 0.04 SOL
+const MIN_SOL_FOR_PARTIAL_SETUP = LAMPORTS_PER_SOL / 50 // 0.02 SOL
+const MIN_SOL_FOR_TRANSACTIONS = LAMPORTS_PER_SOL / 6250 // 0.00016 SOL
 const idl_object = JSON.parse(JSON.stringify(idl))
 let NUMBER_OF_TX: number
 let unlockTokens: (arg0: number) => void
 let checkMembershipAccount: () => void
-let balance: number;
 
 const formatNumber = (num: number): string => {
   // Split the number into whole and decimal parts
@@ -414,10 +415,10 @@ useEffect(() => {
     setIsCreatingMembership(true)
 
     try {
-      balance = await connection.getBalance(wallet.publicKey)
-      // console.log(`Balance: ${balance / LAMPORTS_PER_SOL} SOL`);
+      const solBalance = await connection.getBalance(wallet.publicKey)
+      const requiredBalance = !isMembershipInitialized && !isEscrowInitialized ? MIN_SOL_FOR_NEW_SETUP : MIN_SOL_FOR_PARTIAL_SETUP
 
-      if (balance < MIN_REQUIRED_SOL) {
+      if (solBalance < requiredBalance) {
         setMessageWithType(t.messages.needSolForAccount, "info")
         setIsCreatingMembership(false)
         return
@@ -474,8 +475,10 @@ useEffect(() => {
     setIsCreatingVault(true)
 
     try {
-      balance = await connection.getBalance(wallet.publicKey)
-      if (balance < MIN_REQUIRED_SOL) {
+      const solBalance = await connection.getBalance(wallet.publicKey)
+      const requiredBalance = !isMembershipInitialized && !isEscrowInitialized ? MIN_SOL_FOR_NEW_SETUP : MIN_SOL_FOR_PARTIAL_SETUP
+
+      if (solBalance < requiredBalance) {
         setMessageWithType(t.messages.needSolForVault, "info")
         setIsCreatingVault(false)
         return
@@ -600,9 +603,8 @@ useEffect(() => {
     if (!program || !wallet?.publicKey) return
 
     const solBalance = await connection.getBalance(wallet.publicKey)
-    balance = solBalance
 
-    if (solBalance < MIN_REQUIRED_SOL) {
+    if (solBalance < MIN_SOL_FOR_TRANSACTIONS) {
       setMessageWithType(t.messages.needSolForTransactions, "info")
       return
     }
@@ -737,9 +739,8 @@ useEffect(() => {
     if (!program || !wallet?.publicKey || !membershipAccount || !escrowAccount) return
 
     const solBalance = await connection.getBalance(wallet.publicKey)
-    balance = solBalance
 
-    if (solBalance < MIN_REQUIRED_SOL) {
+    if (solBalance < MIN_SOL_FOR_TRANSACTIONS) {
       setMessageWithType(t.messages.needSolForTransactions, "info")
       return
     }
