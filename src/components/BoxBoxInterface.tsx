@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from "react"
 import { useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui"
 import { Program, AnchorProvider, utils, setProvider } from "@coral-xyz/anchor"
-import { PublicKey } from "@solana/web3.js"
+import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js"
 import idl from "../idl/boxbox.json"
 import type { F1boxbox } from "../types/boxbox"
 import BN from "bn.js"
@@ -598,7 +598,13 @@ useEffect(() => {
     const program = getProgram()
     if (!program || !wallet?.publicKey) return
 
-    if (balance < 0.00016) return setMessageWithType(t.messages.needSolForTransactions, "info")
+    const solBalance = await connection.getBalance(wallet.publicKey)
+    balance = solBalance
+
+    if (solBalance < 0.02 * LAMPORTS_PER_SOL) {
+      setMessageWithType(t.messages.needSolForTransactions, "info")
+      return
+    }
 
     try {
       // Check if membership account has been created
@@ -728,6 +734,14 @@ useEffect(() => {
   unlockTokens = async (lockIndex: number) => {
     const program = getProgram()
     if (!program || !wallet?.publicKey || !membershipAccount || !escrowAccount) return
+
+    const solBalance = await connection.getBalance(wallet.publicKey)
+    balance = solBalance
+
+    if (solBalance < 0.02 * LAMPORTS_PER_SOL) {
+      setMessageWithType(t.messages.needSolForTransactions, "info")
+      return
+    }
 
     const lock = locks.find((lock) => lock.id === lockIndex)
     // console.log('vault details: ', lock);
