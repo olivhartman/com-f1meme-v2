@@ -31,6 +31,7 @@ import { useTranslation } from "../i18n/TranslationContext"
 // const programID = new PublicKey("AdMkR6N759U4gDR16XmGfScZJJoQAHsYmeo8RvXJJDch")
 const tokenMint = new PublicKey("A5D4sQ3gWgM7QHFRyo3ZavKa9jMjkfHSNR6rX5TNJB8y")
 const MAX_ACTIVE_VAULTS = 99
+const MIN_REQUIRED_SOL = 0.02 * LAMPORTS_PER_SOL
 const idl_object = JSON.parse(JSON.stringify(idl))
 let NUMBER_OF_TX: number
 let unlockTokens: (arg0: number) => void
@@ -416,7 +417,7 @@ useEffect(() => {
       balance = await connection.getBalance(wallet.publicKey)
       // console.log(`Balance: ${balance / LAMPORTS_PER_SOL} SOL`);
 
-      if (balance < 0.00016) {
+      if (balance < MIN_REQUIRED_SOL) {
         setMessageWithType(t.messages.needSolForAccount, "info")
         setIsCreatingMembership(false)
         return
@@ -474,7 +475,7 @@ useEffect(() => {
 
     try {
       balance = await connection.getBalance(wallet.publicKey)
-      if (balance < 0.00016) {
+      if (balance < MIN_REQUIRED_SOL) {
         setMessageWithType(t.messages.needSolForVault, "info")
         setIsCreatingVault(false)
         return
@@ -601,7 +602,7 @@ useEffect(() => {
     const solBalance = await connection.getBalance(wallet.publicKey)
     balance = solBalance
 
-    if (solBalance < 0.02 * LAMPORTS_PER_SOL) {
+    if (solBalance < MIN_REQUIRED_SOL) {
       setMessageWithType(t.messages.needSolForTransactions, "info")
       return
     }
@@ -738,7 +739,7 @@ useEffect(() => {
     const solBalance = await connection.getBalance(wallet.publicKey)
     balance = solBalance
 
-    if (solBalance < 0.02 * LAMPORTS_PER_SOL) {
+    if (solBalance < MIN_REQUIRED_SOL) {
       setMessageWithType(t.messages.needSolForTransactions, "info")
       return
     }
