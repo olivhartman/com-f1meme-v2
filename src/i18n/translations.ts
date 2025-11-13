@@ -482,7 +482,7 @@ export const translations: Record<string, Translations> = {
       // Error messages
       walletNotConnected: "Wallet not connected.",
       errorCheckingMembershipAccount: "Error checking membership account:",
-      needSolForAccount: "You need at least 0.04 SOL if you have not created your vault yet, or 0.02 SOL if the vault already exists. Add SOL, then disconnect and reconnect your wallet to try again.",
+      needSolForAccount: "You need at least 0.04 SOL to start create account & safety vault. Disconnect and reconnect your wallet to try again.",
       rejectedCreateAccount: "You rejected the request to create your membership account",
       errorCreatingAccount: "Error creating account:",
       needSolForVault: "You need at least 0.02 SOL to create your vault. Add SOL, then disconnect and reconnect your wallet to try again.",
@@ -811,7 +811,7 @@ export const translations: Record<string, Translations> = {
       // Error messages
       walletNotConnected: "钱包未连接。",
       errorCheckingMembershipAccount: "检查会员账户时出错：",
-      needSolForAccount: "如果尚未创建保险库，您需要至少0.04 SOL；如果保险库已存在，则需要0.02 SOL。请添加SOL后断开并重新连接钱包再试。",
+      needSolForAccount: "您需要至少0.04 SOL才能开始创建账户和安全保险库。请断开并重新连接钱包再试。",
       rejectedCreateAccount: "您拒绝了创建会员账户的请求",
       errorCreatingAccount: "创建账户时出错：",
       needSolForVault: "创建保险库需要至少0.02 SOL。请添加SOL后断开并重新连接钱包再试。",
