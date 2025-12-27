@@ -1,7 +1,7 @@
 import { cloudinaryService } from './cloudinary';
 
 // Backend API base URL
-const API_BASE_URL = 'https://boxbox.wtf';
+const API_BASE_URL = ' https://boxbox-prediction.up.railway.app';
 
 export interface ProfileData {
   name: string;
@@ -319,7 +319,7 @@ export const airtableService = {
       
       // Check if it's a CORS error
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        const corsError = new Error('CORS error: The server at boxbox.wtf is not allowing requests from this domain. Please contact the server administrator to add CORS headers.');
+        const corsError = new Error('CORS error: The server at  https://boxbox-prediction.up.railway.app is not allowing requests from this domain. Please contact the server administrator to add CORS headers.');
         corsError.name = 'CORSError';
         throw corsError;
       }
