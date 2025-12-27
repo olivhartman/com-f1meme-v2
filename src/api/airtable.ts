@@ -284,6 +284,7 @@ export const airtableService = {
     try {
       const response = await fetch(`${API_BASE_URL}/f1meme/gallery/all`, {
         method: 'GET',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -315,6 +316,14 @@ export const airtableService = {
       return mappedPhotos;
     } catch (error) {
       console.error('Error getting all gallery photos:', error);
+      
+      // Check if it's a CORS error
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        const corsError = new Error('CORS error: The server at boxbox.wtf is not allowing requests from this domain. Please contact the server administrator to add CORS headers.');
+        corsError.name = 'CORSError';
+        throw corsError;
+      }
+      
       throw error;
     }
   },
